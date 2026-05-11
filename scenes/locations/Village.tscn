@@ -1,0 +1,468 @@
+[gd_scene format=3 uid="uid://22h0r7k8d70n"]
+
+[ext_resource type="PackedScene" uid="uid://b5516dth7xd2g" path="res://scenes/blocks/village_ground_stone_block.tscn" id="1_as1ji"]
+[ext_resource type="PackedScene" uid="uid://behcp4l382nne" path="res://scenes/blocks/village_ground_grass_block.tscn" id="2_3bmxx"]
+[ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="2_ravw6"]
+[ext_resource type="PackedScene" uid="uid://bowhle1cbirje" path="res://scenes/buildings/village_lamp_post.tscn" id="3_8dl0j"]
+[ext_resource type="PackedScene" uid="uid://dsi08b8fw851n" path="res://scenes/buildings/miners_cottage.tscn" id="4_kxkoh"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3bmxx"]
+sky_top_color = Color(0.14509805, 0.22352941, 0.38431373, 1)
+sky_horizon_color = Color(0.8392157, 0.6117647, 0.3764706, 1)
+sky_curve = 0.18
+ground_bottom_color = Color(0.07450981, 0.105882354, 0.08235294, 1)
+ground_horizon_color = Color(0.53333336, 0.3764706, 0.24705882, 1)
+sun_angle_max = 32.0
+
+[sub_resource type="Sky" id="Sky_0glln"]
+sky_material = SubResource("ProceduralSkyMaterial_3bmxx")
+
+[sub_resource type="Environment" id="Environment_aip1x"]
+background_mode = 2
+sky = SubResource("Sky_0glln")
+ambient_light_source = 2
+ambient_light_color = Color(0.39215687, 0.30980393, 0.23529412, 1)
+ambient_light_sky_contribution = 0.55
+ambient_light_energy = 0.28
+tonemap_mode = 2
+tonemap_exposure = 0.92
+tonemap_white = 5.5
+glow_enabled = true
+glow_intensity = 0.18
+glow_strength = 0.45
+fog_enabled = true
+fog_light_color = Color(0.7411765, 0.5647059, 0.36862746, 1)
+fog_light_energy = 0.28
+fog_sun_scatter = 0.18
+fog_density = 0.012
+fog_sky_affect = 0.35
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_8dl0j"]
+exposure_multiplier = 1.08
+
+[sub_resource type="Compositor" id="Compositor_tx7ar"]
+
+[node name="Village" type="Node3D" unique_id=1678694081]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1515792633]
+environment = SubResource("Environment_aip1x")
+camera_attributes = SubResource("CameraAttributesPractical_8dl0j")
+compositor = SubResource("Compositor_tx7ar")
+
+[node name="Grounds" type="Node3D" parent="." unique_id=1653731533]
+
+[node name="Stone" type="Node3D" parent="Grounds" unique_id=1877903512]
+
+[node name="VillageGroundStoneBlock" parent="Grounds/Stone" unique_id=341660718 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+
+[node name="VillageGroundStoneBlock2" parent="Grounds/Stone" unique_id=1616253419 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="VillageGroundStoneBlock3" parent="Grounds/Stone" unique_id=240524545 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
+
+[node name="VillageGroundStoneBlock4" parent="Grounds/Stone" unique_id=1625233926 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
+
+[node name="VillageGroundStoneBlock5" parent="Grounds/Stone" unique_id=1420125839 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+
+[node name="VillageGroundStoneBlock6" parent="Grounds/Stone" unique_id=595973026 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+
+[node name="VillageGroundStoneBlock7" parent="Grounds/Stone" unique_id=1091940648 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+
+[node name="VillageGroundStoneBlock8" parent="Grounds/Stone" unique_id=1800011692 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
+
+[node name="VillageGroundStoneBlock9" parent="Grounds/Stone" unique_id=892153381 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+
+[node name="VillageGroundStoneBlock10" parent="Grounds/Stone" unique_id=1629331784 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="VillageGroundStoneBlock11" parent="Grounds/Stone" unique_id=1712787636 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
+
+[node name="VillageGroundStoneBlock12" parent="Grounds/Stone" unique_id=659664443 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 4)
+
+[node name="VillageGroundStoneBlock13" parent="Grounds/Stone" unique_id=2020084282 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
+
+[node name="VillageGroundStoneBlock14" parent="Grounds/Stone" unique_id=1650313029 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="VillageGroundStoneBlock15" parent="Grounds/Stone" unique_id=193702188 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
+
+[node name="VillageGroundStoneBlock16" parent="Grounds/Stone" unique_id=1036501466 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
+
+[node name="VillageGroundStoneBlock17" parent="Grounds/Stone" unique_id=1414941670 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3)
+
+[node name="VillageGroundStoneBlock18" parent="Grounds/Stone" unique_id=1060090464 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 4)
+
+[node name="VillageGroundStoneBlock19" parent="Grounds/Stone" unique_id=1682642941 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
+
+[node name="VillageGroundStoneBlock20" parent="Grounds/Stone" unique_id=567784287 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 4)
+
+[node name="VillageGroundStoneBlock21" parent="Grounds/Stone" unique_id=410567413 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
+
+[node name="VillageGroundStoneBlock22" parent="Grounds/Stone" unique_id=654650023 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
+
+[node name="VillageGroundStoneBlock23" parent="Grounds/Stone" unique_id=1241088025 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
+
+[node name="VillageGroundStoneBlock24" parent="Grounds/Stone" unique_id=515029960 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
+
+[node name="VillageGroundStoneBlock26" parent="Grounds/Stone" unique_id=846345089 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="VillageGroundStoneBlock28" parent="Grounds/Stone" unique_id=1467738591 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
+
+[node name="VillageGroundStoneBlock30" parent="Grounds/Stone" unique_id=1876414847 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+
+[node name="VillageGroundStoneBlock32" parent="Grounds/Stone" unique_id=1675448379 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -2)
+
+[node name="VillageGroundStoneBlock33" parent="Grounds/Stone" unique_id=1163615820 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+
+[node name="VillageGroundStoneBlock34" parent="Grounds/Stone" unique_id=122246341 instance=ExtResource("1_as1ji")]
+
+[node name="VillageGroundStoneBlock35" parent="Grounds/Stone" unique_id=1108661294 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+
+[node name="VillageGroundStoneBlock36" parent="Grounds/Stone" unique_id=1698604713 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+
+[node name="VillageGroundStoneBlock38" parent="Grounds/Stone" unique_id=595063846 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+
+[node name="VillageGroundStoneBlock40" parent="Grounds/Stone" unique_id=869231816 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -2)
+
+[node name="VillageGroundStoneBlock41" parent="Grounds/Stone" unique_id=792806989 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+
+[node name="VillageGroundStoneBlock42" parent="Grounds/Stone" unique_id=1215303922 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+
+[node name="VillageGroundStoneBlock43" parent="Grounds/Stone" unique_id=966566258 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="VillageGroundStoneBlock44" parent="Grounds/Stone" unique_id=1576071623 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+
+[node name="VillageGroundStoneBlock45" parent="Grounds/Stone" unique_id=567276851 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+
+[node name="VillageGroundStoneBlock46" parent="Grounds/Stone" unique_id=1058813745 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+
+[node name="VillageGroundStoneBlock47" parent="Grounds/Stone" unique_id=553340792 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -1)
+
+[node name="VillageGroundStoneBlock48" parent="Grounds/Stone" unique_id=1325897506 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
+
+[node name="VillageGroundStoneBlock27" parent="Grounds/Stone" unique_id=309274752 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="VillageGroundStoneBlock29" parent="Grounds/Stone" unique_id=2118553279 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -3)
+
+[node name="VillageGroundStoneBlock31" parent="Grounds/Stone" unique_id=243320615 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -3)
+
+[node name="VillageGroundStoneBlock37" parent="Grounds/Stone" unique_id=2139398004 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
+
+[node name="VillageGroundStoneBlock39" parent="Grounds/Stone" unique_id=1853774278 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
+
+[node name="VillageGroundStoneBlock49" parent="Grounds/Stone" unique_id=1327275104 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
+
+[node name="VillageGroundStoneBlock50" parent="Grounds/Stone" unique_id=211979323 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+
+[node name="VillageGroundStoneBlock51" parent="Grounds/Stone" unique_id=1530003644 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -4)
+
+[node name="VillageGroundStoneBlock52" parent="Grounds/Stone" unique_id=567903364 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
+
+[node name="VillageGroundStoneBlock53" parent="Grounds/Stone" unique_id=415472691 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -4)
+
+[node name="VillageGroundStoneBlock54" parent="Grounds/Stone" unique_id=730859909 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
+
+[node name="VillageGroundStoneBlock55" parent="Grounds/Stone" unique_id=1295170643 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -4)
+
+[node name="VillageGroundStoneBlock25" parent="Grounds/Stone" unique_id=2066549415 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
+
+[node name="VillageGroundStoneBlock56" parent="Grounds/Stone" unique_id=1381534246 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
+
+[node name="VillageGroundStoneBlock57" parent="Grounds/Stone" unique_id=1190486137 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
+
+[node name="VillageGroundStoneBlock58" parent="Grounds/Stone" unique_id=2056857990 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
+
+[node name="VillageGroundStoneBlock59" parent="Grounds/Stone" unique_id=333328379 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
+
+[node name="VillageGroundStoneBlock60" parent="Grounds/Stone" unique_id=1720636102 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -1)
+
+[node name="VillageGroundStoneBlock61" parent="Grounds/Stone" unique_id=275065382 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="VillageGroundStoneBlock62" parent="Grounds/Stone" unique_id=2116395921 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
+
+[node name="VillageGroundStoneBlock63" parent="Grounds/Stone" unique_id=1028171941 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
+
+[node name="VillageGroundStoneBlock64" parent="Grounds/Stone" unique_id=1771486934 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1)
+
+[node name="VillageGroundStoneBlock65" parent="Grounds/Stone" unique_id=1975883341 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
+
+[node name="VillageGroundStoneBlock66" parent="Grounds/Stone" unique_id=1029882168 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
+
+[node name="VillageGroundStoneBlock67" parent="Grounds/Stone" unique_id=115223073 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4)
+
+[node name="VillageGroundStoneBlock68" parent="Grounds/Stone" unique_id=456364280 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -2)
+
+[node name="VillageGroundStoneBlock69" parent="Grounds/Stone" unique_id=1487384060 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1)
+
+[node name="VillageGroundStoneBlock70" parent="Grounds/Stone" unique_id=224260882 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+
+[node name="VillageGroundStoneBlock71" parent="Grounds/Stone" unique_id=819975366 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -3)
+
+[node name="VillageGroundStoneBlock72" parent="Grounds/Stone" unique_id=1848285134 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -4)
+
+[node name="VillageGroundStoneBlock73" parent="Grounds/Stone" unique_id=781197685 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 1)
+
+[node name="VillageGroundStoneBlock74" parent="Grounds/Stone" unique_id=1764367280 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
+
+[node name="VillageGroundStoneBlock75" parent="Grounds/Stone" unique_id=898346510 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
+
+[node name="VillageGroundStoneBlock76" parent="Grounds/Stone" unique_id=1251369789 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
+
+[node name="VillageGroundStoneBlock77" parent="Grounds/Stone" unique_id=96363052 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)
+
+[node name="VillageGroundStoneBlock78" parent="Grounds/Stone" unique_id=1900313946 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -1)
+
+[node name="VillageGroundStoneBlock79" parent="Grounds/Stone" unique_id=1728413252 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="VillageGroundStoneBlock80" parent="Grounds/Stone" unique_id=389356795 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -3)
+
+[node name="VillageGroundStoneBlock81" parent="Grounds/Stone" unique_id=1590989708 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -4)
+
+[node name="VillageGroundStoneBlock82" parent="Grounds/Stone" unique_id=1773932633 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
+
+[node name="VillageGroundStoneBlock83" parent="Grounds/Stone" unique_id=56382612 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
+
+[node name="VillageGroundStoneBlock84" parent="Grounds/Stone" unique_id=2079099600 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
+
+[node name="VillageGroundStoneBlock85" parent="Grounds/Stone" unique_id=372378272 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 4)
+
+[node name="VillageGroundStoneBlock86" parent="Grounds/Stone" unique_id=1655377633 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -2)
+
+[node name="VillageGroundStoneBlock87" parent="Grounds/Stone" unique_id=1906237556 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
+
+[node name="VillageGroundStoneBlock88" parent="Grounds/Stone" unique_id=1494249797 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
+
+[node name="VillageGroundStoneBlock89" parent="Grounds/Stone" unique_id=196766133 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
+
+[node name="VillageGroundStoneBlock90" parent="Grounds/Stone" unique_id=1503935756 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
+
+[node name="VillageGroundStoneBlock91" parent="Grounds/Stone" unique_id=297142303 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="VillageGroundStoneBlock92" parent="Grounds/Stone" unique_id=797934925 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 5)
+
+[node name="VillageGroundStoneBlock93" parent="Grounds/Stone" unique_id=162234391 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 5)
+
+[node name="VillageGroundStoneBlock94" parent="Grounds/Stone" unique_id=1486096017 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 5)
+
+[node name="VillageGroundStoneBlock95" parent="Grounds/Stone" unique_id=1217044222 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 5)
+
+[node name="VillageGroundStoneBlock96" parent="Grounds/Stone" unique_id=684756229 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 5)
+
+[node name="VillageGroundStoneBlock97" parent="Grounds/Stone" unique_id=741866502 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
+
+[node name="VillageGroundStoneBlock98" parent="Grounds/Stone" unique_id=1846418012 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 5)
+
+[node name="VillageGroundStoneBlock99" parent="Grounds/Stone" unique_id=1199008048 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 5)
+
+[node name="VillageGroundStoneBlock100" parent="Grounds/Stone" unique_id=1308285538 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+
+[node name="VillageGroundGrassBlock" parent="Grounds/Stone" unique_id=234625758 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+
+[node name="VillageGroundStoneBlock101" parent="Grounds/Stone" unique_id=233872668 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+
+[node name="VillageGroundStoneBlock102" parent="Grounds/Stone" unique_id=1649644116 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+
+[node name="VillageGroundStoneBlock103" parent="Grounds/Stone" unique_id=576684000 instance=ExtResource("1_as1ji")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
+
+[node name="VillageLampPost" parent="Grounds/Stone" unique_id=62623079 instance=ExtResource("3_8dl0j")]
+transform = Transform3D(-0.99433625, 0, 0.106281474, 0, 1, 0, -0.106281474, 0, -0.99433625, -3.4861777, 0.5282841, 1)
+
+[node name="Grass" type="Node3D" parent="Grounds" unique_id=213363264]
+
+[node name="VillageGroundGrassBlock11" parent="Grounds/Grass" unique_id=1388807500 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
+
+[node name="VillageGroundGrassBlock9" parent="Grounds/Grass" unique_id=1439917876 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -2)
+
+[node name="VillageGroundGrassBlock2" parent="Grounds/Grass" unique_id=538754183 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 4)
+
+[node name="VillageGroundGrassBlock3" parent="Grounds/Grass" unique_id=1607479550 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
+
+[node name="VillageGroundGrassBlock4" parent="Grounds/Grass" unique_id=1017226858 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
+
+[node name="VillageGroundGrassBlock5" parent="Grounds/Grass" unique_id=503417082 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
+
+[node name="VillageGroundGrassBlock6" parent="Grounds/Grass" unique_id=1087152373 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
+
+[node name="VillageGroundGrassBlock7" parent="Grounds/Grass" unique_id=1657716908 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
+
+[node name="VillageGroundGrassBlock8" parent="Grounds/Grass" unique_id=471919239 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
+
+[node name="VillageGroundGrassBlock10" parent="Grounds/Grass" unique_id=240735698 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
+
+[node name="VillageGroundGrassBlock12" parent="Grounds/Grass" unique_id=1672423748 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
+
+[node name="VillageGroundGrassBlock13" parent="Grounds/Grass" unique_id=1471847618 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
+
+[node name="VillageGroundGrassBlock14" parent="Grounds/Grass" unique_id=2146541263 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
+
+[node name="VillageGroundGrassBlock15" parent="Grounds/Grass" unique_id=1215235439 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
+
+[node name="VillageGroundGrassBlock16" parent="Grounds/Grass" unique_id=83680762 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
+
+[node name="VillageGroundGrassBlock17" parent="Grounds/Grass" unique_id=967205607 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
+
+[node name="VillageGroundGrassBlock18" parent="Grounds/Grass" unique_id=1086821180 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="VillageGroundGrassBlock19" parent="Grounds/Grass" unique_id=107370739 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
+
+[node name="VillageGroundGrassBlock20" parent="Grounds/Grass" unique_id=1950268655 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -1)
+
+[node name="VillageGroundGrassBlock21" parent="Grounds/Grass" unique_id=1906698273 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
+
+[node name="VillageGroundGrassBlock22" parent="Grounds/Grass" unique_id=121030315 instance=ExtResource("2_3bmxx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
+
+[node name="Dirty" type="Node3D" parent="Grounds" unique_id=1823282949]
+
+[node name="Wood" type="Node3D" parent="Grounds" unique_id=768524741]
+
+[node name="Buildings" type="Node3D" parent="." unique_id=1526991322]
+
+[node name="NPCs" type="Node3D" parent="." unique_id=809800312]
+
+[node name="Props" type="Node3D" parent="." unique_id=1877085469]
+
+[node name="Lights" type="Node3D" parent="." unique_id=1474033332]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lights" unique_id=84038505]
+transform = Transform3D(0.819152, -0.36868784, 0.43938506, 0, 0.76604444, 0.64278764, -0.57357645, -0.5265408, 0.62750685, -0.23796606, 5.8291597, 0)
+light_color = Color(1, 0.7647059, 0.5058824, 1)
+light_energy = 1.85
+light_angular_distance = 0.8
+shadow_enabled = true
+shadow_bias = 0.025
+shadow_normal_bias = 1.15
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 36.0
+
+[node name="Camera3D" type="Node3D" parent="." unique_id=692381270]
+
+[node name="Camera3D" type="Camera3D" parent="Camera3D" unique_id=2081721068]
+transform = Transform3D(0.70710677, -0.39540908, 0.5862181, 0, 0.8290376, 0.5591929, -0.70710677, -0.39540908, 0.5862181, 3.411, 4.931, 6.541)
+fov = 45.0
+
+[node name="Player" parent="." unique_id=817496980 instance=ExtResource("2_ravw6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
+
+[node name="MinersCottage" parent="." unique_id=1571526993 instance=ExtResource("4_kxkoh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)

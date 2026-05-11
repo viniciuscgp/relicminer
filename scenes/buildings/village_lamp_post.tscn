@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bowhle1cbirje"]
+
+[ext_resource type="PackedScene" uid="uid://cyrxfymw8hrxr" path="res://models/VillageLampPost/VillageLampPost.glb" id="1_8t2jo"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8t2jo"]
+radius = 0.1
+height = 1.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8t2jo"]
+size = Vector3(0.2, 0.457959, 0.1336914)
+
+[node name="VillageLampPost" type="StaticBody3D" unique_id=62623079]
+
+[node name="VillageLampPost" parent="." unique_id=1668744643 instance=ExtResource("1_8t2jo")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=217877824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13225639, -0.011831164, 0)
+shape = SubResource("CapsuleShape3D_8t2jo")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=401585326]
+transform = Transform3D(0.9914767, 0, 0.13028394, 0, 1, 0, -0.13028394, 0, 0.9914767, -0.13594674, 0.3341728, 0.035816226)
+shape = SubResource("BoxShape3D_8t2jo")

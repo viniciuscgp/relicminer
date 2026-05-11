@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://b1jccwntwnqcm"]
+
+[ext_resource type="Script" uid="uid://7nv415bkejq1" path="res://scenes/blocks/block.gd" id="1_8r6n6"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_3gtdk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3gtdk"]
+
+[node name="Block" type="StaticBody3D" unique_id=341660718]
+script = ExtResource("1_8r6n6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1043705401]
+mesh = SubResource("BoxMesh_3gtdk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1472537085]
+shape = SubResource("BoxShape3D_3gtdk")

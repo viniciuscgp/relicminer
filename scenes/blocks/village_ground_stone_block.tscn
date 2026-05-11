@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://b5516dth7xd2g"]
+
+[ext_resource type="PackedScene" uid="uid://bowr7kqsg5nky" path="res://scenes/blocks/village_ground_block.tscn" id="1_agtj4"]
+[ext_resource type="Texture2D" uid="uid://x06yumimjt5s" path="res://textures/village_stone_floor_01_albedo.png" id="2_cj0jv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4h5ld"]
+albedo_texture = ExtResource("2_cj0jv")
+uv1_triplanar = true
+
+[node name="VillageGroundStoneBlock" unique_id=341660718 instance=ExtResource("1_agtj4")]
+
+[node name="MeshInstance3D" parent="." index="0" unique_id=1043705401]
+material_override = SubResource("StandardMaterial3D_4h5ld")

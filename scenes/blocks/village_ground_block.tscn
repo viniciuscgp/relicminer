@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bowr7kqsg5nky"]
+
+[ext_resource type="PackedScene" uid="uid://b1jccwntwnqcm" path="res://scenes/blocks/block.tscn" id="1_q586x"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_q586x"]
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q586x"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3lluu"]
+size = Vector3(1, 0.1, 1)
+
+[node name="Block" unique_id=341660718 instance=ExtResource("1_q586x")]
+
+[node name="MeshInstance3D" parent="." index="0" unique_id=1043705401]
+mesh = SubResource("BoxMesh_q586x")
+surface_material_override/0 = SubResource("StandardMaterial3D_q586x")
+
+[node name="CollisionShape3D" parent="." index="1" unique_id=1472537085]
+shape = SubResource("BoxShape3D_3lluu")

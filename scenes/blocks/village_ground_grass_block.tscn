@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://behcp4l382nne"]
+
+[ext_resource type="PackedScene" uid="uid://bowr7kqsg5nky" path="res://scenes/blocks/village_ground_block.tscn" id="1_86b0i"]
+[ext_resource type="Texture2D" uid="uid://ctmy73s5kccf3" path="res://textures/village_grass_01_albedo.png" id="2_ylh16"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qn05w"]
+specular_mode = 1
+albedo_texture = ExtResource("2_ylh16")
+refraction_scale = 0.0
+uv1_triplanar = true
+
+[node name="VillageGroundGrassBlock" unique_id=341660718 instance=ExtResource("1_86b0i")]
+
+[node name="MeshInstance3D" parent="." index="0" unique_id=1043705401]
+material_override = SubResource("StandardMaterial3D_qn05w")
