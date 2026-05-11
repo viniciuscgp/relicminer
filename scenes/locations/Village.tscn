@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://behcp4l382nne" path="res://scenes/blocks/village_ground_grass_block.tscn" id="2_3bmxx"]
 [ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="2_ravw6"]
 [ext_resource type="PackedScene" uid="uid://bowhle1cbirje" path="res://scenes/buildings/village_lamp_post.tscn" id="3_8dl0j"]
+[ext_resource type="PackedScene" uid="uid://bp3hrmwchhx32" path="res://scenes/buildings/green_tree.tscn" id="3_tx7ar"]
 [ext_resource type="PackedScene" uid="uid://dsi08b8fw851n" path="res://scenes/buildings/miners_cottage.tscn" id="4_kxkoh"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3bmxx"]
@@ -364,9 +365,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
 [node name="VillageGroundStoneBlock103" parent="Grounds/Stone" unique_id=576684000 instance=ExtResource("1_as1ji")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
 
-[node name="VillageLampPost" parent="Grounds/Stone" unique_id=62623079 instance=ExtResource("3_8dl0j")]
-transform = Transform3D(-0.99433625, 0, 0.106281474, 0, 1, 0, -0.106281474, 0, -0.99433625, -3.4861777, 0.5282841, 1)
-
 [node name="Grass" type="Node3D" parent="Grounds" unique_id=213363264]
 
 [node name="VillageGroundGrassBlock11" parent="Grounds/Grass" unique_id=1388807500 instance=ExtResource("2_3bmxx")]
@@ -438,6 +436,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
 
 [node name="Buildings" type="Node3D" parent="." unique_id=1526991322]
 
+[node name="GreenTree" parent="Buildings" unique_id=803132096 instance=ExtResource("3_tx7ar")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
+
+[node name="MinersCottage" parent="Buildings" unique_id=1571526993 instance=ExtResource("4_kxkoh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
+
+[node name="VillageLampPost" parent="Buildings" unique_id=62623079 instance=ExtResource("3_8dl0j")]
+transform = Transform3D(-1.5861144, 0, 0.2103368, 0, 1.6, 0, -0.2103368, 0, -1.5861144, -3.8320377, 1.236627, -1.6974548)
+
 [node name="NPCs" type="Node3D" parent="." unique_id=809800312]
 
 [node name="Props" type="Node3D" parent="." unique_id=1877085469]
@@ -463,6 +470,3 @@ fov = 45.0
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("2_ravw6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
-
-[node name="MinersCottage" parent="." unique_id=1571526993 instance=ExtResource("4_kxkoh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)

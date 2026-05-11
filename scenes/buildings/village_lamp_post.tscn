@@ -10,6 +10,7 @@ height = 1.5
 size = Vector3(0.2, 0.457959, 0.1336914)
 
 [node name="VillageLampPost" type="StaticBody3D" unique_id=62623079]
+transform = Transform3D(1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0)
 
 [node name="VillageLampPost" parent="." unique_id=1668744643 instance=ExtResource("1_8t2jo")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bp3hrmwchhx32"]
+
+[ext_resource type="PackedScene" uid="uid://cx85ifdapw4yw" path="res://models/green-tree/LowPolyMedievalPine.glb" id="1_ynpjl"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ynpjl"]
+radius = 0.2607422
+height = 2.6743164
+
+[node name="GreenTree" type="StaticBody3D" unique_id=803132096]
+
+[node name="LowPolyMedievalPine" parent="." unique_id=758961027 instance=ExtResource("1_ynpjl")]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1675203601]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.021700561, 1.306522, 0.014735758)
+shape = SubResource("CapsuleShape3D_ynpjl")
