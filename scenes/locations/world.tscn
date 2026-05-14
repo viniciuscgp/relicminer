@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://bkf6n8m4qyagk"]
 
-[ext_resource type="Texture2D" uid="uid://ddprscrpsofah" path="res://demo/assets/textures/ground037_alb_ht.png" id="1_321g5"]
-[ext_resource type="Texture2D" uid="uid://c1ots7w6i0i1q" path="res://demo/assets/textures/ground037_nrm_rgh.png" id="2_lc2ud"]
-[ext_resource type="Texture2D" uid="uid://c88j3oj0lf6om" path="res://demo/assets/textures/rock023_alb_ht.png" id="3_cqucs"]
-[ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://demo/assets/textures/rock023_nrm_rgh.png" id="4_1llb7"]
+[ext_resource type="Texture2D" uid="uid://ddprscrpsofah" path="res://textures/terrain/ground037_alb_ht.png" id="1_321g5"]
+[ext_resource type="Texture2D" uid="uid://c1ots7w6i0i1q" path="res://textures/terrain/ground037_nrm_rgh.png" id="2_lc2ud"]
+[ext_resource type="Texture2D" uid="uid://c88j3oj0lf6om" path="res://textures/terrain/rock023_alb_ht.png" id="3_cqucs"]
+[ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://textures/terrain/rock023_nrm_rgh.png" id="4_1llb7"]
 [ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="5_1llb7"]
-[ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://demo/components/Environment.tscn" id="6_d6lop"]
+[ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://scenes/components/Environment.tscn" id="6_d6lop"]
 
 [sub_resource type="Gradient" id="Gradient_cqucs"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -597,9 +597,9 @@ void fragment() {
 
 [sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_jhfow"]
 _shader_parameters = {
-&"auto_base_texture": 0,
+&"auto_base_texture": 1,
 &"auto_height_reduction": 0.1,
-&"auto_overlay_texture": 1,
+&"auto_overlay_texture": 0,
 &"auto_slope": 1.0,
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.5,
@@ -619,8 +619,9 @@ _shader_parameters = {
 &"projection_threshold": 0.8
 }
 world_background = 0
+auto_shader = true
+shader_override_enabled = true
 shader_override = SubResource("Shader_cqucs")
-show_region_grid = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5q4s"]
 transparency = 4
@@ -657,17 +658,15 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [node name="World" type="Node3D" unique_id=1473166930]
 
+[node name="Environment" parent="." unique_id=1202088949 instance=ExtResource("6_d6lop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 265.15833, 0)
+
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1223664392]
 data_directory = "res://terrain_data"
 material = SubResource("Terrain3DMaterial_jhfow")
 assets = SubResource("Terrain3DAssets_1l4sk")
-show_grid = true
-show_region_grid = true
 top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 0.28061646, -0.95982, 0, 0.95982, 0.28061646, 2592.8965, 43.459717, -793.4381)
-
-[node name="Environment" parent="." unique_id=1202088949 instance=ExtResource("6_d6lop")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 265.15833, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83.85336, 71.20421, -577.21936)
