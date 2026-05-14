@@ -45,6 +45,10 @@ def delete_previous() -> None:
             if block.users == 0 and block.name.startswith(PREFIXES):
                 data_group.remove(block)
 
+    for action in list(bpy.data.actions):
+        if action.name.startswith("Player_Basic"):
+            bpy.data.actions.remove(action)
+
 
 def make_collection() -> bpy.types.Collection:
     collection = bpy.data.collections.new(COLLECTION_NAME)
@@ -422,7 +426,8 @@ def add_armature(collection: bpy.types.Collection) -> bpy.types.Object:
     spine = bone("spine", (0, 0, 1.35), (0, 0, 2.2), pelvis)
     neck = bone("neck", (0, 0, 2.2), (0, 0, 2.46), spine)
     head = bone("head", (0, 0, 2.46), (0, 0, 3.2), neck)
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    # Character faces -Y, so its right side is world -X and left side is world +X.
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         upper = bone(f"upper_arm.{side}", (0.28 * sx, 0, 2.08), (0.72 * sx, -0.02, 1.54), spine)
         fore = bone(f"forearm.{side}", (0.72 * sx, -0.02, 1.54), (0.78 * sx, -0.08, 1.05), upper)
         bone(f"hand.{side}", (0.78 * sx, -0.08, 1.05), (0.78 * sx, -0.10, 0.86), fore)
@@ -470,7 +475,7 @@ def build_character() -> dict[str, object]:
     backpack_ctrl = empty("Rig_Backpack_FK", (0.0, 0.35, 1.95), collection, spine)
 
     controls = {"root": rig_root, "pelvis": pelvis, "spine": spine, "head": head_ctrl, "backpack": backpack_ctrl}
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         shoulder = empty(f"Rig_Shoulder_{side}_FK", (0.38 * sx, -0.02, 2.03), collection, spine)
         elbow = empty(f"Rig_Elbow_{side}_FK", (0.72 * sx, -0.06, 1.48), collection, shoulder)
         wrist = empty(f"Rig_Wrist_{side}_FK", (0.75 * sx, -0.10, 1.03), collection, elbow)
@@ -490,12 +495,12 @@ def build_character() -> dict[str, object]:
     neck = cylinder("Player_Neck", 0.13, 0.23, (0, -0.01, 2.34), mats["skin"], collection, vertices=10)
     head = sphere("Player_Head", 1.0, (0.43, 0.37, 0.51), (0.0, -0.04, 2.73), mats["skin"], collection, segments=18, rings=9)
     nose = sphere("Player_Nose", 1.0, (0.055, 0.040, 0.045), (0.0, -0.405, 2.67), mats["skin_shadow"], collection, segments=8, rings=4)
-    ear_l = sphere("Player_Ear_L", 1.0, (0.08, 0.035, 0.12), (-0.43, -0.03, 2.66), mats["skin"], collection, segments=8, rings=4)
-    ear_r = sphere("Player_Ear_R", 1.0, (0.08, 0.035, 0.12), (0.43, -0.03, 2.66), mats["skin"], collection, segments=8, rings=4)
+    ear_r = sphere("Player_Ear_R", 1.0, (0.08, 0.035, 0.12), (-0.43, -0.03, 2.66), mats["skin"], collection, segments=8, rings=4)
+    ear_l = sphere("Player_Ear_L", 1.0, (0.08, 0.035, 0.12), (0.43, -0.03, 2.66), mats["skin"], collection, segments=8, rings=4)
     for obj in (neck, head, nose, ear_l, ear_r):
         parent_keep_transform(obj, head_ctrl)
 
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         eye = sphere(f"Player_Eye_{side}_White", 1.0, (0.062, 0.017, 0.082), (0.135 * sx, -0.397, 2.79), mats["eye_white"], collection, 12, 6)
         iris = sphere(f"Player_Eye_{side}_Iris", 1.0, (0.031, 0.006, 0.043), (0.135 * sx, -0.414, 2.788), mats["iris"], collection, 10, 4)
         pupil = sphere(f"Player_Eye_{side}_Pupil", 1.0, (0.014, 0.004, 0.020), (0.135 * sx, -0.420, 2.788), mats["black"], collection, 8, 4)
@@ -530,7 +535,7 @@ def build_character() -> dict[str, object]:
     for i, pts in enumerate(hair_points, start=1):
         lock = wedge_mesh(f"Player_Hair_Front_Lock_{i:02d}", list(pts), mats["hair"], collection, (0.0, 0.0, 2.75))
         parent_keep_transform(lock, head_ctrl)
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         side_lock = wedge_mesh(
             f"Player_Hair_Side_{side}",
             [(0.33 * sx, -0.15, 2.94), (0.53 * sx, -0.18, 2.69), (0.37 * sx, -0.02, 2.59), (0.28 * sx, -0.03, 2.88)],
@@ -549,20 +554,20 @@ def build_character() -> dict[str, object]:
     for obj in (shirt, vest, belt, buckle, torso_decal_obj, strap):
         parent_keep_transform(obj, spine if obj.location.z > 1.45 else pelvis)
 
-    pouch = cube("Player_Belt_Pouch_R", (0.22, 0.10, 0.36), (0.48, -0.22, 1.14), mats["leather"], collection, bevel_width=0.018)
-    tool_loop = cylinder("Player_Belt_Tool_Loop_R", 0.055, 0.08, (0.34, -0.25, 1.19), mats["dark_leather"], collection, vertices=8, rotation=(math.radians(90), 0, 0))
+    pouch = cube("Player_Belt_Pouch_L", (0.22, 0.10, 0.36), (0.48, -0.22, 1.14), mats["leather"], collection, bevel_width=0.018)
+    tool_loop = cylinder("Player_Belt_Tool_Loop_L", 0.055, 0.08, (0.34, -0.25, 1.19), mats["dark_leather"], collection, vertices=8, rotation=(math.radians(90), 0, 0))
     for obj in (pouch, tool_loop):
         parent_keep_transform(obj, pelvis)
 
     roll = cylinder("Player_Backpack_Rolled_Bedroll", 0.22, 0.72, (0.0, 0.36, 2.00), mats["dark_leather"], collection, vertices=12, rotation=(0.0, math.radians(90), 0.0), bevel_width=0.008)
     pack = cube("Player_Backpack_Base", (0.48, 0.20, 0.56), (0.0, 0.38, 1.72), mats["leather"], collection, bevel_width=0.035)
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         bedroll_cap = cylinder(f"Player_Bedroll_Cap_{side}", 0.185, 0.035, (0.37 * sx, 0.36, 2.00), mats["cap"], collection, vertices=10, rotation=(0.0, math.radians(90), 0.0))
         parent_keep_transform(bedroll_cap, backpack_ctrl)
     for obj in (roll, pack):
         parent_keep_transform(obj, backpack_ctrl)
 
-    for side, sx in (("L", -1.0), ("R", 1.0)):
+    for side, sx in (("R", -1.0), ("L", 1.0)):
         upper_arm = limb_segment(f"Player_UpperArm_{side}", Vector((0.43 * sx, -0.02, 2.00)), Vector((0.66 * sx, -0.04, 1.52)), 0.135, 0.12, mats["shirt"], collection)
         cuff = cylinder(f"Player_Sleeve_Cuff_{side}", 0.13, 0.09, (0.66 * sx, -0.04, 1.52), mats["shirt_fold"], collection, vertices=10, rotation=(math.radians(12), 0, math.radians(12 * sx)), bevel_width=0.005)
         forearm = limb_segment(f"Player_Forearm_{side}", Vector((0.67 * sx, -0.05, 1.46)), Vector((0.75 * sx, -0.09, 1.04)), 0.10, 0.085, mats["skin"], collection)
@@ -779,12 +784,12 @@ def create_basic_animations() -> None:
     ]
     for frame, shoulder, elbow, wrist_z in wave_frames:
         neutral(frame)
-        key("Rig_Shoulder_L_FK", frame, rot=(0.0, shoulder, -12.0 if shoulder else 0.0))
-        key("Rig_Elbow_L_FK", frame, rot=(elbow, 0.0, -8.0))
-        key("Rig_Wrist_L_FK", frame, rot=(0.0, 0.0, wrist_z))
-        key("Rig_Shoulder_R_FK", frame, rot=(4.0, 0.0, 4.0))
-        key("Rig_Head_FK", frame, rot=(0.0, 0.0, -4.0))
-        key("Rig_Spine_FK", frame, rot=(0.0, 0.0, -2.0))
+        key("Rig_Shoulder_R_FK", frame, rot=(0.0, shoulder, 12.0 if shoulder else 0.0))
+        key("Rig_Elbow_R_FK", frame, rot=(elbow, 0.0, 8.0))
+        key("Rig_Wrist_R_FK", frame, rot=(0.0, 0.0, wrist_z))
+        key("Rig_Shoulder_L_FK", frame, rot=(4.0, 0.0, -4.0))
+        key("Rig_Head_FK", frame, rot=(0.0, 0.0, 4.0))
+        key("Rig_Spine_FK", frame, rot=(0.0, 0.0, 2.0))
 
     for obj in controls.values():
         if not obj.animation_data or not obj.animation_data.action:
@@ -872,15 +877,41 @@ def bind_modular_meshes_to_armature() -> dict[str, int]:
     return {"bound_objects": bound, "hidden_legacy_controls": hidden_controls}
 
 
+def create_right_hand_socket(collection: bpy.types.Collection) -> bpy.types.Object:
+    arm = bpy.data.objects["Rig_Adventurer_Armature_Reference"]
+    socket = bpy.data.objects.new("RightHandSocket", None)
+    socket.empty_display_type = "ARROWS"
+    socket.empty_display_size = 0.11
+    collection.objects.link(socket)
+    socket.matrix_world = arm.matrix_world @ arm.data.bones["hand.R"].matrix_local
+    socket.location += Vector((0.0, -0.06, 0.0))
+    world = socket.matrix_world.copy()
+    socket.parent = arm
+    socket.parent_type = "BONE"
+    socket.parent_bone = "hand.R"
+    socket.matrix_world = world
+    socket["GodotUsage"] = "Attach external weapon/item scene to this socket after import."
+    return socket
+
+
 def create_bone_animations() -> None:
     scene = bpy.context.scene
     scene.frame_start = 1
-    scene.frame_end = 250
+    scene.frame_end = 500
     scene.render.fps = 24
 
     for marker in list(scene.timeline_markers):
         scene.timeline_markers.remove(marker)
-    for name, frame in (("Idle", 1), ("Walk", 80), ("Jump", 140), ("Wave", 200)):
+    for name, frame in (
+        ("Idle", 1),
+        ("Walk", 80),
+        ("Jump", 140),
+        ("Wave", 200),
+        ("hold_pickaxe", 260),
+        ("mine_pickaxe", 280),
+        ("attack_sword", 360),
+        ("use_item", 430),
+    ):
         scene.timeline_markers.new(name, frame=frame)
 
     arm = bpy.data.objects["Rig_Adventurer_Armature_Reference"]
@@ -998,23 +1029,64 @@ def create_bone_animations() -> None:
             },
         )
 
+    # hold_pickaxe: the external pickaxe can rest over the right shoulder while the hand grips its shaft.
+    for frame, rotations in (
+        (260, {"upper_arm.R": (-58.0, 32.0, -58.0), "forearm.R": (-98.0, -44.0, -64.0), "hand.R": (0.0, 0.0, 6.0), "spine": (-1.0, 0.0, -2.0), "head": (1.0, 0.0, 1.0)}),
+        (270, {"upper_arm.R": (-57.0, 32.0, -57.0), "forearm.R": (-97.0, -44.0, -63.0), "hand.R": (0.0, 0.0, 6.0), "spine": (-1.5, 0.0, -2.0), "head": (1.2, 0.0, 1.0)}),
+        (278, {"upper_arm.R": (-58.0, 32.0, -58.0), "forearm.R": (-98.0, -44.0, -64.0), "hand.R": (0.0, 0.0, 6.0), "spine": (-1.0, 0.0, -2.0), "head": (1.0, 0.0, 1.0)}),
+    ):
+        pose(frame, rotations)
+
+    # mine_pickaxe: start from shoulder carry, raise both hands, then strike down and forward toward -Y.
+    for frame, rotations in (
+        (280, {"upper_arm.R": (-58.0, 32.0, -58.0), "forearm.R": (-98.0, -44.0, -64.0), "hand.R": (0.0, 0.0, 6.0), "spine": (-1.0, 0.0, -2.0), "head": (1.0, 0.0, 1.0)}),
+        (294, {"upper_arm.R": (-6.0, 0.0, 52.0), "forearm.R": (60.0, 0.0, 10.0), "hand.R": (0.0, 0.0, 8.0), "upper_arm.L": (-6.0, 0.0, -52.0), "forearm.L": (60.0, 0.0, -10.0), "hand.L": (0.0, 0.0, -8.0), "spine": (-4.0, 0.0, 0.0), "head": (3.0, 0.0, 0.0)}),
+        (308, {"upper_arm.R": (-2.0, 0.0, 56.0), "forearm.R": (62.0, 0.0, 10.0), "hand.R": (0.0, 0.0, 8.0), "upper_arm.L": (-2.0, 0.0, -56.0), "forearm.L": (62.0, 0.0, -10.0), "hand.L": (0.0, 0.0, -8.0), "spine": (-5.0, 0.0, 0.0), "head": (3.5, 0.0, 0.0)}),
+        (322, {"upper_arm.R": (-55.0, 0.0, 10.0), "forearm.R": (-18.0, 0.0, 4.0), "hand.R": (0.0, 0.0, -10.0), "upper_arm.L": (-48.0, 0.0, -10.0), "forearm.L": (-12.0, 0.0, -4.0), "hand.L": (0.0, 0.0, 10.0), "spine": (7.0, 0.0, 0.0), "head": (-4.0, 0.0, 0.0)}),
+        (336, {"upper_arm.R": (-42.0, 0.0, 14.0), "forearm.R": (-8.0, 0.0, 4.0), "hand.R": (0.0, 0.0, -6.0), "upper_arm.L": (-36.0, 0.0, -14.0), "forearm.L": (-6.0, 0.0, -4.0), "hand.L": (0.0, 0.0, 6.0), "spine": (3.5, 0.0, 0.0), "head": (-2.0, 0.0, 0.0)}),
+        (350, {"upper_arm.R": (-58.0, 32.0, -58.0), "forearm.R": (-98.0, -44.0, -64.0), "hand.R": (0.0, 0.0, 6.0), "spine": (-1.0, 0.0, -2.0), "head": (1.0, 0.0, 1.0)}),
+    ):
+        pose(frame, rotations)
+
+    # attack_sword: one-handed diagonal slash, lifting on the right and cutting forward across -Y.
+    for frame, rotations in (
+        (360, {"upper_arm.R": (4.0, 0.0, 8.0), "forearm.R": (8.0, 0.0, 4.0), "hand.R": (0.0, 0.0, 0.0)}),
+        (372, {"upper_arm.R": (8.0, 0.0, 46.0), "forearm.R": (32.0, 0.0, 10.0), "hand.R": (0.0, 0.0, 14.0), "spine": (-2.0, 0.0, -2.0), "head": (1.0, 0.0, 1.0)}),
+        (386, {"upper_arm.R": (-52.0, 0.0, 6.0), "forearm.R": (-10.0, 0.0, -6.0), "hand.R": (0.0, 0.0, -22.0), "spine": (4.0, 0.0, 2.0), "head": (-2.0, 0.0, -1.0), "upper_arm.L": (4.0, 0.0, -4.0)}),
+        (400, {"upper_arm.R": (-28.0, 0.0, 8.0), "forearm.R": (-4.0, 0.0, -2.0), "hand.R": (0.0, 0.0, -10.0), "spine": (2.0, 0.0, 1.0), "head": (-1.0, 0.0, 0.0)}),
+        (414, {"upper_arm.R": (4.0, 0.0, 8.0), "forearm.R": (8.0, 0.0, 4.0), "hand.R": (0.0, 0.0, 0.0)}),
+    ):
+        pose(frame, rotations)
+
+    # use_item: bring the right hand socket up toward the chest/face and lower it again.
+    for frame, rotations in (
+        (430, {"upper_arm.R": (4.0, 0.0, 4.0), "forearm.R": (6.0, 0.0, 2.0), "hand.R": (0.0, 0.0, 0.0)}),
+        (444, {"upper_arm.R": (28.0, 0.0, 8.0), "forearm.R": (38.0, 0.0, 6.0), "hand.R": (0.0, 0.0, 6.0), "head": (5.0, 0.0, 2.0), "spine": (-1.0, 0.0, 1.0)}),
+        (460, {"upper_arm.R": (30.0, 0.0, 8.0), "forearm.R": (42.0, 0.0, 8.0), "hand.R": (0.0, 0.0, -6.0), "head": (7.0, 0.0, 2.0), "spine": (-1.0, 0.0, 1.0)}),
+        (472, {"upper_arm.R": (12.0, 0.0, 5.0), "forearm.R": (18.0, 0.0, 3.0), "hand.R": (0.0, 0.0, 0.0)}),
+        (480, {}),
+    ):
+        pose(frame, rotations)
+
     if arm.animation_data and arm.animation_data.action:
         arm.animation_data.action.name = "Player_Basic_Bone_Animations"
 
     scene["Player_Adventurer_Animation_Notes"] = (
-        "Timeline markers: Idle 1-60, Walk 80-120, Jump 140-188, Wave 200-250. "
+        "Timeline markers: Idle 1-60, Walk 80-120, Jump 140-188, Wave 200-250, "
+        "hold_pickaxe 260-278, mine_pickaxe 280-350, attack_sword 360-414, use_item 430-480. "
         "Animations are keyed on Rig_Adventurer_Armature_Reference pose bones. No limb mesh uses FK-empty displacement."
     )
+    scene.frame_set(1)
 
 
 def save_and_preview() -> None:
+    bpy.context.scene.frame_set(1)
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND_PATH))
-    bpy.context.scene.render.filepath = str(PREVIEW_PATH)
-    bpy.ops.render.render(write_still=True)
 
 
 result = build_character()
 binding_result = bind_modular_meshes_to_armature()
+create_right_hand_socket(bpy.data.collections[COLLECTION_NAME])
 configure_scene()
 create_bone_animations()
 save_and_preview()
