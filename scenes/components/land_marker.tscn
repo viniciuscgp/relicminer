@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://buoshjnl2yl65"]
+
+[ext_resource type="Script" uid="uid://dk6vu5h5w7eki" path="res://scenes/components/land_marker.gd" id="1_2ega0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goijd"]
+albedo_color = Color(1, 0.40123826, 0.7655953, 1)
+metallic = 0.69
+metallic_specular = 0.36
+emission_enabled = true
+emission = Color(0.5713575, 0.101425625, 0.5882354, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2ega0"]
+material = SubResource("StandardMaterial3D_goijd")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_goijd"]
+
+[node name="LandMarker" type="Node3D" unique_id=1308701578]
+script = ExtResource("1_2ega0")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1517599116]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=239230098]
+mesh = SubResource("CapsuleMesh_2ega0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1442627242]
+shape = SubResource("CapsuleShape3D_goijd")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=542914773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1713779, 0)
+billboard = 1
+text = "This is a Label"
+font_size = 64

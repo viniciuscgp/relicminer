@@ -2,27 +2,26 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c307hdmos4gtm"
-path.bptc="res://.godot/imported/rock023_nrm_rgh.png-4cc62a26cd9b76f0c9c45ae2f75d6c5f.bptc.ctex"
+uid="uid://blad1xry3uyb1"
+path="res://.godot/imported/ground037_alb_ht.png-868cb4fad334d1c054bea506621230cb.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://textures/terrain/rock023_nrm_rgh.png"
-dest_files=["res://.godot/imported/rock023_nrm_rgh.png-4cc62a26cd9b76f0c9c45ae2f75d6c5f.bptc.ctex"]
+source_file="res://textures/terrain/ground037/ground037_alb_ht.png"
+dest_files=["res://.godot/imported/ground037_alb_ht.png-868cb4fad334d1c054bea506621230cb.ctex"]
 
 [params]
 
-compress/mode=2
-compress/high_quality=true
+compress/mode=0
+compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=2
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
@@ -38,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

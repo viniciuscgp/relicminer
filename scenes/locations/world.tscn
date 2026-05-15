@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://bkf6n8m4qyagk"]
 
-[ext_resource type="Texture2D" uid="uid://ddprscrpsofah" path="res://textures/terrain/ground037_alb_ht.png" id="1_321g5"]
-[ext_resource type="Texture2D" uid="uid://c1ots7w6i0i1q" path="res://textures/terrain/ground037_nrm_rgh.png" id="2_lc2ud"]
-[ext_resource type="Texture2D" uid="uid://c88j3oj0lf6om" path="res://textures/terrain/rock023_alb_ht.png" id="3_cqucs"]
-[ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://textures/terrain/rock023_nrm_rgh.png" id="4_1llb7"]
+[ext_resource type="Texture2D" uid="uid://blad1xry3uyb1" path="res://textures/terrain/ground037/ground037_alb_ht.png" id="2_00p1q"]
+[ext_resource type="Texture2D" uid="uid://0pc523t5g0ie" path="res://textures/terrain/ground037/ground037_nrm_rgh.png" id="3_p5qu5"]
+[ext_resource type="Texture2D" uid="uid://gsan06q7kakd" path="res://textures/terrain/ground037/rock023_alb_ht.png" id="4_1l4sk"]
 [ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="5_1llb7"]
+[ext_resource type="Texture2D" uid="uid://c66g6d5v4tp7v" path="res://textures/terrain/ground037/rock023_nrm_rgh.png" id="5_eyg7e"]
 [ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://scenes/components/Environment.tscn" id="6_d6lop"]
-[ext_resource type="PackedScene" uid="uid://b1jccwntwnqcm" path="res://scenes/blocks/block.tscn" id="7_jhfow"]
+[ext_resource type="Texture2D" uid="uid://bep6q472pwfdi" path="res://textures/terrain/Ground103_1K-PNG/Ground103_alb_ht.png" id="6_u7c30"]
+[ext_resource type="PackedScene" uid="uid://buoshjnl2yl65" path="res://scenes/components/land_marker.tscn" id="7_jhfow"]
+[ext_resource type="Texture2D" uid="uid://c5w6kl22hp550" path="res://textures/terrain/Ground103_1K-PNG/Ground103_nrm_rgh.png" id="7_nbnoy"]
 
 [sub_resource type="Gradient" id="Gradient_cqucs"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -642,20 +644,26 @@ last_lod = 0
 last_shadow_lod = 0
 lod0_range = 128.0
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_p5qu5"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_atjdx"]
 name = "ground037_alb_ht"
-albedo_texture = ExtResource("1_321g5")
-normal_texture = ExtResource("2_lc2ud")
+albedo_texture = ExtResource("2_00p1q")
+normal_texture = ExtResource("3_p5qu5")
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_d6lop"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_vdlkt"]
 name = "rock023_alb_ht"
 id = 1
-albedo_texture = ExtResource("3_cqucs")
-normal_texture = ExtResource("4_1llb7")
+albedo_texture = ExtResource("4_1l4sk")
+normal_texture = ExtResource("5_eyg7e")
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_dwhbb"]
+name = "Ground103_alb_ht"
+id = 2
+albedo_texture = ExtResource("6_u7c30")
+normal_texture = ExtResource("7_nbnoy")
 
 [sub_resource type="Terrain3DAssets" id="Terrain3DAssets_1l4sk"]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_00p1q")])
-texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_p5qu5"), SubResource("Terrain3DTextureAsset_d6lop")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_atjdx"), SubResource("Terrain3DTextureAsset_vdlkt"), SubResource("Terrain3DTextureAsset_dwhbb")])
 
 [node name="World" type="Node3D" unique_id=1473166930]
 
@@ -670,54 +678,78 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2083.517, 24.272095, -185.4838)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60.54361, 69.75581, -610.7689)
 
 [node name="Markers" type="Node3D" parent="." unique_id=980118374]
 
 [node name="CenterBlock" parent="Markers" unique_id=341660718 instance=ExtResource("7_jhfow")]
 transform = Transform3D(60, 0, 0, 0, 60, 0, 0, 0, 60, 1277.717, 0, 895.098)
+label = "Centro do Mapa"
 
 [node name="CityAltavia" parent="Markers" unique_id=1737033822 instance=ExtResource("7_jhfow")]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -185.575, 0, -447.468)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -133.1685, 65.798096, -589.71405)
+label = "City Altavia"
 
 [node name="CityKardun" parent="Markers" unique_id=1411760314 instance=ExtResource("7_jhfow")]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2372.87, 0, -109.787)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2407.7998, 0, -162.18149)
+label = "City Kardun"
 
 [node name="CodilheiraCinzenta" parent="Markers" unique_id=1321832697 instance=ExtResource("7_jhfow")]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 232.98926, 0, -797.5951)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 232.98926, 67.557465, -797.5951)
+label = "Cordilheira Cinzenta"
 
 [node name="GargantaDosEcos" parent="Markers" unique_id=1556043316 instance=ExtResource("7_jhfow")]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1593.2805, 0, -734.5973)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1534.3594, 84.69522, -793.31836)
+label = "Garganta dos Ecos"
 
 [node name="RuinasDeTharom" parent="Markers" unique_id=322248447 instance=ExtResource("7_jhfow")]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 523.94434, 0, -283.17233)
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 510.14087, 0, -289.8457)
+label = "Ruinas de Tharom"
 
 [node name="BosqueDeEldren" parent="Markers" unique_id=1725190354 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -325.12457, 0, -73.1156)
+label = "Bosque de Elndren"
 
 [node name="CitySerpentia" parent="Markers" unique_id=927246538 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 272.62488, 0, 849.2837)
+label = "City Serpentia"
 
 [node name="CityLunaria" parent="Markers" unique_id=1641449538 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -277.46204, 0, 1952.1353)
+label = "City Lunaria"
 
 [node name="CityValdora" parent="Markers" unique_id=906184755 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1929.7734, 0, 1046.8557)
+label = "City Valdora"
 
 [node name="CityPedraForte" parent="Markers" unique_id=903504932 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1288.0197, 0, 1695.72)
+label = "City Pedra Forte"
 
 [node name="LandMarkTorreQuebrada" parent="Markers" unique_id=1262055900 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 835.6028, 0, 2192.1572)
+label = "Torre Quebrada"
 
 [node name="LandMarkPocoDosAntigos" parent="Markers" unique_id=1196393813 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1757.2152, 0, 2220.6826)
+label = "Poço dos Antigos"
 
 [node name="CavernaDoSussuro" parent="Markers" unique_id=1284834990 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2920.113, 0, 2042.9497)
+label = "Caverna do Sussuro"
 
 [node name="MinasDeUmbraferro" parent="Markers" unique_id=349585037 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2973.4678, 0, 1039.427)
+label = "Mina Umbraferro"
 
 [node name="MinaAltaDeFerrofrio" parent="Markers" unique_id=874552222 instance=ExtResource("7_jhfow")]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2974.2732, 0, 416.9779)
+label = "Mina Alta de Ferrofrio"
+
+[node name="LunariaIsland1" parent="Markers" unique_id=1803791631 instance=ExtResource("7_jhfow")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 435.6602, 4.1691895, 1782.6584)
+label = "Lunaria Island 1"
+
+[node name="LunariaIsland2" parent="Markers" unique_id=1168801588 instance=ExtResource("7_jhfow")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 43.453598, 6.306572, 1638.2454)
+label = "Lunaria Island 2"
