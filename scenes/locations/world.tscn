@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://textures/terrain/rock023_nrm_rgh.png" id="4_1llb7"]
 [ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="5_1llb7"]
 [ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://scenes/components/Environment.tscn" id="6_d6lop"]
+[ext_resource type="PackedScene" uid="uid://b1jccwntwnqcm" path="res://scenes/blocks/block.tscn" id="7_jhfow"]
 
 [sub_resource type="Gradient" id="Gradient_cqucs"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -659,7 +660,7 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 [node name="World" type="Node3D" unique_id=1473166930]
 
 [node name="Environment" parent="." unique_id=1202088949 instance=ExtResource("6_d6lop")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 265.15833, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1241.7966, 265.15833, 802.27075)
 
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1223664392]
 data_directory = "res://terrain_data"
@@ -669,4 +670,54 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83.85336, 71.20421, -577.21936)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2083.517, 24.272095, -185.4838)
+
+[node name="Markers" type="Node3D" parent="." unique_id=980118374]
+
+[node name="CenterBlock" parent="Markers" unique_id=341660718 instance=ExtResource("7_jhfow")]
+transform = Transform3D(60, 0, 0, 0, 60, 0, 0, 0, 60, 1277.717, 0, 895.098)
+
+[node name="CityAltavia" parent="Markers" unique_id=1737033822 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -185.575, 0, -447.468)
+
+[node name="CityKardun" parent="Markers" unique_id=1411760314 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2372.87, 0, -109.787)
+
+[node name="CodilheiraCinzenta" parent="Markers" unique_id=1321832697 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 232.98926, 0, -797.5951)
+
+[node name="GargantaDosEcos" parent="Markers" unique_id=1556043316 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1593.2805, 0, -734.5973)
+
+[node name="RuinasDeTharom" parent="Markers" unique_id=322248447 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 523.94434, 0, -283.17233)
+
+[node name="BosqueDeEldren" parent="Markers" unique_id=1725190354 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -325.12457, 0, -73.1156)
+
+[node name="CitySerpentia" parent="Markers" unique_id=927246538 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 272.62488, 0, 849.2837)
+
+[node name="CityLunaria" parent="Markers" unique_id=1641449538 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, -277.46204, 0, 1952.1353)
+
+[node name="CityValdora" parent="Markers" unique_id=906184755 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1929.7734, 0, 1046.8557)
+
+[node name="CityPedraForte" parent="Markers" unique_id=903504932 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1288.0197, 0, 1695.72)
+
+[node name="LandMarkTorreQuebrada" parent="Markers" unique_id=1262055900 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 835.6028, 0, 2192.1572)
+
+[node name="LandMarkPocoDosAntigos" parent="Markers" unique_id=1196393813 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 1757.2152, 0, 2220.6826)
+
+[node name="CavernaDoSussuro" parent="Markers" unique_id=1284834990 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2920.113, 0, 2042.9497)
+
+[node name="MinasDeUmbraferro" parent="Markers" unique_id=349585037 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2973.4678, 0, 1039.427)
+
+[node name="MinaAltaDeFerrofrio" parent="Markers" unique_id=874552222 instance=ExtResource("7_jhfow")]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 2974.2732, 0, 416.9779)
