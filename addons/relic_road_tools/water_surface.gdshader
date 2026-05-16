@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, cull_disabled, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, depth_prepass_alpha, cull_disabled, diffuse_burley, specular_schlick_ggx;
 
 uniform vec4 shallow_color : source_color = vec4(0.05, 0.42, 0.75, 0.62);
 uniform vec4 deep_color : source_color = vec4(0.01, 0.12, 0.22, 0.78);

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://7bhmvai7g1r5" path="res://scripts/player.gd" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scripts/river_survey_recorder.gd" id="2_lsa8m"]
+[ext_resource type="PackedScene" uid="uid://dtxucqa7t3oe6" path="res://scenes/components/UnderwaterEnvironment.tscn" id="3_6n8mq"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vyb7"]
 albedo_color = Color(1, 0.28235295, 1, 1)
@@ -35,6 +36,8 @@ margin = 0.25
 [node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D" unique_id=1977999872]
 current = true
 fov = 70.0
+
+[node name="UnderwaterEnvironment" parent="CameraPivot/SpringArm3D/Camera3D" instance=ExtResource("3_6n8mq")]
 
 [node name="RiverSurveyRecorder" type="Node3D" parent="." unique_id=1368953571]
 script = ExtResource("2_lsa8m")

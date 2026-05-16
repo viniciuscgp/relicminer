@@ -1,9 +1,15 @@
 extends Node3D
 
 
-@export var output_path := "res://river_survey.json"
+@export_dir var output_directory := "res://surveys/rivers"
+@export var survey_base_name := "blue_river"
+@export var survey_name := "blue_river_01"
+@export var auto_increment_name := true
+@export var output_path := ""
 @export var sample_distance := 4.0
 @export var max_bank_distance := 80.0
+@export var bank_probe_radius := 1.0
+@export var bank_probe_vertical_radius := 0.5
 @export var surface_height_offset := 1.0
 @export var auto_detect_surface_height := true
 @export var max_surface_scan_height := 8.0
@@ -115,8 +121,9 @@ func _find_surface_profile(space_state: PhysicsDirectSpaceState3D, player_positi
 
 
 func _make_surface_profile(space_state: PhysicsDirectSpaceState3D, origin: Vector3, side: Vector3, excludes: Array[RID]) -> Dictionary:
-	var left_hit := _raycast(space_state, origin, origin + side * max_bank_distance, excludes)
-	var right_hit := _raycast(space_state, origin, origin - side * max_bank_distance, excludes)
+	var forward := Vector3(side.z, 0.0, -side.x).normalized()
+	var left_hit := _bank_raycast(space_state, origin, side, forward, excludes)
+	var right_hit := _bank_raycast(space_state, origin, -side, forward, excludes)
 	return {
 		"center": origin,
 		"left": _edge_position(left_hit, origin + side * max_bank_distance, origin.y),
@@ -126,19 +133,126 @@ func _make_surface_profile(space_state: PhysicsDirectSpaceState3D, origin: Vecto
 	}
 
 
+func _bank_raycast(space_state: PhysicsDirectSpaceState3D, origin: Vector3, direction: Vector3, forward: Vector3, excludes: Array[RID]) -> Dictionary:
+	var offsets: Array[Vector3] = [Vector3.ZERO]
+	var horizontal_radius := maxf(bank_probe_radius, 0.0)
+	var vertical_radius := maxf(bank_probe_vertical_radius, 0.0)
+	if horizontal_radius > 0.0:
+		offsets.append(forward * horizontal_radius)
+		offsets.append(-forward * horizontal_radius)
+		offsets.append(forward * horizontal_radius * 0.5)
+		offsets.append(-forward * horizontal_radius * 0.5)
+	if vertical_radius > 0.0:
+		offsets.append(Vector3.UP * vertical_radius)
+		offsets.append(-Vector3.UP * vertical_radius)
+	if horizontal_radius > 0.0 and vertical_radius > 0.0:
+		offsets.append(forward * horizontal_radius + Vector3.UP * vertical_radius)
+		offsets.append(-forward * horizontal_radius + Vector3.UP * vertical_radius)
+		offsets.append(forward * horizontal_radius - Vector3.UP * vertical_radius)
+		offsets.append(-forward * horizontal_radius - Vector3.UP * vertical_radius)
+
+	var best_hit := {}
+	var best_distance := INF
+	for offset in offsets:
+		var from := origin + offset
+		var hit := _raycast(space_state, from, from + direction * max_bank_distance, excludes)
+		if hit.is_empty():
+			continue
+		var distance := origin.distance_to(hit["position"])
+		if distance < best_distance:
+			best_distance = distance
+			best_hit = hit
+	return best_hit
+
+
 func _save_samples() -> void:
-	var file := FileAccess.open(output_path, FileAccess.WRITE)
+	var path := _get_output_path()
+	_ensure_directory(path.get_base_dir())
+	var file := FileAccess.open(path, FileAccess.WRITE)
 	if not file:
-		push_error("RiverSurveyRecorder: could not write %s." % output_path)
+		push_error("RiverSurveyRecorder: could not write %s." % path)
 		return
 
 	var payload := {
 		"version": 1,
+		"name": _get_survey_name_from_path(path),
 		"sample_distance": sample_distance,
 		"samples": samples,
 	}
 	file.store_string(JSON.stringify(payload, "\t"))
-	print("RiverSurveyRecorder: saved %d sample(s) to %s." % [samples.size(), output_path])
+	print("RiverSurveyRecorder: saved %d sample(s) to %s." % [samples.size(), path])
+
+
+func _get_output_path() -> String:
+	if not output_path.strip_edges().is_empty():
+		return output_path.strip_edges()
+
+	var clean_name := _safe_file_name(survey_name)
+	if clean_name.is_empty():
+		clean_name = "river_survey"
+	if auto_increment_name:
+		clean_name = _get_next_survey_name()
+	return output_directory.path_join(clean_name + ".json")
+
+
+func _get_next_survey_name() -> String:
+	var clean_base_name := _safe_file_name(survey_base_name)
+	if clean_base_name.is_empty():
+		clean_base_name = _safe_file_name(survey_name)
+	if clean_base_name.is_empty():
+		clean_base_name = "river_survey"
+
+	var next_index := 1
+	var directory := DirAccess.open(output_directory)
+	if directory:
+		directory.list_dir_begin()
+		var file_name := directory.get_next()
+		while not file_name.is_empty():
+			if not directory.current_is_dir() and file_name.get_extension().to_lower() == "json":
+				var base_name := file_name.get_basename()
+				var index := _survey_index_from_name(base_name, clean_base_name)
+				if index >= next_index:
+					next_index = index + 1
+			file_name = directory.get_next()
+		directory.list_dir_end()
+
+	return "%s_%02d" % [clean_base_name, next_index]
+
+
+func _survey_index_from_name(value: String, clean_base_name: String) -> int:
+	var prefix := clean_base_name + "_"
+	if not value.begins_with(prefix):
+		return 0
+
+	var suffix := value.substr(prefix.length())
+	if suffix.is_empty():
+		return 0
+	for index in suffix.length():
+		var character := suffix[index]
+		if character < "0" or character > "9":
+			return 0
+	return int(suffix)
+
+
+func _get_survey_name_from_path(path: String) -> String:
+	return path.get_file().get_basename()
+
+
+func _ensure_directory(path: String) -> void:
+	if path.is_empty() or DirAccess.dir_exists_absolute(path):
+		return
+	DirAccess.make_dir_recursive_absolute(path)
+
+
+func _safe_file_name(value: String) -> String:
+	var safe := value.strip_edges().to_lower()
+	safe = safe.replace(" ", "_")
+	var output := ""
+	for index in safe.length():
+		var character := safe[index]
+		if (character >= "a" and character <= "z") or (character >= "0" and character <= "9") or character == "_" or character == "-":
+			output += character
+	return output
 
 
 func _get_motion_direction(player: Node3D) -> Vector3:

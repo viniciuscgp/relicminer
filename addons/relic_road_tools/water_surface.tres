@@ -1,12 +1,25 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dkxtwx1c8r7nh"]
 
-[ext_resource type="Shader" path="res://addons/relic_road_tools/water_surface.gdshader" id="1_surface"]
-[ext_resource type="Texture2D" path="res://textures/water/0001.png" id="2_normal_a"]
-[ext_resource type="Texture2D" path="res://textures/water/0060.png" id="3_normal_b"]
-[ext_resource type="Texture2D" path="res://textures/water/0120.png" id="4_normal_c"]
+[ext_resource type="Shader" uid="uid://c5o8h2tknr5i1" path="res://addons/relic_road_tools/water_surface.gdshader" id="1_surface"]
+[ext_resource type="Texture2D" uid="uid://c5molq5ey7rf0" path="res://textures/water/0001.png" id="2_normal_a"]
+[ext_resource type="Texture2D" uid="uid://dkab1j0e1kwrb" path="res://textures/water/0060.png" id="3_normal_b"]
+[ext_resource type="Texture2D" uid="uid://ddumjcgpn4yvu" path="res://textures/water/0120.png" id="4_normal_c"]
 
 [resource]
+render_priority = 0
 shader = ExtResource("1_surface")
+shader_parameter/shallow_color = Color(0.004067896, 0.051987763, 0.11106245, 0.8627451)
+shader_parameter/deep_color = Color(0.009000002, 0.09735001, 0.18, 0.9411765)
+shader_parameter/highlight_color = Color(0.55, 0.94749993, 1, 0.84705883)
 shader_parameter/normal_a = ExtResource("2_normal_a")
 shader_parameter/normal_b = ExtResource("3_normal_b")
 shader_parameter/normal_c = ExtResource("4_normal_c")
+shader_parameter/normal_scale_a = 0.035
+shader_parameter/normal_scale_b = 0.07
+shader_parameter/normal_scale_c = 0.12
+shader_parameter/wave_speed = 0.015
+shader_parameter/wave_strength = 0.48
+shader_parameter/roughness = 0.065
+shader_parameter/metallic = 0.0
+shader_parameter/fresnel_strength = 0.4
+shader_parameter/fresnel_power = 3.0

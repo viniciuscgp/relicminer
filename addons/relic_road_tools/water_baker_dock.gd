@@ -5,21 +5,25 @@ extends VBoxContainer
 const RIVER_MARKER_SCENE := "res://scenes/components/river_marker.tscn"
 const LAKE_MARKER_SCENE := "res://scenes/components/lake_marker.tscn"
 const GENERATED_ROOT_NAME := "GeneratedWater"
-const SURVEY_RIVER_NAME := "SurveyRiver"
-const DEFAULT_SURVEY_FILE := "res://river_survey.json"
+const SURVEY_RIVER_PREFIX := "SurveyRiver_"
+const WATER_AREA_GROUP := "water_volume"
+const DEFAULT_SURVEY_DIRECTORY := "res://surveys/rivers"
 const DEFAULT_SURFACE_MATERIAL := preload("res://addons/relic_road_tools/water_surface.tres")
-const DEFAULT_VOLUME_MATERIAL := preload("res://addons/relic_road_tools/water_volume.tres")
 
 
 var editor_plugin: EditorPlugin
 var curve_step_spin: SpinBox
 var smooth_passes_spin: SpinBox
 var surface_offset_spin: SpinBox
-var survey_path_edit: LineEdit
+var survey_edge_inset_spin: SpinBox
+var survey_height_offset_spin: SpinBox
+var lake_height_offset_spin: SpinBox
+var lake_min_depth_spin: SpinBox
+var survey_max_edge_jump_spin: SpinBox
+var survey_directory_edit: LineEdit
 var surface_picker: EditorResourcePicker
-var volume_picker: EditorResourcePicker
 var bake_button: Button
-var bake_survey_button: Button
+var bake_all_surveys_button: Button
 var clear_button: Button
 var status_label: Label
 var bake_warnings: Array[String] = []
@@ -31,38 +35,42 @@ func _init() -> void:
 
 	var title := Label.new()
 	title.text = "Water Baker"
-	title.tooltip_text = "Generates river and lake meshes from visible RiverMarker and LakeMarker nodes."
+	title.tooltip_text = "Gera meshes de rios e lagoas a partir de marcadores visiveis e arquivos de scan."
 	title.add_theme_font_size_override("font_size", 16)
 	add_child(title)
 
-	curve_step_spin = _add_spin("Curve Step", 0.5, 30.0, 0.5, 4.0, "m", "Distance between sampled river curve points. Lower values follow curves better.")
-	smooth_passes_spin = _add_spin("Smooth Passes", 0.0, 5.0, 1.0, 2.0, "", "Rounds river and lake corners. Higher values are smoother but pull the water edge inward.")
-	surface_offset_spin = _add_spin("Surface Offset", -100.0, 100.0, 0.1, 0.0, "m", "Adds height to marker origins when generating the water surface.")
-	survey_path_edit = _add_path_edit("Survey File", DEFAULT_SURVEY_FILE, "River survey file recorded by the player sensor.")
-	surface_picker = _add_material_picker("Surface", DEFAULT_SURFACE_MATERIAL, "Material used by the visible water surface.")
-	volume_picker = _add_material_picker("Volume", DEFAULT_VOLUME_MATERIAL, "Material used by generated sides and bottom volume.")
+	curve_step_spin = _add_spin("Passo Curva", 0.5, 30.0, 0.5, 4.0, "m", "Distancia entre pontos amostrados nas curvas de rio por marcador. Valores menores seguem melhor a curva.")
+	smooth_passes_spin = _add_spin("Suavizacao", 0.0, 5.0, 1.0, 2.0, "", "Suaviza cantos de rios e lagoas. Valores maiores arredondam mais, mas podem puxar a borda para dentro.")
+	surface_offset_spin = _add_spin("Altura Global", -100.0, 100.0, 0.1, 0.0, "m", "Soma uma altura global na superficie gerada a partir dos marcadores.")
+	survey_edge_inset_spin = _add_spin("Recuo Scan", 0.0, 12.0, 0.25, 1.5, "m", "Puxa as bordas dos rios escaneados para dentro da vala para evitar agua exatamente em cima da margem.")
+	survey_height_offset_spin = _add_spin("Altura Scan", -5.0, 5.0, 0.1, -2.0, "m", "Ajusta somente a altura dos rios gerados por scan. Use valores negativos para abaixar a agua.")
+	lake_height_offset_spin = _add_spin("Altura Lagoa", -5.0, 5.0, 0.1, -2.0, "m", "Ajusta somente a altura das lagoas feitas com LakeMarker. Use valores negativos para abaixar a superficie.")
+	lake_min_depth_spin = _add_spin("Prof. Lagoa", 0.1, 100.0, 0.1, 12.1, "m", "Profundidade minima do volume da lagoa usado para detectar camera, player, peixes e efeito submerso.")
+	survey_max_edge_jump_spin = _add_spin("Salto Max.", 0.0, 80.0, 1.0, 16.0, "m", "Limita saltos bruscos da margem detectada pelo scan. Use 0 para desativar.")
+	survey_directory_edit = _add_path_edit("Pasta Scans", DEFAULT_SURVEY_DIRECTORY, "Pasta com os arquivos JSON dos trechos de rio gravados pelo sensor.")
+	surface_picker = _add_material_picker("Superficie", DEFAULT_SURFACE_MATERIAL, "Material usado pela superficie visivel da agua.")
 
 	bake_button = Button.new()
-	bake_button.text = "Bake Water"
-	bake_button.tooltip_text = "Generates normal Godot meshes and Area3D water volumes from visible markers."
+	bake_button.text = "Gerar Marcadores"
+	bake_button.tooltip_text = "Gera lagoas e rios por marcadores visiveis, criando mesh e volumes Area3D."
 	bake_button.pressed.connect(_on_bake_pressed)
 	add_child(bake_button)
 
-	bake_survey_button = Button.new()
-	bake_survey_button.text = "Bake Survey File"
-	bake_survey_button.tooltip_text = "Generates a river mesh from the survey samples recorded by the player."
-	bake_survey_button.pressed.connect(_on_bake_survey_pressed)
-	add_child(bake_survey_button)
+	bake_all_surveys_button = Button.new()
+	bake_all_surveys_button.text = "Gerar Scans"
+	bake_all_surveys_button.tooltip_text = "Gera um trecho de rio para cada arquivo JSON na pasta de scans."
+	bake_all_surveys_button.pressed.connect(_on_bake_all_surveys_pressed)
+	add_child(bake_all_surveys_button)
 
 	clear_button = Button.new()
-	clear_button.text = "Clear Generated Water"
-	clear_button.tooltip_text = "Removes the GeneratedWater node created by this tool."
+	clear_button.text = "Remover Agua Gerada"
+	clear_button.tooltip_text = "Remove o node GeneratedWater criado por esta ferramenta."
 	clear_button.pressed.connect(_on_clear_pressed)
 	add_child(clear_button)
 
 	status_label = Label.new()
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status_label.text = "Use RiverMarker edge pairs for rivers and LakeMarker outlines for lakes."
+	status_label.text = "Use LakeMarker para lagoas e arquivos de scan para rios."
 	add_child(status_label)
 
 
@@ -144,23 +152,24 @@ func _on_bake_pressed() -> void:
 	_clear_marker_generated_water(generated_root)
 
 	var surface_material := _get_picker_material(surface_picker, DEFAULT_SURFACE_MATERIAL)
-	var volume_material := _get_picker_material(volume_picker, DEFAULT_VOLUME_MATERIAL)
 	var curve_step := float(curve_step_spin.value)
 	var smooth_passes := int(smooth_passes_spin.value)
 	var surface_offset := float(surface_offset_spin.value)
+	var lake_height_offset := float(lake_height_offset_spin.value)
+	var lake_min_depth := float(lake_min_depth_spin.value)
 	var river_count := 0
 	var lake_count := 0
 	var invalid_count := 0
 	bake_warnings.clear()
 
 	for route in river_routes:
-		if _bake_river(generated_root, route, surface_material, volume_material, curve_step, smooth_passes, surface_offset):
+		if _bake_river(generated_root, route, surface_material, curve_step, smooth_passes, surface_offset):
 			river_count += 1
 		else:
 			invalid_count += 1
 
 	for route in lake_routes:
-		if _bake_lake(generated_root, route, surface_material, volume_material, smooth_passes, surface_offset):
+		if _bake_lake(generated_root, route, surface_material, smooth_passes, surface_offset + lake_height_offset, lake_min_depth):
 			lake_count += 1
 		else:
 			invalid_count += 1
@@ -177,28 +186,47 @@ func _on_bake_pressed() -> void:
 	_set_status(message, false)
 
 
-func _on_bake_survey_pressed() -> void:
+func _on_bake_all_surveys_pressed() -> void:
 	var root: Node = editor_plugin.get_scene_root()
 	if not root:
 		_set_status("No edited scene is open.", true)
 		return
 
-	var samples := _read_survey_samples(survey_path_edit.text.strip_edges())
-	if samples.size() < 2:
-		_set_status("Survey file needs at least 2 valid samples.", true)
+	var survey_paths := _collect_survey_files(survey_directory_edit.text.strip_edges())
+	if survey_paths.is_empty():
+		_set_status("No survey JSON files found.", true)
 		return
 
 	var generated_root := _get_or_create_generated_root(root)
-	_clear_named_child(generated_root, SURVEY_RIVER_NAME)
+	_clear_survey_generated_water(generated_root)
 
 	var surface_material := _get_picker_material(surface_picker, DEFAULT_SURFACE_MATERIAL)
-	var volume_material := _get_picker_material(volume_picker, DEFAULT_VOLUME_MATERIAL)
 	var smooth_passes := int(smooth_passes_spin.value)
-	if _bake_survey_river(generated_root, _smooth_river_sections(samples, smooth_passes), surface_material, volume_material):
-		EditorInterface.mark_scene_as_unsaved()
-		_set_status("Generated survey river from %d sample(s)." % samples.size(), false)
-	else:
-		_set_status("Survey river could not be generated.", true)
+	var edge_inset := float(survey_edge_inset_spin.value)
+	var survey_height_offset := float(survey_height_offset_spin.value)
+	var max_edge_jump := float(survey_max_edge_jump_spin.value)
+	var generated_count := 0
+	var invalid_count := 0
+	for survey_path in survey_paths:
+		var samples := _read_survey_samples(survey_path)
+		if samples.size() < 2:
+			invalid_count += 1
+			continue
+		var prepared_samples := _prepare_survey_samples(samples, edge_inset, survey_height_offset, max_edge_jump)
+		if _bake_survey_river(generated_root, _survey_node_name_from_path(survey_path), _smooth_river_sections(prepared_samples, smooth_passes), surface_material):
+			generated_count += 1
+		else:
+			invalid_count += 1
+
+	if generated_count == 0:
+		_set_status("No survey rivers generated. Check JSON files.", true)
+		return
+
+	EditorInterface.mark_scene_as_unsaved()
+	var message := "Generated %d survey river(s)." % generated_count
+	if invalid_count > 0:
+		message += " Ignored %d invalid file(s)." % invalid_count
+	_set_status(message, false)
 
 
 func _on_clear_pressed() -> void:
@@ -243,6 +271,12 @@ func _get_or_create_generated_root(root: Node) -> Node3D:
 	return generated_root
 
 
+func _configure_water_area(area: Area3D) -> void:
+	area.monitoring = true
+	area.monitorable = true
+	area.add_to_group(WATER_AREA_GROUP, true)
+
+
 func _clear_children(node: Node) -> void:
 	for child in node.get_children():
 		child.free()
@@ -250,9 +284,15 @@ func _clear_children(node: Node) -> void:
 
 func _clear_marker_generated_water(node: Node) -> void:
 	for child in node.get_children():
-		if child.name == SURVEY_RIVER_NAME:
+		if String(child.name).begins_with(SURVEY_RIVER_PREFIX):
 			continue
 		child.free()
+
+
+func _clear_survey_generated_water(node: Node) -> void:
+	for child in node.get_children():
+		if String(child.name).begins_with(SURVEY_RIVER_PREFIX):
+			child.free()
 
 
 func _clear_named_child(node: Node, child_name: String) -> void:
@@ -330,7 +370,7 @@ func _is_visible_node(node: Node) -> bool:
 	return true
 
 
-func _bake_river(parent: Node, route: Dictionary, surface_material: Material, volume_material: Material, curve_step: float, smooth_passes: int, global_surface_offset: float) -> bool:
+func _bake_river(parent: Node, route: Dictionary, surface_material: Material, curve_step: float, smooth_passes: int, global_surface_offset: float) -> bool:
 	var markers: Array = (route["markers"] as Array).duplicate()
 	if markers.size() < 4:
 		_set_status("River %s found %d RiverMarker node(s), but needs at least 4: two edge pairs." % [String(route["name"]), markers.size()], true)
@@ -354,39 +394,70 @@ func _bake_river(parent: Node, route: Dictionary, surface_material: Material, vo
 
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "WaterMesh"
-	mesh_instance.mesh = _build_river_edge_mesh(samples, surface_material, volume_material)
+	mesh_instance.mesh = _build_river_edge_mesh(samples, surface_material)
 	body.add_child(mesh_instance)
 	mesh_instance.owner = editor_plugin.get_scene_root()
 
 	var area := Area3D.new()
 	area.name = "WaterArea"
+	_configure_water_area(area)
 	body.add_child(area)
 	area.owner = editor_plugin.get_scene_root()
 	_add_river_edge_collision_prisms(area, samples)
 	return true
 
 
-func _bake_survey_river(parent: Node, samples: Array, surface_material: Material, volume_material: Material) -> bool:
+func _bake_survey_river(parent: Node, node_name: String, samples: Array, surface_material: Material) -> bool:
 	if samples.size() < 2:
 		return false
 
 	var body := Node3D.new()
-	body.name = SURVEY_RIVER_NAME
+	body.name = node_name
 	parent.add_child(body)
 	body.owner = editor_plugin.get_scene_root()
 
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "WaterMesh"
-	mesh_instance.mesh = _build_river_edge_mesh(samples, surface_material, volume_material)
+	mesh_instance.mesh = _build_river_edge_mesh(samples, surface_material)
 	body.add_child(mesh_instance)
 	mesh_instance.owner = editor_plugin.get_scene_root()
 
 	var area := Area3D.new()
 	area.name = "WaterArea"
+	_configure_water_area(area)
 	body.add_child(area)
 	area.owner = editor_plugin.get_scene_root()
 	_add_river_edge_collision_prisms(area, samples)
 	return true
+
+
+func _collect_survey_files(directory_path: String) -> Array[String]:
+	var survey_paths: Array[String] = []
+	if directory_path.is_empty():
+		_set_status("Survey directory path is empty.", true)
+		return survey_paths
+
+	var directory := DirAccess.open(directory_path)
+	if not directory:
+		_set_status("Survey directory not found: %s" % directory_path, true)
+		return survey_paths
+
+	directory.list_dir_begin()
+	var file_name := directory.get_next()
+	while not file_name.is_empty():
+		if not directory.current_is_dir() and file_name.get_extension().to_lower() == "json":
+			survey_paths.append(directory_path.path_join(file_name))
+		file_name = directory.get_next()
+	directory.list_dir_end()
+	survey_paths.sort()
+	return survey_paths
+
+
+func _survey_node_name_from_path(path: String) -> String:
+	var base_name := path.get_file().get_basename()
+	if base_name.is_empty():
+		base_name = "survey_river"
+	return _safe_node_name(SURVEY_RIVER_PREFIX + base_name)
 
 
 func _read_survey_samples(path: String) -> Array:
@@ -440,6 +511,74 @@ func _parse_vector3(value: Variant, fallback: Vector3) -> Vector3:
 	if value is Array and value.size() >= 3:
 		return Vector3(float(value[0]), float(value[1]), float(value[2]))
 	return fallback
+
+
+func _prepare_survey_samples(samples: Array, edge_inset: float, height_offset: float, max_edge_jump: float) -> Array:
+	var prepared := samples.duplicate(true)
+	_orient_river_sections(prepared)
+	if max_edge_jump > 0.0:
+		_clamp_survey_edge_jumps(prepared, max_edge_jump)
+	if edge_inset > 0.0:
+		_inset_survey_edges(prepared, edge_inset)
+	if not is_zero_approx(height_offset):
+		_offset_survey_height(prepared, height_offset)
+	return prepared
+
+
+func _clamp_survey_edge_jumps(samples: Array, max_edge_jump: float) -> void:
+	if samples.size() < 2:
+		return
+
+	for index in range(1, samples.size()):
+		var previous: Dictionary = samples[index - 1]
+		var current: Dictionary = samples[index]
+		var previous_center: Vector3 = previous["center"]
+		var current_center: Vector3 = current["center"]
+		var center_delta := current_center - previous_center
+		center_delta.y = 0.0
+		var allowed_jump := maxf(max_edge_jump, _flat_distance(previous_center, current_center) * 3.0)
+
+		var previous_left: Vector3 = previous["left"]
+		var previous_right: Vector3 = previous["right"]
+		var current_left: Vector3 = current["left"]
+		var current_right: Vector3 = current["right"]
+		if _flat_distance(previous_left, current_left) > allowed_jump:
+			current_left = previous_left + center_delta
+			current_left.y = (current["left"] as Vector3).y
+			current["left"] = current_left
+		if _flat_distance(previous_right, current_right) > allowed_jump:
+			current_right = previous_right + center_delta
+			current_right.y = (current["right"] as Vector3).y
+			current["right"] = current_right
+		current["center"] = ((current["left"] as Vector3) + (current["right"] as Vector3)) * 0.5
+
+
+func _inset_survey_edges(samples: Array, edge_inset: float) -> void:
+	for sample in samples:
+		var left: Vector3 = sample["left"]
+		var right: Vector3 = sample["right"]
+		var width := _flat_distance(left, right)
+		if width <= 0.01:
+			continue
+		var midpoint := (left + right) * 0.5
+		var weight := clampf(edge_inset / width, 0.0, 0.45)
+		sample["left"] = left.lerp(midpoint, weight)
+		sample["right"] = right.lerp(midpoint, weight)
+		sample["center"] = ((sample["left"] as Vector3) + (sample["right"] as Vector3)) * 0.5
+
+
+func _offset_survey_height(samples: Array, height_offset: float) -> void:
+	for sample in samples:
+		var left: Vector3 = sample["left"]
+		var right: Vector3 = sample["right"]
+		var center: Vector3 = sample["center"]
+		left.y += height_offset
+		right.y += height_offset
+		center.y += height_offset
+		sample["left"] = left
+		sample["right"] = right
+		sample["center"] = center
+		sample["depth"] = maxf(float(sample["depth"]) + height_offset, 0.1)
 
 
 func _sample_river_edge_pairs(markers: Array, sample_step: float, smooth_passes: int, global_surface_offset: float) -> Array:
@@ -698,19 +837,11 @@ func _flat_distance_squared(a: Vector3, b: Vector3) -> float:
 	return delta_x * delta_x + delta_z * delta_z
 
 
-func _build_river_edge_mesh(samples: Array, surface_material: Material, volume_material: Material) -> ArrayMesh:
-	var left_top: Array[Vector3] = []
-	var right_top: Array[Vector3] = []
-	var left_bottom: Array[Vector3] = []
-	var right_bottom: Array[Vector3] = []
+func _flat_distance(a: Vector3, b: Vector3) -> float:
+	return sqrt(_flat_distance_squared(a, b))
 
-	for index in samples.size():
-		var depth := float(samples[index]["depth"])
-		left_top.append(samples[index]["left"])
-		right_top.append(samples[index]["right"])
-		left_bottom.append(left_top[-1] - Vector3(0.0, depth, 0.0))
-		right_bottom.append(right_top[-1] - Vector3(0.0, depth, 0.0))
 
+func _build_river_edge_mesh(samples: Array, surface_material: Material) -> ArrayMesh:
 	var surface_vertices := PackedVector3Array()
 	var surface_uvs := PackedVector2Array()
 	var surface_indices := PackedInt32Array()
@@ -718,8 +849,8 @@ func _build_river_edge_mesh(samples: Array, surface_material: Material, volume_m
 	for index in samples.size():
 		if index > 0:
 			length_u += (samples[index]["center"] as Vector3).distance_to(samples[index - 1]["center"])
-		surface_vertices.append(left_top[index])
-		surface_vertices.append(right_top[index])
+		surface_vertices.append(samples[index]["left"])
+		surface_vertices.append(samples[index]["right"])
 		surface_uvs.append(Vector2(length_u * 0.05, 0.0))
 		surface_uvs.append(Vector2(length_u * 0.05, 1.0))
 
@@ -727,18 +858,8 @@ func _build_river_edge_mesh(samples: Array, surface_material: Material, volume_m
 		var base := index * 2
 		surface_indices.append_array(PackedInt32Array([base, base + 2, base + 1, base + 1, base + 2, base + 3]))
 
-	var volume_vertices := PackedVector3Array()
-	var volume_uvs := PackedVector2Array()
-	var volume_indices := PackedInt32Array()
-	_add_river_volume_faces(volume_vertices, volume_uvs, volume_indices, left_top, left_bottom)
-	_add_river_volume_faces(volume_vertices, volume_uvs, volume_indices, right_bottom, right_top)
-	_add_river_volume_faces(volume_vertices, volume_uvs, volume_indices, left_bottom, right_bottom)
-	_add_river_cap(volume_vertices, volume_uvs, volume_indices, left_top[0], right_top[0], right_bottom[0], left_bottom[0])
-	_add_river_cap(volume_vertices, volume_uvs, volume_indices, right_top[-1], left_top[-1], left_bottom[-1], right_bottom[-1])
-
 	var mesh := ArrayMesh.new()
 	_add_mesh_surface(mesh, surface_vertices, surface_uvs, surface_indices, surface_material)
-	_add_mesh_surface(mesh, volume_vertices, volume_uvs, volume_indices, volume_material)
 	return mesh
 
 
@@ -765,27 +886,7 @@ func _add_river_edge_collision_prisms(area: Area3D, samples: Array) -> void:
 		collision.owner = editor_plugin.get_scene_root()
 
 
-func _add_river_volume_faces(vertices: PackedVector3Array, uvs: PackedVector2Array, indices: PackedInt32Array, a_points: Array[Vector3], b_points: Array[Vector3]) -> void:
-	var start := vertices.size()
-	for index in a_points.size():
-		vertices.append(a_points[index])
-		vertices.append(b_points[index])
-		uvs.append(Vector2(index, 0.0))
-		uvs.append(Vector2(index, 1.0))
-
-	for index in range(a_points.size() - 1):
-		var base := start + index * 2
-		indices.append_array(PackedInt32Array([base, base + 2, base + 1, base + 1, base + 2, base + 3]))
-
-
-func _add_river_cap(vertices: PackedVector3Array, uvs: PackedVector2Array, indices: PackedInt32Array, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
-	var base := vertices.size()
-	vertices.append_array(PackedVector3Array([a, b, c, d]))
-	uvs.append_array(PackedVector2Array([Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]))
-	indices.append_array(PackedInt32Array([base, base + 1, base + 2, base, base + 2, base + 3]))
-
-
-func _bake_lake(parent: Node, route: Dictionary, surface_material: Material, volume_material: Material, smooth_passes: int, global_surface_offset: float) -> bool:
+func _bake_lake(parent: Node, route: Dictionary, surface_material: Material, smooth_passes: int, global_surface_offset: float, minimum_depth: float) -> bool:
 	var markers: Array = route["markers"]
 	if markers.size() < 3:
 		return false
@@ -795,7 +896,7 @@ func _bake_lake(parent: Node, route: Dictionary, surface_material: Material, vol
 		var water_profile := _get_marker_water_profile(marker, global_surface_offset, 3.0)
 		profiles.append({
 			"position": water_profile["position"],
-			"depth": water_profile["depth"],
+			"depth": maxf(float(water_profile["depth"]), minimum_depth),
 		})
 	_order_lake_profiles_around_center(profiles)
 	_remove_duplicate_lake_profiles(profiles)
@@ -827,12 +928,13 @@ func _bake_lake(parent: Node, route: Dictionary, surface_material: Material, vol
 
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "WaterMesh"
-	mesh_instance.mesh = _build_lake_mesh(top_points, bottom_points, triangles, surface_material, volume_material)
+	mesh_instance.mesh = _build_lake_mesh(top_points, triangles, surface_material)
 	body.add_child(mesh_instance)
 	mesh_instance.owner = editor_plugin.get_scene_root()
 
 	var area := Area3D.new()
 	area.name = "WaterArea"
+	_configure_water_area(area)
 	body.add_child(area)
 	area.owner = editor_plugin.get_scene_root()
 	_add_lake_collision_prisms(area, top_points, bottom_points, triangles)
@@ -892,7 +994,7 @@ func _lerp_lake_profile(a: Dictionary, b: Dictionary, weight: float) -> Dictiona
 	}
 
 
-func _build_lake_mesh(top_points: Array[Vector3], bottom_points: Array[Vector3], triangles: PackedInt32Array, surface_material: Material, volume_material: Material) -> ArrayMesh:
+func _build_lake_mesh(top_points: Array[Vector3], triangles: PackedInt32Array, surface_material: Material) -> ArrayMesh:
 	var surface_vertices := PackedVector3Array()
 	var surface_uvs := PackedVector2Array()
 	var surface_indices := PackedInt32Array()
@@ -901,25 +1003,8 @@ func _build_lake_mesh(top_points: Array[Vector3], bottom_points: Array[Vector3],
 		surface_uvs.append(Vector2(point.x, point.z) * 0.05)
 	surface_indices = triangles
 
-	var volume_vertices := PackedVector3Array()
-	var volume_uvs := PackedVector2Array()
-	var volume_indices := PackedInt32Array()
-	for point in bottom_points:
-		volume_vertices.append(point)
-		volume_uvs.append(Vector2(point.x, point.z) * 0.05)
-	for index in range(0, triangles.size(), 3):
-		volume_indices.append_array(PackedInt32Array([triangles[index + 2], triangles[index + 1], triangles[index]]))
-
-	for index in top_points.size():
-		var next := (index + 1) % top_points.size()
-		var base := volume_vertices.size()
-		volume_vertices.append_array(PackedVector3Array([top_points[index], top_points[next], bottom_points[next], bottom_points[index]]))
-		volume_uvs.append_array(PackedVector2Array([Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]))
-		volume_indices.append_array(PackedInt32Array([base, base + 1, base + 2, base, base + 2, base + 3]))
-
 	var mesh := ArrayMesh.new()
 	_add_mesh_surface(mesh, surface_vertices, surface_uvs, surface_indices, surface_material)
-	_add_mesh_surface(mesh, volume_vertices, volume_uvs, volume_indices, volume_material)
 	return mesh
 
 
@@ -944,11 +1029,27 @@ func _add_lake_collision_prisms(area: Area3D, top_points: Array[Vector3], bottom
 func _add_mesh_surface(mesh: ArrayMesh, vertices: PackedVector3Array, uvs: PackedVector2Array, indices: PackedInt32Array, material: Material) -> void:
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_NORMAL] = _make_surface_normals(vertices.size())
+	arrays[Mesh.ARRAY_TANGENT] = _make_surface_tangents(vertices.size())
 	arrays[Mesh.ARRAY_VERTEX] = vertices
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
 	arrays[Mesh.ARRAY_INDEX] = indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+
+
+func _make_surface_normals(vertex_count: int) -> PackedVector3Array:
+	var normals := PackedVector3Array()
+	for _index in vertex_count:
+		normals.append(Vector3.UP)
+	return normals
+
+
+func _make_surface_tangents(vertex_count: int) -> PackedFloat32Array:
+	var tangents := PackedFloat32Array()
+	for _index in vertex_count:
+		tangents.append_array(PackedFloat32Array([1.0, 0.0, 0.0, 1.0]))
+	return tangents
 
 
 func _catmull_rom_point(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, t: float) -> Vector3:
