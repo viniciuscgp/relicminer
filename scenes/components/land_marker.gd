@@ -1,13 +1,22 @@
+@tool
 extends Node3D
 
-@export var label:String = "Label"
+@export var label: String = "Label":
+	set(value):
+		label = value
+		_update_label()
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
-	$Label3D.text = label	
-	pass # Replace with function body.
+	_update_label()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		_update_label()
+
+
+func _update_label() -> void:
+	var label_node := get_node_or_null("Label3D") as Label3D
+	if label_node and label_node.text != label:
+		label_node.text = label

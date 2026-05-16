@@ -138,6 +138,10 @@ func _on_bake_pressed() -> void:
 		_set_status("Terrain3D has no data resource.", true)
 		return
 	_refresh_texture_options(terrain)
+	var texture_id := _get_selected_texture_id()
+	if texture_id == NO_TEXTURE_ID:
+		_set_status("Select a Terrain3D texture before baking.", true)
+		return
 
 	var routes: Array[Array] = _collect_routes(root)
 	if routes.is_empty():
@@ -152,7 +156,7 @@ func _on_bake_pressed() -> void:
 		float(falloff_spin.value),
 		float(sample_step_spin.value),
 		float(write_step_spin.value),
-		_get_selected_texture_id(),
+		texture_id,
 		float(texture_cutoff_spin.value)
 	)
 
@@ -293,7 +297,6 @@ func _refresh_texture_options(terrain: Node = null) -> void:
 
 	var selected_id := _get_selected_texture_id()
 	texture_option.clear()
-	texture_option.add_item("No texture paint", NO_TEXTURE_ID)
 
 	if not terrain:
 		var root: Node = editor_plugin.get_scene_root() if editor_plugin else null
@@ -312,6 +315,9 @@ func _refresh_texture_options(terrain: Node = null) -> void:
 			if texture_name.is_empty():
 				texture_name = "Texture %d" % texture_id
 			texture_option.add_item("%d - %s" % [texture_id, texture_name], texture_id)
+
+	if texture_option.item_count == 0:
+		texture_option.add_item("No Terrain3D textures found", NO_TEXTURE_ID)
 
 	_select_texture_id(selected_id)
 
@@ -341,21 +347,23 @@ func _find_first_by_class(node: Node, cls_name: String) -> Node:
 
 
 func _collect_routes(root: Node) -> Array[Array]:
-	var street_root := root.find_child("Street", true, false)
-	if not street_root:
-		return []
-
 	var routes: Array[Array] = []
-	var direct_route := _collect_street_makers_under(street_root, false)
+	_collect_routes_recursive(root, routes)
+	return routes
+
+
+func _collect_routes_recursive(node: Node, routes: Array[Array]) -> void:
+	if node != editor_plugin.get_scene_root() and not _is_marker_visible(node):
+		return
+	if _is_street_maker(node):
+		return
+
+	var direct_route := _collect_street_makers_under(node, false)
 	if direct_route.size() >= 2:
 		routes.append(direct_route)
 
-	for child in street_root.get_children():
-		var route := _collect_street_makers_under(child, true)
-		if route.size() >= 2:
-			routes.append(route)
-
-	return routes
+	for child in node.get_children():
+		_collect_routes_recursive(child, routes)
 
 
 func _collect_street_makers_under(node: Node, recursive: bool) -> Array[Vector3]:
