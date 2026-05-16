@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://egneeaiwbsax"]
+
+[ext_resource type="Script" uid="uid://hmc7yu6474ab" path="res://scenes/components/river_marker.gd" id="1_river"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wppo2"]
+radius = 2.0
+height = 8.0
+
+[node name="RiverMarker" type="Node3D" unique_id=210068478]
+script = ExtResource("1_river")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=859792193]
+mesh = SubResource("CapsuleMesh_wppo2")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=498491488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+billboard = 1
+text = "RiverMarker
+edge / d 2.0
+surface y 0.0"
+outline_size = 8

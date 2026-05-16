@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://addons/relic_road_tools/water_surface.gdshader" id="1_surface"]
+[ext_resource type="Texture2D" path="res://textures/water/0001.png" id="2_normal_a"]
+[ext_resource type="Texture2D" path="res://textures/water/0060.png" id="3_normal_b"]
+[ext_resource type="Texture2D" path="res://textures/water/0120.png" id="4_normal_c"]
+
+[resource]
+shader = ExtResource("1_surface")
+shader_parameter/normal_a = ExtResource("2_normal_a")
+shader_parameter/normal_b = ExtResource("3_normal_b")
+shader_parameter/normal_c = ExtResource("4_normal_c")

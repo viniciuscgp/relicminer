@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
 
-@export var speed := 15.0
+@export var speed := 25.0
 @export var jump_velocity := 14.5
 @export var mouse_sensitivity := 0.0025
 @export var gamepad_look_sensitivity := 3.0
@@ -42,5 +42,4 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0, friction * delta)
-
 	move_and_slide()
