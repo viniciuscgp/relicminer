@@ -2,7 +2,6 @@
 extends VBoxContainer
 
 
-const RIVER_MARKER_SCENE := "res://scenes/components/river_marker.tscn"
 const LAKE_MARKER_SCENE := "res://scenes/components/lake_marker.tscn"
 const GENERATED_ROOT_NAME := "GeneratedWater"
 const SURVEY_RIVER_PREFIX := "SurveyRiver_"
@@ -12,7 +11,6 @@ const DEFAULT_SURFACE_MATERIAL := preload("res://addons/relic_road_tools/water_s
 
 
 var editor_plugin: EditorPlugin
-var curve_step_spin: SpinBox
 var smooth_passes_spin: SpinBox
 var surface_offset_spin: SpinBox
 var survey_edge_inset_spin: SpinBox
@@ -35,11 +33,10 @@ func _init() -> void:
 
 	var title := Label.new()
 	title.text = "Water Baker"
-	title.tooltip_text = "Gera meshes de rios e lagoas a partir de marcadores visiveis e arquivos de scan."
+	title.tooltip_text = "Gera lagoas a partir de marcadores visiveis e rios a partir de arquivos de scan."
 	title.add_theme_font_size_override("font_size", 16)
 	add_child(title)
 
-	curve_step_spin = _add_spin("Passo Curva", 0.5, 30.0, 0.5, 4.0, "m", "Distancia entre pontos amostrados nas curvas de rio por marcador. Valores menores seguem melhor a curva.")
 	smooth_passes_spin = _add_spin("Suavizacao", 0.0, 5.0, 1.0, 2.0, "", "Suaviza cantos de rios e lagoas. Valores maiores arredondam mais, mas podem puxar a borda para dentro.")
 	surface_offset_spin = _add_spin("Altura Global", -100.0, 100.0, 0.1, 0.0, "m", "Soma uma altura global na superficie gerada a partir dos marcadores.")
 	survey_edge_inset_spin = _add_spin("Recuo Scan", 0.0, 12.0, 0.25, 1.5, "m", "Puxa as bordas dos rios escaneados para dentro da vala para evitar agua exatamente em cima da margem.")
@@ -52,7 +49,7 @@ func _init() -> void:
 
 	bake_button = Button.new()
 	bake_button.text = "Gerar Marcadores"
-	bake_button.tooltip_text = "Gera lagoas e rios por marcadores visiveis, criando mesh e volumes Area3D."
+	bake_button.tooltip_text = "Gera lagoas por LakeMarker, criando mesh e volumes Area3D."
 	bake_button.pressed.connect(_on_bake_pressed)
 	add_child(bake_button)
 
@@ -142,31 +139,22 @@ func _on_bake_pressed() -> void:
 		_set_status("No edited scene is open.", true)
 		return
 
-	var river_routes := _collect_marker_routes(root, true)
-	var lake_routes := _collect_marker_routes(root, false)
-	if river_routes.is_empty() and lake_routes.is_empty():
-		_set_status("No visible river or lake marker routes found.", true)
+	var lake_routes := _collect_marker_routes(root)
+	if lake_routes.is_empty():
+		_set_status("Nenhuma rota visivel de LakeMarker encontrada.", true)
 		return
 
 	var generated_root := _get_or_create_generated_root(root)
 	_clear_marker_generated_water(generated_root)
 
 	var surface_material := _get_picker_material(surface_picker, DEFAULT_SURFACE_MATERIAL)
-	var curve_step := float(curve_step_spin.value)
 	var smooth_passes := int(smooth_passes_spin.value)
 	var surface_offset := float(surface_offset_spin.value)
 	var lake_height_offset := float(lake_height_offset_spin.value)
 	var lake_min_depth := float(lake_min_depth_spin.value)
-	var river_count := 0
 	var lake_count := 0
 	var invalid_count := 0
 	bake_warnings.clear()
-
-	for route in river_routes:
-		if _bake_river(generated_root, route, surface_material, curve_step, smooth_passes, surface_offset):
-			river_count += 1
-		else:
-			invalid_count += 1
 
 	for route in lake_routes:
 		if _bake_lake(generated_root, route, surface_material, smooth_passes, surface_offset + lake_height_offset, lake_min_depth):
@@ -174,13 +162,13 @@ func _on_bake_pressed() -> void:
 		else:
 			invalid_count += 1
 
-	if river_count == 0 and lake_count == 0:
+	if lake_count == 0:
 		if invalid_count == 0:
-			_set_status("No water generated. Check marker counts and order.", true)
+			_set_status("Nenhuma lagoa gerada. Verifique quantidade e ordem dos marcadores.", true)
 		return
 
 	EditorInterface.mark_scene_as_unsaved()
-	var message := "Generated %d river(s) and %d lake(s)." % [river_count, lake_count]
+	var message := "Gerou %d lagoa(s)." % lake_count
 	if not bake_warnings.is_empty():
 		message += " " + " ".join(bake_warnings)
 	_set_status(message, false)
@@ -301,34 +289,33 @@ func _clear_named_child(node: Node, child_name: String) -> void:
 		child.free()
 
 
-func _collect_marker_routes(root: Node, river: bool) -> Array:
+func _collect_marker_routes(root: Node) -> Array:
 	var routes: Array = []
-	_collect_marker_routes_recursive(root, root, river, routes)
+	_collect_marker_routes_recursive(root, root, routes)
 	return routes
 
 
-func _collect_marker_routes_recursive(root: Node, node: Node, river: bool, routes: Array) -> void:
+func _collect_marker_routes_recursive(root: Node, node: Node, routes: Array) -> void:
 	if node != root and not _is_visible_node(node):
 		return
-	if _is_marker(node, river):
+	if _is_marker(node):
 		return
 
-	var route := _collect_direct_markers(node, river)
-	var minimum := 2 if river else 3
-	if route.size() >= minimum:
+	var route := _collect_direct_markers(node)
+	if route.size() >= 3:
 		routes.append({
 			"name": node.name,
 			"markers": route,
 		})
 
 	for child in node.get_children():
-		_collect_marker_routes_recursive(root, child, river, routes)
+		_collect_marker_routes_recursive(root, child, routes)
 
 
-func _collect_direct_markers(node: Node, river: bool) -> Array:
+func _collect_direct_markers(node: Node) -> Array:
 	var markers: Array = []
 	for child in node.get_children():
-		if _is_marker(child, river) and _is_visible_node(child):
+		if _is_marker(child) and _is_visible_node(child):
 			markers.append(child)
 	markers.sort_custom(_compare_marker_order)
 	return markers
@@ -355,9 +342,7 @@ func _marker_order_index(marker_name: StringName) -> int:
 	return int(digits)
 
 
-func _is_marker(node: Node, river: bool) -> bool:
-	if river:
-		return node.name.begins_with("RiverMarker") or node.scene_file_path == RIVER_MARKER_SCENE
+func _is_marker(node: Node) -> bool:
 	return node.name.begins_with("LakeMarker") or node.scene_file_path == LAKE_MARKER_SCENE
 
 
@@ -367,43 +352,6 @@ func _is_visible_node(node: Node) -> bool:
 	for property in node.get_property_list():
 		if String(property.name) == "visible":
 			return bool(node.get("visible"))
-	return true
-
-
-func _bake_river(parent: Node, route: Dictionary, surface_material: Material, curve_step: float, smooth_passes: int, global_surface_offset: float) -> bool:
-	var markers: Array = (route["markers"] as Array).duplicate()
-	if markers.size() < 4:
-		_set_status("River %s found %d RiverMarker node(s), but needs at least 4: two edge pairs." % [String(route["name"]), markers.size()], true)
-		return false
-	if markers.size() % 2 != 0:
-		var skip_index := _choose_unpaired_river_marker_to_skip(markers, global_surface_offset)
-		var skipped_marker: Node = markers[skip_index]
-		markers.remove_at(skip_index)
-		var warning := "River %s had an odd marker count; skipped %s for this bake." % [String(route["name"]), skipped_marker.name]
-		bake_warnings.append(warning)
-		push_warning("WaterBaker: " + warning)
-
-	var samples := _sample_river_edge_pairs(markers, curve_step, smooth_passes, global_surface_offset)
-	if samples.size() < 2:
-		return false
-
-	var body := Node3D.new()
-	body.name = _safe_node_name(String(route["name"]))
-	parent.add_child(body)
-	body.owner = editor_plugin.get_scene_root()
-
-	var mesh_instance := MeshInstance3D.new()
-	mesh_instance.name = "WaterMesh"
-	mesh_instance.mesh = _build_river_edge_mesh(samples, surface_material)
-	body.add_child(mesh_instance)
-	mesh_instance.owner = editor_plugin.get_scene_root()
-
-	var area := Area3D.new()
-	area.name = "WaterArea"
-	_configure_water_area(area)
-	body.add_child(area)
-	area.owner = editor_plugin.get_scene_root()
-	_add_river_edge_collision_prisms(area, samples)
 	return true
 
 
@@ -581,89 +529,6 @@ func _offset_survey_height(samples: Array, height_offset: float) -> void:
 		sample["depth"] = maxf(float(sample["depth"]) + height_offset, 0.1)
 
 
-func _sample_river_edge_pairs(markers: Array, sample_step: float, smooth_passes: int, global_surface_offset: float) -> Array:
-	var profiles: Array = []
-	for marker in markers:
-		profiles.append(_get_marker_water_profile(marker, global_surface_offset, 2.0))
-
-	var sections := _build_river_edge_sections(profiles)
-	_order_river_sections(sections)
-	_optimize_river_section_order(sections)
-	_orient_river_sections(sections)
-	sections = _smooth_river_sections(sections, smooth_passes)
-
-	var samples: Array = []
-	for segment in range(sections.size() - 1):
-		var left1: Vector3 = sections[segment]["left"]
-		var left2: Vector3 = sections[segment + 1]["left"]
-		var right1: Vector3 = sections[segment]["right"]
-		var right2: Vector3 = sections[segment + 1]["right"]
-		var center1: Vector3 = sections[segment]["center"]
-		var center2: Vector3 = sections[segment + 1]["center"]
-		var distance := center1.distance_to(center2)
-		var steps := maxi(2, ceili(distance / maxf(sample_step, 0.25)))
-
-		for step in range(steps):
-			var t := float(step) / float(steps)
-			var left := left1.lerp(left2, t)
-			var right := right1.lerp(right2, t)
-			samples.append({
-				"left": left,
-				"right": right,
-				"center": (left + right) * 0.5,
-				"depth": lerpf(float(sections[segment]["depth"]), float(sections[segment + 1]["depth"]), t),
-			})
-
-	samples.append(sections[-1])
-	return samples
-
-
-func _choose_unpaired_river_marker_to_skip(markers: Array, global_surface_offset: float) -> int:
-	var best_index := 0
-	var best_score := INF
-	for skip_index in markers.size():
-		var profiles: Array = []
-		for marker_index in markers.size():
-			if marker_index == skip_index:
-				continue
-			profiles.append(_get_marker_water_profile(markers[marker_index], global_surface_offset, 2.0))
-
-		var sections := _build_river_edge_sections(profiles)
-		_order_river_sections(sections)
-		_optimize_river_section_order(sections)
-		_orient_river_sections(sections)
-		var score := _score_river_sections(sections)
-		if score < best_score:
-			best_score = score
-			best_index = skip_index
-	return best_index
-
-
-func _score_river_sections(sections: Array) -> float:
-	if sections.size() < 2:
-		return INF
-
-	var score := 0.0
-	for section in sections:
-		var left: Vector3 = section["left"]
-		var right: Vector3 = section["right"]
-		score += _flat_distance_squared(left, right) * 0.25
-
-	for index in range(sections.size() - 1):
-		var current_center: Vector3 = sections[index]["center"]
-		var next_center: Vector3 = sections[index + 1]["center"]
-		score += _flat_distance_squared(current_center, next_center)
-
-		var left_a: Vector3 = sections[index]["left"]
-		var right_a: Vector3 = sections[index]["right"]
-		var left_b: Vector3 = sections[index + 1]["left"]
-		var right_b: Vector3 = sections[index + 1]["right"]
-		score += maxf(0.0, _flat_distance_squared(left_a, left_b) - _flat_distance_squared(current_center, next_center)) * 0.15
-		score += maxf(0.0, _flat_distance_squared(right_a, right_b) - _flat_distance_squared(current_center, next_center)) * 0.15
-
-	return score
-
-
 func _smooth_river_sections(sections: Array, smooth_passes: int) -> Array:
 	var smoothed := sections.duplicate(true)
 	for _pass_index in range(clampi(smooth_passes, 0, 5)):
@@ -694,125 +559,6 @@ func _lerp_river_section(a: Dictionary, b: Dictionary, weight: float) -> Diction
 		"center": (left + right) * 0.5,
 		"depth": lerpf(float(a["depth"]), float(b["depth"]), weight),
 	}
-
-
-func _build_river_edge_sections(profiles: Array) -> Array:
-	var candidates: Array = []
-	for a in profiles.size():
-		for b in range(a + 1, profiles.size()):
-			var a_position: Vector3 = profiles[a]["position"]
-			var b_position: Vector3 = profiles[b]["position"]
-			candidates.append({
-				"a": a,
-				"b": b,
-				"distance": _flat_distance_squared(a_position, b_position),
-			})
-	candidates.sort_custom(_compare_pair_candidate)
-
-	var used := {}
-	var sections: Array = []
-	for candidate in candidates:
-		var a_index: int = candidate["a"]
-		var b_index: int = candidate["b"]
-		if used.has(a_index) or used.has(b_index):
-			continue
-
-		used[a_index] = true
-		used[b_index] = true
-		var left: Vector3 = profiles[a_index]["position"]
-		var right: Vector3 = profiles[b_index]["position"]
-		var surface_y := (left.y + right.y) * 0.5
-		left.y = surface_y
-		right.y = surface_y
-		sections.append({
-			"left": left,
-			"right": right,
-			"center": (left + right) * 0.5,
-			"depth": maxf((float(profiles[a_index]["depth"]) + float(profiles[b_index]["depth"])) * 0.5, 0.1),
-		})
-
-	return sections
-
-
-func _compare_pair_candidate(a: Dictionary, b: Dictionary) -> bool:
-	return float(a["distance"]) < float(b["distance"])
-
-
-func _order_river_sections(sections: Array) -> void:
-	if sections.size() < 3:
-		return
-
-	var start_index := _find_farthest_section_endpoint(sections)
-	var ordered: Array = [sections[start_index]]
-	var used := {start_index: true}
-
-	while ordered.size() < sections.size():
-		var last_center: Vector3 = ordered[-1]["center"]
-		var best_index := -1
-		var best_distance := INF
-		for index in sections.size():
-			if used.has(index):
-				continue
-			var center: Vector3 = sections[index]["center"]
-			var distance := _flat_distance_squared(last_center, center)
-			if distance < best_distance:
-				best_distance = distance
-				best_index = index
-		if best_index < 0:
-			break
-		used[best_index] = true
-		ordered.append(sections[best_index])
-
-	sections.clear()
-	sections.append_array(ordered)
-
-
-func _find_farthest_section_endpoint(sections: Array) -> int:
-	var best_a := 0
-	var best_distance := -1.0
-	for a in sections.size():
-		var a_center: Vector3 = sections[a]["center"]
-		for b in range(a + 1, sections.size()):
-			var b_center: Vector3 = sections[b]["center"]
-			var distance := _flat_distance_squared(a_center, b_center)
-			if distance > best_distance:
-				best_distance = distance
-				best_a = a
-	return best_a
-
-
-func _optimize_river_section_order(sections: Array) -> void:
-	if sections.size() < 4:
-		return
-
-	var improved := true
-	var max_passes := 24
-	var pass_index := 0
-	while improved and pass_index < max_passes:
-		improved = false
-		pass_index += 1
-		for a in range(0, sections.size() - 3):
-			for b in range(a + 2, sections.size() - 1):
-				var current_cost := _section_link_cost(sections[a], sections[a + 1]) + _section_link_cost(sections[b], sections[b + 1])
-				var swapped_cost := _section_link_cost(sections[a], sections[b]) + _section_link_cost(sections[a + 1], sections[b + 1])
-				if swapped_cost + 0.001 < current_cost:
-					_reverse_sections(sections, a + 1, b)
-					improved = true
-
-
-func _section_link_cost(a: Dictionary, b: Dictionary) -> float:
-	var a_center: Vector3 = a["center"]
-	var b_center: Vector3 = b["center"]
-	return _flat_distance_squared(a_center, b_center)
-
-
-func _reverse_sections(sections: Array, start: int, end: int) -> void:
-	while start < end:
-		var temp: Variant = sections[start]
-		sections[start] = sections[end]
-		sections[end] = temp
-		start += 1
-		end -= 1
 
 
 func _orient_river_sections(sections: Array) -> void:

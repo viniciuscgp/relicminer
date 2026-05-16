@@ -12,8 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://cvv1rpqsr71jp" path="res://textures/terrain/Ground068_1K-PNG/Ground068_alb_ht.png" id="8_1l4sk"]
 [ext_resource type="Texture2D" uid="uid://b5qtvqrruxstj" path="res://textures/terrain/PavingStones142_1K-PNG/PavingStones142_alb_ht.png" id="9_u7c30"]
 [ext_resource type="Texture2D" uid="uid://bfa1lwhct5ow" path="res://textures/terrain/PavingStones142_1K-PNG/PavingStones142_nrm_rgh.png" id="10_nbnoy"]
-[ext_resource type="PackedScene" uid="uid://beyy0y5jn5mha" path="res://scenes/components/street_maker.tscn" id="11_1l4sk"]
-[ext_resource type="PackedScene" uid="uid://egneeaiwbsax" path="res://scenes/components/river_marker.tscn" id="14_nbnoy"]
+[ext_resource type="PackedScene" uid="uid://beyy0y5jn5mha" path="res://scenes/components/road_maker.tscn" id="11_1l4sk"]
 [ext_resource type="PackedScene" path="res://scenes/components/lake_marker.tscn" id="15_atjdx"]
 [ext_resource type="Material" uid="uid://dkxtwx1c8r7nh" path="res://addons/relic_road_tools/water_surface.tres" id="16_vdlkt"]
 
@@ -11805,13 +11804,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2793.465, -0.00012207031, 134
 [node name="StreetMaker12" parent="RoadValdora-Umbraferro" unique_id=879846889 instance=ExtResource("11_1l4sk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2793.465, -0.00012207031, 1346.7739)
 
-[node name="BlueRiver" type="Node3D" parent="." unique_id=53486719]
-visible = false
-
-[node name="RiverMarker" parent="BlueRiver" unique_id=210068478 instance=ExtResource("14_nbnoy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1532.0476, 8.229141, -810.4188)
-visible = false
-
 [node name="Lake" type="Node3D" parent="." unique_id=309140861]
 visible = false
 
@@ -11958,8 +11950,6 @@ transform = Transform3D(0.9800845, 0.19858114, 0, -0.19858114, 0.9800845, 0, 0, 
 
 [node name="LakeMarker39" parent="Lake" unique_id=754059330 instance=ExtResource("15_atjdx")]
 transform = Transform3D(0.9800845, 0.19858114, 0, -0.19858114, 0.9800845, 0, 0, 0, 1, 80.3653, 0, 1183.572)
-
-[node name="Balls" type="Node3D" parent="." unique_id=316650426]
 
 [node name="GeneratedWater" type="Node3D" parent="." unique_id=1225768568]
 
