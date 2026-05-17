@@ -7,13 +7,20 @@ var water_dock: Control
 
 
 func _enter_tree() -> void:
+	call_deferred("_create_docks")
+
+
+func _create_docks() -> void:
+	if road_dock or water_dock:
+		return
+
 	road_dock = preload("res://addons/relic_road_tools/road_baker_dock.gd").new()
 	road_dock.editor_plugin = self
-	add_control_to_dock(DOCK_SLOT_RIGHT_UL, road_dock)
+	add_control_to_dock(DOCK_SLOT_RIGHT_BL, road_dock)
 
 	water_dock = preload("res://addons/relic_road_tools/water_baker_dock.gd").new()
 	water_dock.editor_plugin = self
-	add_control_to_dock(DOCK_SLOT_RIGHT_UL, water_dock)
+	add_control_to_dock(DOCK_SLOT_RIGHT_BL, water_dock)
 
 
 func _exit_tree() -> void:
