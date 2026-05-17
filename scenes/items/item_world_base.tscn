@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/items/item_world_base.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_item"]
+albedo_color = Color(0.95, 0.78, 0.28, 1)
+roughness = 0.64
+
+[sub_resource type="BoxMesh" id="BoxMesh_item"]
+size = Vector3(0.35, 0.35, 0.35)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_item"]
+radius = 0.45
+
+[node name="ItemWorldBase" type="Area3D"]
+script = ExtResource("1")
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_item")
+mesh = SubResource("BoxMesh_item")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_item")

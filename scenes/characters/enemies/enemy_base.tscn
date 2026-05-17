@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/characters/enemies/enemy_base.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/components/combat_stats_component.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.62, 0.12, 0.1, 1)
+roughness = 0.76
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_enemy"]
+radius = 0.35
+height = 1.6
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
+radius = 0.35
+height = 1.6
+
+[node name="EnemyBase" type="CharacterBody3D"]
+script = ExtResource("1")
+
+[node name="CombatStats" parent="." instance=ExtResource("2")]
+display_name = "Inimigo"
+
+[node name="Inventory" parent="." instance=ExtResource("3")]
+display_name = "Inventario do inimigo"
+capacity_slots = 8
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+material_override = SubResource("StandardMaterial3D_enemy")
+mesh = SubResource("CapsuleMesh_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_enemy")

@@ -19,6 +19,11 @@ enum Kind {
 @export_multiline var description := ""
 @export var kind: Kind = Kind.MISC
 
+@export_group("Presentation")
+@export var icon: Texture2D
+@export var world_scene: PackedScene
+@export var generate_icon_from_world_scene := true
+
 @export_group("Inventory")
 @export_range(0.0, 1000.0, 0.01, "or_greater") var weight_kg := 0.0
 @export_range(1, 999, 1, "or_greater") var stack_limit := 1
@@ -48,3 +53,20 @@ func can_stack() -> bool:
 func is_key_for(lock_id: StringName) -> bool:
 	return kind == Kind.KEY and (key_id == lock_id or id == lock_id)
 
+
+func has_world_scene() -> bool:
+	return world_scene != null
+
+
+func should_generate_icon() -> bool:
+	return generate_icon_from_world_scene and world_scene != null
+
+
+func create_world_instance(amount := 1, durability := -1.0) -> Node:
+	if world_scene == null:
+		return null
+
+	var instance := world_scene.instantiate()
+	if instance.has_method("setup"):
+		instance.call("setup", self, amount, durability)
+	return instance
