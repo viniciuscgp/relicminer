@@ -1,5 +1,4 @@
 extends Node
-class_name InventoryComponent
 
 const ItemStackScript := preload("res://scripts/systems/items/item_stack.gd")
 

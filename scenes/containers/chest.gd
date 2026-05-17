@@ -1,10 +1,10 @@
-extends Node3D
-class_name InventoryContainer3D
+extends StaticBody3D
+class_name Chest
 
-signal opened(actor_inventory: Node, container_inventory: Node)
+signal opened(actor_inventory: Node, chest_inventory: Node)
 signal open_failed(reason: String)
 
-@export var inventory_path: NodePath = NodePath("Inventory")
+@export var inventory_path: NodePath = NodePath("InventoryComponent")
 
 @onready var inventory: Node = get_node_or_null(inventory_path)
 
@@ -14,12 +14,14 @@ func get_inventory() -> Node:
 
 
 func can_open(actor_inventory: Node = null) -> bool:
-	return inventory != null and bool(inventory.call("is_accessible", actor_inventory))
+	if inventory == null:
+		return false
+	return bool(inventory.call("is_accessible", actor_inventory))
 
 
 func open(actor_inventory: Node = null) -> bool:
 	if inventory == null:
-		open_failed.emit("Este container nao possui inventario.")
+		open_failed.emit("Este bau nao possui inventario.")
 		return false
 
 	if not bool(inventory.call("unlock_with", actor_inventory)):

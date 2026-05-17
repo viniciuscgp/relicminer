@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cthdl0i46to8p"]
 
-[ext_resource type="Script" uid="uid://7bhmvai7g1r5" path="res://scripts/player.gd" id="1_3vyb7"]
-[ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scripts/river_survey_recorder.gd" id="2_lsa8m"]
+[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_3vyb7"]
+[ext_resource type="Script" path="res://scenes/player/river_survey_recorder.gd" id="2_lsa8m"]
 [ext_resource type="PackedScene" uid="uid://dtxucqa7t3oe6" path="res://scenes/components/UnderwaterEnvironment.tscn" id="3_6n8mq"]
-[ext_resource type="Script" path="res://scripts/systems/inventory/inventory_component.gd" id="4_inventory"]
-[ext_resource type="Script" path="res://scripts/systems/player/player_stats.gd" id="5_stats"]
+[ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="4_inventory"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_stats.tscn" id="5_stats"]
 [ext_resource type="PackedScene" path="res://scenes/ui/player_hud.tscn" id="6_hud"]
 [ext_resource type="Script" path="res://scripts/systems/items/item_stack.gd" id="7_stack"]
 [ext_resource type="Resource" path="res://resources/items/simple_pickaxe.tres" id="8_pickaxe"]
@@ -67,15 +67,13 @@ amount = 12
 [node name="Player" type="CharacterBody3D" unique_id=817496980]
 script = ExtResource("1_3vyb7")
 
-[node name="Inventory" type="Node" parent="." unique_id=1129232090]
-script = ExtResource("4_inventory")
+[node name="Inventory" parent="." unique_id=1129232090 instance=ExtResource("4_inventory")]
 display_name = "Mochila"
 capacity_slots = 18
 max_weight_kg = 32.0
 starting_items = Array[Resource]([SubResource("ItemStack_pickaxe"), SubResource("ItemStack_sword"), SubResource("ItemStack_torch"), SubResource("ItemStack_bread"), SubResource("ItemStack_potion"), SubResource("ItemStack_stone"), SubResource("ItemStack_crown")])
 
-[node name="PlayerStats" type="Node" parent="." unique_id=302393514]
-script = ExtResource("5_stats")
+[node name="PlayerStats" parent="." unique_id=302393514 instance=ExtResource("5_stats")]
 inventory_path = NodePath("../Inventory")
 
 [node name="PlayerHUD" parent="." instance=ExtResource("6_hud")]

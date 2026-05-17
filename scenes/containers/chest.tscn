@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/containers/chest.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chest"]
+albedo_color = Color(0.36, 0.2, 0.1, 1)
+roughness = 0.72
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.55, 0.43, 0.24, 1)
+metallic = 0.55
+roughness = 0.38
+
+[sub_resource type="BoxMesh" id="BoxMesh_chest"]
+size = Vector3(1.35, 0.75, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_latch"]
+size = Vector3(0.18, 0.22, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
+size = Vector3(1.35, 0.75, 0.8)
+
+[node name="Chest" type="StaticBody3D"]
+script = ExtResource("1")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+material_override = SubResource("StandardMaterial3D_chest")
+mesh = SubResource("BoxMesh_chest")
+
+[node name="Latch" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, -0.44)
+material_override = SubResource("StandardMaterial3D_metal")
+mesh = SubResource("BoxMesh_latch")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+shape = SubResource("BoxShape3D_chest")
+
+[node name="InventoryComponent" parent="." instance=ExtResource("2")]
+display_name = "Bau"
+capacity_slots = 12

@@ -6,7 +6,8 @@ plugavel e facil de ler.
 
 ## Principios
 
-- Sistemas reutilizaveis ficam em componentes.
+- Sistemas reutilizaveis ficam em componentes instanciaveis quando fizer sentido.
+- Scripts especificos de uma cena ficam ao lado do `.tscn`.
 - O player, baus, NPCs e inimigos usam o mesmo inventario.
 - A UI/HUD fica em cenas separadas, plugadas onde for necessario.
 - Dados de itens ficam em Resources, nao espalhados em scripts.
@@ -27,7 +28,7 @@ plugavel e facil de ler.
 ## Fase 2 - Interacao e containers
 
 - [x] Criar contrato simples para abrir inventarios de outros objetos.
-- [ ] Criar cena base de bau usando `InventoryComponent`.
+- [x] Criar cena base de bau usando `InventoryComponent`.
 - [x] Permitir inventarios trancados por `key_id`.
 - [ ] Permitir transferir itens entre inventarios.
 - [ ] Criar uma UI separada para container/inventario.

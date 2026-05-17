@@ -1,5 +1,4 @@
 extends Node
-class_name PlayerStats
 
 signal changed
 signal health_changed(current: float, maximum: float)

@@ -1,5 +1,4 @@
 extends CanvasLayer
-class_name PlayerHUD
 
 @export var player_path: NodePath = NodePath("..")
 @export var update_interval := 0.15
