@@ -62,6 +62,10 @@ func _process(delta: float) -> void:
 	_apply_underwater_blend(_blend)
 
 
+func is_underwater() -> bool:
+	return _underwater
+
+
 func _resolve_target() -> Node3D:
 	if not target_path.is_empty():
 		var node := get_node_or_null(target_path) as Node3D

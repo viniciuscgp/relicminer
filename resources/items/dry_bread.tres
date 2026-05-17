@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"dry_bread"
+display_name = "Pao Seco"
+description = "Comida simples. Nao e boa, mas ajuda a seguir andando."
+kind = 5
+weight_kg = 0.3
+stack_limit = 8
+buy_price = 3
+sell_price = 1
+hunger_restore = 15.0
+

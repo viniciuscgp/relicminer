@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"simple_pickaxe"
+display_name = "Picareta Simples"
+description = "Ferramenta basica para pedra fraca e minerio comum."
+kind = 3
+weight_kg = 3.0
+stack_limit = 1
+buy_price = 50
+sell_price = 12
+weapon_damage = 4
+durability_max = 100.0
+

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"weak_healing_potion"
+display_name = "Pocao Fraca de Cura"
+description = "Recupera uma pequena quantidade de vida."
+kind = 6
+weight_kg = 0.4
+stack_limit = 6
+buy_price = 25
+sell_price = 8
+hp_restore = 25.0
+

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/inventory/inventory_container_3d.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/systems/inventory/inventory_component.gd" id="2"]
+
+[node name="InventoryContainer3D" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("2")
+display_name = "Container"
+capacity_slots = 12
+

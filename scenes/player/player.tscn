@@ -3,6 +3,17 @@
 [ext_resource type="Script" uid="uid://7bhmvai7g1r5" path="res://scripts/player.gd" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scripts/river_survey_recorder.gd" id="2_lsa8m"]
 [ext_resource type="PackedScene" uid="uid://dtxucqa7t3oe6" path="res://scenes/components/UnderwaterEnvironment.tscn" id="3_6n8mq"]
+[ext_resource type="Script" path="res://scripts/systems/inventory/inventory_component.gd" id="4_inventory"]
+[ext_resource type="Script" path="res://scripts/systems/player/player_stats.gd" id="5_stats"]
+[ext_resource type="PackedScene" path="res://scenes/ui/player_hud.tscn" id="6_hud"]
+[ext_resource type="Script" path="res://scripts/systems/items/item_stack.gd" id="7_stack"]
+[ext_resource type="Resource" path="res://resources/items/simple_pickaxe.tres" id="8_pickaxe"]
+[ext_resource type="Resource" path="res://resources/items/short_sword.tres" id="9_sword"]
+[ext_resource type="Resource" path="res://resources/items/simple_torch.tres" id="10_torch"]
+[ext_resource type="Resource" path="res://resources/items/dry_bread.tres" id="11_bread"]
+[ext_resource type="Resource" path="res://resources/items/weak_healing_potion.tres" id="12_potion"]
+[ext_resource type="Resource" path="res://resources/items/small_stone.tres" id="13_stone"]
+[ext_resource type="Resource" path="res://resources/items/copper_crown.tres" id="14_crown"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vyb7"]
 albedo_color = Color(1, 0.28235295, 1, 1)
@@ -15,8 +26,59 @@ height = 1.2
 radius = 0.25
 height = 1.2
 
+[sub_resource type="Resource" id="ItemStack_pickaxe"]
+script = ExtResource("7_stack")
+item = ExtResource("8_pickaxe")
+amount = 1
+durability = 100.0
+
+[sub_resource type="Resource" id="ItemStack_sword"]
+script = ExtResource("7_stack")
+item = ExtResource("9_sword")
+amount = 1
+durability = 100.0
+
+[sub_resource type="Resource" id="ItemStack_torch"]
+script = ExtResource("7_stack")
+item = ExtResource("10_torch")
+amount = 2
+durability = 180.0
+
+[sub_resource type="Resource" id="ItemStack_bread"]
+script = ExtResource("7_stack")
+item = ExtResource("11_bread")
+amount = 3
+
+[sub_resource type="Resource" id="ItemStack_potion"]
+script = ExtResource("7_stack")
+item = ExtResource("12_potion")
+amount = 1
+
+[sub_resource type="Resource" id="ItemStack_stone"]
+script = ExtResource("7_stack")
+item = ExtResource("13_stone")
+amount = 5
+
+[sub_resource type="Resource" id="ItemStack_crown"]
+script = ExtResource("7_stack")
+item = ExtResource("14_crown")
+amount = 12
+
 [node name="Player" type="CharacterBody3D" unique_id=817496980]
 script = ExtResource("1_3vyb7")
+
+[node name="Inventory" type="Node" parent="." unique_id=1129232090]
+script = ExtResource("4_inventory")
+display_name = "Mochila"
+capacity_slots = 18
+max_weight_kg = 32.0
+starting_items = Array[Resource]([SubResource("ItemStack_pickaxe"), SubResource("ItemStack_sword"), SubResource("ItemStack_torch"), SubResource("ItemStack_bread"), SubResource("ItemStack_potion"), SubResource("ItemStack_stone"), SubResource("ItemStack_crown")])
+
+[node name="PlayerStats" type="Node" parent="." unique_id=302393514]
+script = ExtResource("5_stats")
+inventory_path = NodePath("../Inventory")
+
+[node name="PlayerHUD" parent="." instance=ExtResource("6_hud")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=800391728]
 material_override = SubResource("StandardMaterial3D_3vyb7")
