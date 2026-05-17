@@ -1,0 +1,410 @@
+LORE BASE - RELIC MINER
+Região: Vale de Arvandor
+
+============================================================
+1. VISÃO GERAL DA REGIÃO
+============================================================
+
+O Vale de Arvandor é uma grande bacia natural cercada pela Cordilheira Cinzenta, 
+uma cadeia de montanhas antigas que isola a região do restante do mundo conhecido.
+
+Durante séculos, Arvandor foi evitado por viajantes, mercadores e exércitos. 
+As histórias falavam de minas amaldiçoadas, ruínas soterradas, 
+luzes estranhas nas montanhas e vozes vindas de cavernas profundas.
+
+Com o passar do tempo, a necessidade por metais raros, 
+cristais energéticos e antigas relíquias trouxe mineradores, aventureiros, 
+comerciantes e estudiosos para o vale. Pequenos acampamentos cresceram, 
+estradas foram abertas e, aos poucos, seis cidades principais surgiram ao redor das rotas de mineração.
+
+O que começou como uma corrida por minério se tornou algo muito maior. 
+Nas profundezas das minas, os trabalhadores começaram a encontrar objetos que não 
+pareciam ter sido feitos por mãos humanas comuns: placas gravadas, mecanismos de pedra e metal, 
+cristais que ainda emitem luz e fragmentos de uma civilização desaparecida.
+
+Essas descobertas deram origem ao nome pelo qual muitos aventureiros passaram a conhecer a região:
+
+Relic Miner — o vale onde quem minera a terra também desenterra o passado.
+
+============================================================
+2. A ANTIGA CIVILIZAÇÃO DE THAROM
+============================================================
+
+Muito antes das cidades atuais existirem, o Vale de Arvandor pertenceu aos Antigos de Tharom.
+Os Tharom eram uma civilização subterrânea avançada que dominava a mineração, 
+a lapidação de cristais e a criação de máquinas alimentadas por energia mineral. 
+Eles construíram câmaras profundas, templos sob montanhas, 
+torres de observação e túneis que conectavam diferentes partes do vale.
+
+Ninguém sabe exatamente por que eles desapareceram.
+
+Alguns dizem que cavaram fundo demais.
+Outros dizem que encontraram algo adormecido sob as montanhas.
+Há também quem acredite que os Tharom não desapareceram, mas se esconderam em algum lugar abaixo da terra.
+
+As relíquias encontradas pelo jogador pertencem a essa civilização perdida. 
+Cada uma delas revela um pequeno pedaço da verdade sobre Arvandor.
+
+============================================================
+3. PRINCIPAIS CIDADES DO VALE
+============================================================
+
+------------------------------------------------------------
+3.1. PEDRAFORTE - Cidade da Encruzilhada
+------------------------------------------------------------
+
+Pedraforte começou como um simples posto de descanso entre quatro estradas. 
+Mineradores, tropeiros e comerciantes paravam ali para descansar antes de seguir para as minas, montanhas, 
+rios ou cidades distantes.
+Com o tempo, o acampamento virou vila. A vila virou cidade. 
+Hoje Pedraforte é o ponto mais movimentado do Vale de Arvandor.
+
+É uma cidade prática, barulhenta e cheia de gente de todo tipo: mineradores, caçadores, aventureiros, 
+mercadores, ferreiros, carpinteiros, jogadores, ladrões e viajantes.
+
+Por ficar na encruzilhada principal do vale, Pedraforte é o melhor ponto inicial para o jogador.
+
+Função no jogo:
+- Hub inicial
+- Taverna
+- Ferreiro
+- Loja de ferramentas
+- Guilda de mineração
+- Quadro de missões
+- Primeiros NPCs importantes
+- Acesso para várias direções do mapa
+
+Possíveis locais internos:
+- Taverna do Machado Torto
+- Ferraria Brasa Velha
+- Guilda dos Escavadores
+- Armazém de Pedraforte
+- Praça dos Quatro Caminhos
+
+------------------------------------------------------------
+3.2. ALTAVIA - Cidade do Planalto
+------------------------------------------------------------
+
+Altavia foi construída no topo do Planalto das Três Coroas, uma enorme formação de pedra cercada por penhascos.
+Sua posição elevada torna a cidade naturalmente protegida. 
+Para chegar até seus portões, viajantes precisam subir uma estrada longa e sinuosa, 
+esculpida nas laterais do planalto.
+
+Altavia é uma cidade antiga, respeitada e um pouco distante do povo comum. 
+Ali vivem estudiosos, administradores, nobres locais e arqueólogos interessados nas ruínas de Tharom.
+
+Debaixo da cidade existem câmaras seladas, túneis esquecidos e inscrições gravadas em pedras 
+que ninguém conseguiu traduzir completamente.
+
+Alguns moradores acreditam que Altavia não foi fundada por humanos, 
+mas construída sobre as ruínas de uma antiga fortaleza Tharom.
+
+Função no jogo:
+- Cidade política e intelectual
+- Centro de estudos sobre relíquias
+- Missões arqueológicas
+- Biblioteca antiga
+- Acesso a ruínas elevadas
+- Descobertas importantes sobre a história principal
+
+Possíveis locais internos:
+- Biblioteca das Três Coroas
+- Salão dos Regentes
+- Observatório de Altavia
+- Arquivo das Relíquias
+- Escadaria do Planalto
+
+------------------------------------------------------------
+3.3. KARDUN - Cidade do Passo da Montanha
+------------------------------------------------------------
+
+Kardun guarda o principal caminho através da Cordilheira Cinzenta.
+Construída entre montanhas altas e paredões de pedra, a cidade parece mais uma fortaleza do que um povoado comum. 
+Seus muros protegem viajantes contra tempestades, deslizamentos, 
+criaturas das cavernas e saqueadores das trilhas altas.
+
+A vida em Kardun é dura. Os moradores estão acostumados ao frio, ao vento e ao perigo. 
+Muitos são guardas, caçadores, mineiros de altitude ou guias especializados em travessias perigosas.
+
+As minas próximas de Kardun são ricas em metais resistentes e cristais raros, 
+mas também estão entre as mais perigosas do vale.
+
+Função no jogo:
+- Cidade fortificada
+- Acesso a minas de montanha
+- Missões de escolta
+- Inimigos mais fortes
+- Entrada para áreas frias ou rochosas
+- Possível bloqueio natural para progressão
+
+Possíveis locais internos:
+- Portão de Kardun
+- Quartel da Guarda do Passo
+- Mina Alta de Ferrofrio
+- Estalagem do Vento Cortante
+- Torre dos Vigias
+
+------------------------------------------------------------
+3.4. SERPENTIA - Cidade do Rio
+------------------------------------------------------------
+
+Serpentia nasceu às margens do Rio Azul, no ponto onde o curso do rio serpenteia entre terras férteis, 
+pontes e antigas rotas de comércio.
+A cidade recebeu esse nome por causa das curvas do rio, 
+que vistas do alto lembram uma grande serpente atravessando o vale.
+
+Serpentia é uma cidade comercial. 
+Quase tudo que vem das minas passa por seus armazéns: ferro, cobre, prata, gemas, 
+cristais e objetos antigos encontrados nas escavações.
+
+Suas pontes ligam os dois lados da cidade, e suas margens vivem cheias de barqueiros, 
+vendedores, lavadeiras, pescadores e mercadores discutindo preços.
+
+Apesar da aparência movimentada e próspera, Serpentia tem seus mistérios. 
+Às vezes, objetos antigos aparecem presos nas redes dos pescadores. 
+Em certas noites, dizem que símbolos brilham nas pedras submersas do rio.
+
+Função no jogo:
+- Comércio de minérios
+- Mercado central
+- Transporte por rio
+- Missões de entrega
+- Pontes e docas
+- Mistérios ligados à água e às ruínas submersas
+
+Possíveis locais internos:
+- Mercado das Pontes
+- Docas de Serpentia
+- Ponte Velha
+- Casa dos Barqueiros
+- Armazém do Rio Azul
+
+------------------------------------------------------------
+3.5. VALDORA - Cidade do Vale
+------------------------------------------------------------
+
+Valdora fica numa região fértil entre colinas suaves e campos abertos.
+Enquanto outras cidades vivem da mineração, comércio e defesa, Valdora alimenta o Vale de Arvandor. 
+Seus campos produzem grãos, frutas, ervas medicinais e madeira tratada.
+
+A cidade tem um clima mais tranquilo, com fazendas, moinhos, celeiros e pequenos artesãos. 
+Porém, a paz de Valdora é apenas aparente.
+
+Nos campos ao redor existem antigas pedras circulares, marcas no solo e ruínas parcialmente enterradas. 
+Os agricultores dizem que as plantações crescem melhor perto dessas pedras, 
+mas os mais velhos evitam falar sobre elas.
+
+Função no jogo:
+- Cidade rural
+- Coleta de ervas e frutas
+- Missões de fazendeiros
+- Produção de comida
+- Mistérios antigos escondidos nos campos
+- Introdução a elementos sobrenaturais mais sutis
+
+Possíveis locais internos:
+- Moinho de Valdora
+- Campos de Bruma
+- Celeiro dos Irmãos Dorn
+- Círculo das Pedras Antigas
+- Casa da Herbalista
+
+------------------------------------------------------------
+3.6. LUNÁRIA - Cidade do Lago
+------------------------------------------------------------
+
+Lunária foi construída às margens do Lago da Lua Pálida.
+É uma cidade de pescadores, barqueiros, coletores de ervas aquáticas e pequenos comerciantes. 
+Suas casas avançam sobre a água em plataformas de madeira, e várias docas ligam a cidade ao lago.
+
+Em noites sem vento, quando a lua se reflete no lago, luzes azuladas aparecem sob a superfície. 
+Alguns dizem que são minerais brilhando no fundo. Outros juram que são janelas de uma cidade submersa.
+
+Lunária é bela, mas estranha. A neblina aparece mesmo em dias quentes, 
+e sons distantes podem ser ouvidos vindo do meio do lago.
+
+Função no jogo:
+- Pesca
+- Docas
+- Ruínas submersas
+- Materiais raros ligados à água
+- Missões misteriosas
+- Possível área de exploração com barco
+
+Possíveis locais internos:
+- Docas da Lua Pálida
+- Farol de Lunária
+- Casa dos Pescadores
+- Santuário da Água Serena
+- Ilha do Reflexo
+
+============================================================
+4. LOCAIS NATURAIS IMPORTANTES
+============================================================
+
+Cordilheira Cinzenta:
+A grande cadeia de montanhas que cerca o Vale de Arvandor. 
+Serve como barreira natural e define os limites do mapa. 
+É cheia de passagens estreitas, cavernas, minas abandonadas e trilhas perigosas.
+
+Rio Azul:
+O principal rio do vale. Nasce nas montanhas ao norte e atravessa parte da região 
+até desaguar no Lago da Lua Pálida. É essencial para comércio, agricultura e transporte.
+
+Lago da Lua Pálida:
+Um grande lago no sudoeste do vale, conhecido por suas águas calmas e reflexos azulados durante a noite. 
+Há rumores de ruínas no fundo do lago.
+
+Bosque de Eldren:
+Uma floresta antiga próxima às rotas entre Pedraforte, Serpentia e Valdora. 
+Algumas árvores têm marcas estranhas no tronco, semelhantes aos símbolos encontrados nas relíquias Tharom.
+
+Colinas de Bruma:
+Região de colinas suaves cobertas por neblina baixa. 
+Ideal para esconder ruínas, cavernas menores, acampamentos e encontros aleatórios.
+
+Garganta dos Ecos:
+Um desfiladeiro estreito nas montanhas. O vento produz sons parecidos com vozes humanas. 
+Pode servir como caminho perigoso para uma mina ou dungeon importante.
+
+============================================================
+5. LOCAIS PERIGOSOS E PONTOS DE INTERESSE
+============================================================
+
+Minas de Umbraferro:
+Antigas minas profundas onde se encontra um minério escuro e resistente. 
+Os túneis mais baixos foram abandonados depois que mineradores começaram a ouvir batidas 
+vindas de paredes onde não deveria haver passagem.
+
+Ruínas de Tharom:
+Restos visíveis da civilização antiga. Podem aparecer em diferentes partes do mapa: 
+torres quebradas, arcos de pedra, câmaras enterradas e plataformas misteriosas.
+
+Caverna do Sussurro:
+Uma caverna conhecida pelas vozes que parecem chamar o jogador pelo nome. 
+Pode ser usada como dungeon de mistério, com relíquias importantes.
+
+Poço dos Antigos:
+Uma estrutura circular de pedra que desce verticalmente para o subterrâneo. 
+Ninguém sabe sua profundidade real.
+
+Torre Quebrada:
+Uma torre antiga partida ao meio, visível de longe. 
+Pode funcionar como ponto de orientação no mapa.
+
+Mina Alta de Ferrofrio:
+Mina próxima a Kardun, rica em metais resistentes. 
+É uma das primeiras fontes de materiais para upgrades avançados.
+
+============================================================
+6. PROGRESSÃO SUGERIDA DO JOGO
+============================================================
+
+O jogador pode começar em Pedraforte, a cidade da encruzilhada.
+A partir dali, ele recebe pequenas missões de mineração, coleta e entrega. 
+Com o tempo, começa a encontrar fragmentos de relíquias Tharom.
+
+Progressão sugerida:
+
+1. Pedraforte
+- Introdução ao jogo
+- Primeiras ferramentas
+- Tutorial de mineração
+- Primeiras vendas de minério
+
+2. Serpentia
+- Comércio maior
+- Missões de transporte
+- Primeiros rumores sobre relíquias encontradas no rio
+
+3. Valdora
+- Missões rurais
+- Coleta de ervas
+- Descoberta de pedras antigas nos campos
+
+4. Lunária
+- Mistérios do lago
+- Ruínas submersas
+- Materiais raros
+
+5. Kardun
+- Minas perigosas
+- Montanhas
+- Inimigos mais fortes
+
+6. Altavia
+- Revelações sobre os Tharom
+- Biblioteca antiga
+- Relíquias principais
+- Entrada para áreas finais ou segredos profundos
+
+============================================================
+7. IDEIA CENTRAL DA HISTÓRIA
+============================================================
+
+As relíquias encontradas nas minas não são apenas tesouros antigos.
+Elas são partes de um sistema construído pelos Tharom, uma civilização desaparecida 
+que usava cristais minerais para alimentar máquinas subterrâneas.
+
+Quanto mais fundo os mineradores escavam, mais sinais aparecem de que algo 
+ainda está ativo sob o Vale de Arvandor.
+
+O jogador começa como um simples minerador em busca de recursos, 
+mas aos poucos se torna peça central na descoberta da verdadeira história do vale.
+
+============================================================
+8. RESUMO DOS NOMES PRINCIPAIS
+============================================================
+
+Região:
+- Vale de Arvandor
+
+Montanhas:
+- Cordilheira Cinzenta
+
+Rio:
+- Rio Azul
+
+Lago:
+- Lago da Lua Pálida
+
+Cidades:
+- Pedraforte — Cidade da Encruzilhada
+- Altavia — Cidade do Planalto
+- Kardun — Cidade do Passo da Montanha
+- Serpentia — Cidade do Rio
+- Valdora — Cidade do Vale
+- Lunária — Cidade do Lago
+
+Locais naturais:
+- Bosque de Eldren
+- Colinas de Bruma
+- Garganta dos Ecos
+
+Locais perigosos:
+- Minas de Umbraferro
+- Ruínas de Tharom
+- Caverna do Sussurro
+- Poço dos Antigos
+- Torre Quebrada
+- Mina Alta de Ferrofrio
+
+============================================================
+9. OBSERVAÇÃO DE DESIGN PARA O MAPA
+============================================================
+
+A região deve parecer grande, mas não vazia.
+A Cordilheira Cinzenta pode cercar o mapa inteiro, funcionando como limite natural. 
+No centro, as cidades são conectadas por estradas principais. 
+Trilhas secundárias levam a minas, cavernas, ruínas, florestas e pontos de interesse futuros.
+
+A distribuição ideal para o mapa seria:
+
+- Pedraforte no centro/sul, como hub principal
+- Altavia no noroeste, sobre o planalto
+- Kardun no nordeste, no passo da montanha
+- Serpentia no centro/oeste ou centro, junto ao rio
+- Valdora no leste, em uma região fértil
+- Lunária no sudoeste, perto do lago
+
+Isso cria uma progressão natural e visualmente clara para o jogador explorar.

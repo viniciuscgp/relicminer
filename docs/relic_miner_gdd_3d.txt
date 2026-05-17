@@ -1,0 +1,1653 @@
+GDD - RELIC MINER
+Documento de Design do Jogo
+Versao ajustada para jogo 3D em terceira pessoa
+
+======================================================================
+1. VISAO GERAL
+======================================================================
+
+Titulo: Relic Miner
+
+Genero:
+    Aventura 3D casual
+    Mineracao
+    Exploracao
+    Caca ao tesouro
+    Progressao por coleta e upgrades
+
+Perspectiva:
+    Terceira pessoa 3D.
+
+    A camera fica atras do personagem, em um estilo parecido com jogos de
+    aventura em terceira pessoa, como quando Skyrim e colocado em camera de
+    terceira pessoa. O jogador controla o personagem caminhando pelo mundo,
+    vendo o corpo inteiro ou quase inteiro do explorador na tela.
+
+Plataformas alvo:
+    Steam
+    itch.io
+    Windows
+    Linux
+
+Engine sugerida:
+    Godot 4.x
+
+Preco sugerido:
+    US$ 2.00
+
+Publico-alvo:
+    Jogadores casuais que gostam de exploracao, coleta, mineracao, upgrades,
+    cavernas, tesouros escondidos e partidas de curta ou media duracao.
+
+Resumo da proposta:
+    Relic Miner e um jogo 3D de aventura e mineracao onde o jogador controla
+    um explorador em terceira pessoa. Ele sai de uma pequena vila, explora
+    minas, cavernas, ruinas e regioes montanhosas, usa uma picareta para
+    quebrar pedras e minerios, coleta gemas, encontra reliquias antigas,
+    enfrenta criaturas simples e melhora seus equipamentos para explorar areas
+    cada vez mais perigosas.
+
+
+======================================================================
+2. CONCEITO PRINCIPAL
+======================================================================
+
+Relic Miner e um jogo 3D de exploracao casual com foco em mineracao,
+descoberta e recompensa constante.
+
+O jogador controla um pequeno cacador de tesouros em um mundo 3D. Ele caminha
+por vilas, trilhas, montanhas, cavernas, minas antigas e ruinas subterraneas.
+Durante a exploracao, o jogador usa sua picareta para quebrar rochas, minerios,
+cristais e obstaculos, abrindo caminho para encontrar moedas, gemas, recursos,
+baus e reliquias perdidas.
+
+A proposta nao e ser um RPG complexo. O foco principal e a sensacao simples e
+satisfatoria de:
+
+    Explorar -> minerar -> descobrir -> coletar -> melhorar -> explorar de novo
+
+O jogo deve ser facil de entender, visualmente agradavel, com controles simples
+e progresso claro. Mesmo sendo 3D, ele deve manter uma estrutura acessivel,
+sem exigir mecanicas complicadas ou mapas enormes no inicio.
+
+O jogador sempre deve sentir que existe algo interessante escondido em algum
+lugar proximo: uma gema brilhando, uma rocha diferente, uma passagem escondida,
+um bau enterrado, uma ruina antiga ou uma reliquia rara.
+
+
+======================================================================
+3. PITCH CURTO
+======================================================================
+
+Explore minas, cavernas e ruinas antigas em terceira pessoa. Use sua picareta
+para quebrar rochas, coletar gemas, encontrar reliquias perdidas e melhorar
+suas ferramentas para ir cada vez mais fundo em busca de tesouros.
+
+
+======================================================================
+4. PILARES DO JOGO
+======================================================================
+
+4.1 Simplicidade
+----------------------------------------------------------------------
+
+O jogador deve entender rapidamente o que fazer:
+
+    - Andar pelo ambiente.
+    - Girar a camera.
+    - Interagir com NPCs.
+    - Usar a picareta.
+    - Minerar rochas e minerios.
+    - Coletar itens.
+    - Evitar perigos.
+    - Encontrar tesouros.
+    - Voltar para a vila.
+    - Melhorar equipamentos.
+
+Mesmo em 3D, o jogo deve evitar controles confusos. A camera precisa ajudar o
+jogador, nao atrapalhar.
+
+
+4.2 Curiosidade
+----------------------------------------------------------------------
+
+O jogo deve provocar a sensacao constante de:
+
+    "O que sera que tem ali?"
+    "Sera que aquela pedra brilhante tem algo raro?"
+    "Sera que atras daquela parede existe uma passagem?"
+    "Sera que aquela caverna leva para uma reliquia?"
+
+Pistas visuais e sonoras devem indicar lugares interessantes:
+
+    - Pedras com brilho.
+    - Cristais nas paredes.
+    - Rachaduras suspeitas.
+    - Sons metalicos perto de minerios.
+    - Particulas de luz saindo do chao.
+    - Simbolos antigos em ruinas.
+    - Ecos vindos de tuneis escondidos.
+
+
+4.3 Recompensa Frequente
+----------------------------------------------------------------------
+
+O jogador deve receber pequenas recompensas com frequencia:
+
+    - Moedas.
+    - Gemas.
+    - Minerios.
+    - Frutas.
+    - Comida.
+    - Pocoes.
+    - Baús.
+    - Reliquias.
+    - Mapas.
+    - Chaves.
+    - Novas areas.
+    - Melhorias de equipamento.
+
+A ideia e que cada pequena exploracao gere algo util.
+
+
+4.4 Exploracao em Sessoes Curtas
+----------------------------------------------------------------------
+
+Mesmo sendo um jogo 3D, o ideal e que cada saida da vila para uma area de
+exploracao possa durar pouco tempo.
+
+Duracao sugerida por missao:
+
+    - Missoes simples: 3 a 6 minutos.
+    - Missoes medias: 6 a 12 minutos.
+    - Missoes maiores: 12 a 20 minutos.
+
+Isso permite que o jogo seja casual, mas ainda tenha profundidade.
+
+
+4.5 Baixa Frustracao
+----------------------------------------------------------------------
+
+O jogador pode perder vida, energia ou parte dos recursos, mas o jogo nao deve
+parecer injusto.
+
+O jogador deve sentir que falhou porque:
+
+    - Arriscou demais.
+    - Foi fundo demais sem comida.
+    - Ignorou inimigos.
+    - Gastou energia sem planejamento.
+    - Entrou em uma area perigosa cedo demais.
+
+O jogo deve evitar punicoes exageradas.
+
+
+======================================================================
+5. LOOP PRINCIPAL
+======================================================================
+
+1.  O jogador comeca na vila.
+2.  Conversa com NPCs.
+3.  Recebe ou escolhe uma tarefa.
+4.  Compra comida, pocoes, bombas ou ferramentas.
+5.  Sai da vila para uma area de exploracao.
+6.  Explora o ambiente em terceira pessoa.
+7.  Usa a camera para observar trilhas, paredes, tuneis e objetos.
+8.  Usa a picareta para quebrar rochas, minerios e obstaculos.
+9.  Coleta moedas, gemas, minerais, frutas, chaves e reliquias.
+10. Encontra pistas sobre tesouros escondidos.
+11. Evita ou enfrenta inimigos simples.
+12. Desvia de armadilhas e regioes perigosas.
+13. Cumpre o objetivo da tarefa.
+14. Retorna para a vila.
+15. Entrega itens ao NPC correspondente.
+16. Recebe ouro, reputacao, itens ou desbloqueios.
+17. Usa recursos para melhorar ferramentas, mochila, armas e energia.
+18. Aceita novas tarefas e explora areas mais perigosas.
+
+
+======================================================================
+6. ESTRUTURA DO MUNDO
+======================================================================
+
+O jogo tera uma pequena vila central funcionando como hub principal. A partir
+dela o jogador acessa diferentes regioes de exploracao.
+
+A vila pode ficar em uma area aberta, cercada por montanhas, florestas, trilhas
+e entradas de minas.
+
+As areas do jogo podem ser organizadas assim:
+
+    - Vila central.
+    - Minas proximas.
+    - Cavernas naturais.
+    - Ruinas antigas.
+    - Montanhas e vales.
+    - Caverna de cristais.
+    - Templo subterraneo.
+
+O mundo nao precisa ser um grande mundo aberto no inicio. Pode ser dividido em
+areas menores conectadas por entradas, portais, trilhas ou telas de selecao.
+
+Modelo recomendado para a primeira versao:
+
+    - Uma vila 3D pequena.
+    - Algumas entradas de minas.
+    - Areas de exploracao separadas.
+    - Cada area com objetivo claro.
+    - Progressao por desbloqueio de novas entradas.
+
+
+======================================================================
+7. VILA CENTRAL
+======================================================================
+
+A vila e o local seguro do jogo. Nela o jogador descansa, conversa com NPCs,
+compra itens, melhora equipamentos e escolhe para onde explorar.
+
+A vila deve ser compacta, charmosa e facil de navegar.
+
+Funcoes da vila:
+
+    - Receber tarefas.
+    - Entregar itens encontrados.
+    - Comprar comida.
+    - Comprar bombas.
+    - Comprar pocoes.
+    - Comprar armas simples.
+    - Melhorar picareta.
+    - Melhorar mochila.
+    - Ver a colecao de reliquias.
+    - Escolher a proxima area de exploracao.
+    - Salvar progresso.
+
+Locais importantes:
+
+    - Ferraria.
+    - Loja do comerciante.
+    - Taverna ou cozinha.
+    - Casa da arqueologa.
+    - Entrada da mina.
+    - Quadro de tarefas.
+    - Pequeno museu de reliquias.
+
+
+======================================================================
+8. NPCS PRINCIPAIS
+======================================================================
+
+8.1 Ferreiro
+----------------------------------------------------------------------
+
+Funcao:
+    Melhorar ferramentas e fabricar armas simples.
+
+Tarefas possiveis:
+    - Trazer 10 minerios de cobre.
+    - Encontrar 5 pedras de ferro.
+    - Buscar um cristal de fogo perdido.
+    - Recuperar um martelo antigo em uma mina abandonada.
+
+Recompensas:
+    - Upgrade de picareta.
+    - Armas simples.
+    - Desconto em ferramentas.
+    - Ouro.
+
+
+8.2 Comerciante
+----------------------------------------------------------------------
+
+Funcao:
+    Compra e vende itens basicos.
+
+Itens vendidos:
+    - Comida.
+    - Bombas.
+    - Lanternas.
+    - Cordas.
+    - Pocoes simples.
+    - Mochila maior.
+
+Tarefas possiveis:
+    - Encontrar moedas antigas.
+    - Recuperar uma carga perdida.
+    - Trazer gemas para revenda.
+
+
+8.3 Arqueologa
+----------------------------------------------------------------------
+
+Funcao:
+    Estudar reliquias, mapas e objetos antigos.
+
+Tarefas possiveis:
+    - Encontrar uma reliquia especifica.
+    - Recuperar fragmentos de mapa.
+    - Explorar uma camara antiga.
+    - Levar uma tabuleta de pedra para estudo.
+
+Recompensas:
+    - Ouro.
+    - Novas areas no mapa.
+    - Informacoes sobre tesouros.
+    - Itens raros.
+
+
+8.4 Cozinheira ou Taverneiro
+----------------------------------------------------------------------
+
+Funcao:
+    Vender comida e preparar alimentos especiais.
+
+Tarefas possiveis:
+    - Trazer cogumelos de caverna.
+    - Encontrar sal mineral.
+    - Coletar raizes subterraneas.
+    - Buscar frutas raras em regioes montanhosas.
+
+Recompensas:
+    - Comidas especiais.
+    - Bonus temporarios.
+    - Ouro.
+
+
+8.5 Guarda da Vila
+----------------------------------------------------------------------
+
+Funcao:
+    Pedir ajuda contra criaturas perigosas.
+
+Tarefas possiveis:
+    - Eliminar morcegos em uma mina.
+    - Limpar uma area tomada por slimes.
+    - Encontrar uma passagem segura.
+    - Investigar sons estranhos em uma caverna.
+
+Recompensas:
+    - Armas basicas.
+    - Itens defensivos.
+    - Acesso a areas perigosas.
+
+
+======================================================================
+9. SISTEMA DE TAREFAS
+======================================================================
+
+As tarefas devem ser simples, diretas e faceis de entender.
+
+Tipos de tarefa:
+
+    - Coleta:
+        Trazer certa quantidade de minerais, gemas, frutas ou itens.
+
+    - Reliquia:
+        Encontrar uma reliquia especifica em uma area.
+
+    - Exploracao:
+        Chegar ate um ponto importante, como uma camara antiga.
+
+    - Caca:
+        Derrotar ou espantar criaturas de uma area.
+
+    - Entrega:
+        Levar um item de um NPC para outro.
+
+    - Descoberta:
+        Encontrar uma passagem secreta, mapa ou local escondido.
+
+Cada tarefa deve mostrar:
+
+    - NPC solicitante.
+    - Objetivo.
+    - Area recomendada.
+    - Recompensa.
+    - Dificuldade.
+    - Status atual.
+
+Exemplos:
+
+    Tarefa: Minerio para a Ferraria
+    Objetivo: Coletar 10 minerios de cobre
+    Area: Mina Abandonada
+    Recompensa: 100 ouro + desconto no upgrade da picareta
+
+    Tarefa: A Mascara Dourada
+    Objetivo: Encontrar a Mascara Dourada
+    Area: Ruinas Antigas
+    Recompensa: 300 ouro + nova entrada desbloqueada
+
+    Tarefa: Ecos na Caverna
+    Objetivo: Investigar a origem dos sons estranhos
+    Area: Caverna de Cristal
+    Recompensa: mapa antigo
+
+
+======================================================================
+10. MECANICA PRINCIPAL
+======================================================================
+
+10.1 Movimento
+----------------------------------------------------------------------
+
+O personagem se move em ambiente 3D.
+
+Controles sugeridos:
+
+    - WASD ou analogico esquerdo para mover.
+    - Mouse ou analogico direito para controlar a camera.
+    - Espaco para pular, se houver pulo.
+    - Botao de acao para interagir.
+    - Botao de ataque/uso para usar a picareta.
+
+O movimento deve ser simples e responsivo.
+
+O personagem deve poder:
+
+    - Caminhar.
+    - Correr, se houver stamina ou controle de velocidade.
+    - Subir pequenas rampas.
+    - Pular pequenos obstaculos, se desejado.
+    - Entrar em cavernas.
+    - Interagir com objetos e NPCs.
+
+
+10.2 Camera em Terceira Pessoa
+----------------------------------------------------------------------
+
+A camera deve ficar atras do personagem, levemente acima, olhando um pouco para
+baixo. Isso ajuda o jogador a enxergar o terreno, inimigos e objetos proximos.
+
+Estilo da camera:
+
+    - Camera atras do jogador.
+    - Rotacao livre com mouse ou analogico direito.
+    - Distancia ajustada para mostrar o personagem e o ambiente.
+    - Colisao de camera para nao atravessar paredes.
+    - Aproximacao automatica quando houver parede atras.
+
+Referencia de sensacao:
+    Camera de aventura em terceira pessoa, parecida com jogos onde o jogador ve
+o personagem de costas enquanto explora o mundo.
+
+A camera nao deve ser muito distante, pois o jogo precisa manter uma sensacao de
+exploracao e descoberta. Tambem nao deve ser muito proxima, para nao atrapalhar
+a mineracao e o combate.
+
+
+10.3 Mineracao em 3D
+----------------------------------------------------------------------
+
+O jogador usa a picareta para quebrar objetos no mundo 3D.
+
+Em vez de tiles 2D, a mineracao deve funcionar com objetos 3D interativos:
+
+    - Pedras pequenas.
+    - Rochas grandes.
+    - Veios de minerio.
+    - Cristais.
+    - Barricadas.
+    - Paredes rachadas.
+    - Blocos de caverna.
+
+Funcionamento basico:
+
+    1. O jogador se aproxima de uma rocha ou minerio.
+    2. O jogo destaca o objeto interativo.
+    3. O jogador aperta o botao de minerar.
+    4. O personagem executa a animacao da picareta.
+    5. O objeto recebe dano.
+    6. Ao atingir zero resistencia, o objeto quebra.
+    7. Recursos aparecem ou sao coletados automaticamente.
+
+Tipos de objetos mineraveis:
+
+    Objeto                 Resistencia       Recurso possivel
+    ------------------------------------------------------------------
+    Pedra pequena          Baixa             Pedra comum
+    Rocha comum            Media             Pedra, moeda, minerio simples
+    Rocha dura             Alta              Minerios melhores
+    Veio de cobre          Media             Cobre
+    Veio de ferro          Alta              Ferro
+    Cristal azul           Media/alta        Gema azul
+    Cristal raro           Alta              Gema rara
+    Parede rachada         Alta              Passagem secreta
+    Rocha antiga           Muito alta        Reliquia ou chave
+
+A mineracao deve ser visualmente satisfatoria:
+
+    - Particulas de pedra.
+    - Som de impacto.
+    - Pequeno tremor.
+    - Rachaduras aparecendo.
+    - Fragmentos caindo.
+    - Brilho quando houver recurso raro.
+
+
+10.4 Energia
+----------------------------------------------------------------------
+
+A energia limita o quanto o jogador consegue minerar e explorar.
+
+Exemplo inicial:
+
+    Energia maxima: 100
+
+Consumo sugerido:
+
+    - Minerar pedra pequena: -1
+    - Minerar rocha comum: -2
+    - Minerar rocha dura: -3
+    - Minerar cristal raro: -4
+    - Usar ataque fisico com arma: -1 ou sem custo
+    - Correr: consumo opcional
+
+Se a energia acabar:
+
+    - O jogador ainda pode andar.
+    - Nao consegue minerar.
+    - Pode usar comida ou pocao para recuperar energia.
+    - Pode voltar para a vila.
+
+
+10.5 Vida
+----------------------------------------------------------------------
+
+A vida representa a resistencia do personagem contra inimigos, quedas e
+armadilhas.
+
+Exemplo inicial:
+
+    - 3 coracoes.
+    - Dano comum remove meio ou um coracao.
+    - Inimigos maiores podem causar mais dano.
+
+Se a vida chegar a zero:
+
+    - O jogador retorna para a vila.
+    - Pode perder parte dos itens coletados na exploracao.
+    - Reliquias importantes podem ser mantidas, dependendo do balanceamento.
+
+
+10.6 Coleta
+----------------------------------------------------------------------
+
+Itens coletaveis:
+
+    Item                   Funcao
+    ------------------------------------------------------------------
+    Moedas                 Comprar itens e upgrades basicos
+    Gemas                  Comprar upgrades especiais
+    Minerios               Melhorar ferramentas e fabricar itens
+    Reliquias              Objetivos principais e colecao
+    Chaves                 Abrir portas e baus
+    Fragmentos de mapa     Revelar areas secretas
+    Comida                 Recuperar energia
+    Coracoes               Recuperar vida
+    Frutas                 Ingredientes ou recuperacao leve
+    Pocoes                 Bonus temporarios ou cura
+
+A coleta pode acontecer de duas formas:
+
+    - O item cai no chao e o jogador passa por cima para pegar.
+    - O item e coletado automaticamente quando a rocha quebra.
+
+
+======================================================================
+11. COMBATE
+======================================================================
+
+O combate deve existir, mas nao deve dominar o jogo.
+
+A picareta continua sendo a ferramenta principal. Armas servem para dar
+seguranca em areas perigosas, afastar inimigos ou derrotar criaturas fracas.
+
+Armas simples:
+
+    - Faca.
+    - Espada curta.
+    - Espada longa.
+    - Machado.
+    - Lanca.
+    - Besta simples.
+
+Funcoes das armas:
+
+    - Afastar inimigos.
+    - Derrotar criaturas fracas.
+    - Proteger o jogador durante a exploracao.
+    - Permitir acesso a areas com mais perigos.
+
+O combate deve ser simples:
+
+    - Um botao de ataque.
+    - Animacao curta.
+    - Dano por colisao ou area frontal.
+    - Poucos inimigos ao mesmo tempo.
+
+O jogo nao deve virar um RPG de combate pesado.
+
+
+======================================================================
+12. INIMIGOS
+======================================================================
+
+Os inimigos devem ser simples e faceis de implementar.
+
+12.1 Morcego
+----------------------------------------------------------------------
+
+    - Voa em pequenas areas.
+    - Patrulha tuneis e cavernas.
+    - Causa dano ao tocar no jogador.
+    - Pode ser evitado ou derrotado.
+
+
+12.2 Cobra
+----------------------------------------------------------------------
+
+    - Fica no chao.
+    - Move-se lentamente.
+    - Ataca se o jogador chegar perto.
+    - Ideal para ruinas e areas quentes.
+
+
+12.3 Slime de Caverna
+----------------------------------------------------------------------
+
+    - Move-se devagar.
+    - Bloqueia caminhos.
+    - Pode ser destruido com arma, picareta ou bomba.
+    - Pode deixar gosma como item.
+
+
+12.4 Escaravelho
+----------------------------------------------------------------------
+
+    - Anda em padroes simples.
+    - Protege baus e reliquias.
+    - Pode ter carapaca resistente.
+
+
+12.5 Aranha de Mina
+----------------------------------------------------------------------
+
+    - Vive em cantos escuros.
+    - Pode atacar de surpresa.
+    - Pode proteger passagens estreitas.
+
+Para a primeira versao, usar apenas:
+
+    - Morcego.
+    - Cobra.
+    - Slime.
+
+
+======================================================================
+13. ARMADILHAS E PERIGOS
+======================================================================
+
+13.1 Espinhos
+----------------------------------------------------------------------
+
+    - Causam dano ao pisar.
+    - Podem estar visiveis ou parcialmente escondidos.
+
+
+13.2 Rocha Instavel
+----------------------------------------------------------------------
+
+    - Cai quando o jogador passa perto ou quebra suporte.
+    - Pode causar dano.
+    - Pode bloquear caminho.
+
+
+13.3 Gas Venenoso
+----------------------------------------------------------------------
+
+    - Area perigosa que causa dano ao longo do tempo.
+    - Pode exigir item especial ou caminho alternativo.
+
+
+13.4 Piso Quebradico
+----------------------------------------------------------------------
+
+    - Quebra depois que o jogador pisa.
+    - Pode revelar buracos, cavernas inferiores ou atalhos.
+
+
+13.5 Queda
+----------------------------------------------------------------------
+
+    - Quedas pequenas causam pouco ou nenhum dano.
+    - Quedas grandes causam dano.
+    - Algumas quedas podem levar a areas secretas.
+
+Para a primeira versao, usar apenas:
+
+    - Espinhos.
+    - Rocha instavel.
+    - Queda simples.
+
+
+======================================================================
+14. FERRAMENTAS E ITENS USAVEIS
+======================================================================
+
+14.1 Picareta
+----------------------------------------------------------------------
+
+Ferramenta principal do jogo.
+
+Upgrades possiveis:
+
+    - Picareta velha.
+    - Picareta de cobre.
+    - Picareta de ferro.
+    - Picareta de aco.
+    - Picareta dourada.
+    - Picareta antiga.
+
+Efeitos dos upgrades:
+
+    - Quebrar rochas mais rapido.
+    - Consumir menos energia.
+    - Quebrar minerios mais duros.
+    - Aumentar chance de recursos raros.
+
+
+14.2 Bomba
+----------------------------------------------------------------------
+
+Explode uma area pequena.
+
+Efeitos:
+
+    - Quebra rochas proximas.
+    - Abre passagens.
+    - Causa dano em inimigos.
+    - Pode revelar baus escondidos.
+
+
+14.3 Lanterna
+----------------------------------------------------------------------
+
+Aumenta visibilidade em cavernas escuras.
+
+Pode ter upgrades:
+
+    - Maior alcance.
+    - Luz mais forte.
+    - Menor consumo.
+    - Revelar marcas antigas.
+
+
+14.4 Bussola
+----------------------------------------------------------------------
+
+Aponta a direcao aproximada do objetivo principal da area.
+
+Nao deve entregar o caminho exato. Serve apenas como orientacao.
+
+
+14.5 Mapa Antigo
+----------------------------------------------------------------------
+
+Revela parte da area ou marca possiveis locais de tesouro.
+
+
+14.6 Corda
+----------------------------------------------------------------------
+
+Pode permitir subir ou descer lugares especificos.
+
+Uso simples:
+
+    - Descer em buracos.
+    - Acessar plataformas.
+    - Voltar de areas inferiores.
+
+
+14.7 Pocoes
+----------------------------------------------------------------------
+
+Tipos possiveis:
+
+    - Pocao de cura.
+    - Pocao de energia.
+    - Pocao de resistencia.
+    - Pocao de velocidade.
+    - Pocao anti-veneno.
+
+
+======================================================================
+15. COMIDA
+======================================================================
+
+A comida serve para recuperar energia ou dar bonus temporario.
+
+Exemplos:
+
+    Comida                  Efeito
+    ------------------------------------------------------------------
+    Pao simples             Recupera pouca energia
+    Ensopado da vila        Recupera bastante energia
+    Carne seca              Aumenta energia maxima por uma exploracao
+    Cha de ervas            Recupera um pouco de vida
+    Sopa de cogumelos       Reduz consumo de energia por alguns minutos
+    Fruta vermelha          Recupera pouca vida
+    Fruta dourada           Bonus temporario de sorte
+
+
+======================================================================
+16. UPGRADES
+======================================================================
+
+Entre as exploracoes, o jogador pode gastar moedas, gemas e minerios para
+melhorar o personagem.
+
+Upgrades principais:
+
+    Upgrade                 Efeito
+    ------------------------------------------------------------------
+    Picareta melhor         Quebra rochas mais rapido
+    Mochila maior           Permite carregar mais itens
+    Energia maxima          Aumenta energia total
+    Vida maxima             Aumenta coracoes
+    Botas melhores          Aumenta velocidade de movimento
+    Lanterna melhor         Aumenta visao em areas escuras
+    Detector simples        Ajuda a encontrar tesouros escondidos
+    Bolsa de bombas         Permite carregar mais bombas
+    Armadura leve           Reduz dano recebido
+
+
+======================================================================
+17. AREAS E REGIOES DO JOGO
+======================================================================
+
+17.1 Regiao 1 - Mina Abandonada
+----------------------------------------------------------------------
+
+Tema inicial, facil e direto.
+
+Elementos:
+
+    - Entrada de mina.
+    - Trilhos antigos.
+    - Rochas comuns.
+    - Minerio de cobre.
+    - Moedas.
+    - Gemas simples.
+    - Morcegos.
+    - Espinhos.
+
+Objetivo:
+    Ensinar movimentacao, camera, mineracao e coleta.
+
+
+17.2 Regiao 2 - Ruinas Antigas
+----------------------------------------------------------------------
+
+Tema de exploracao arqueologica.
+
+Elementos:
+
+    - Paredes com simbolos.
+    - Portas antigas.
+    - Chaves.
+    - Baus.
+    - Cobras.
+    - Passagens secretas.
+    - Reliquias comuns e raras.
+
+Objetivo:
+    Introduzir puzzles simples, chaves e reliquias.
+
+
+17.3 Regiao 3 - Caverna de Cristal
+----------------------------------------------------------------------
+
+Area mais bonita e brilhante.
+
+Elementos:
+
+    - Cristais azuis e roxos.
+    - Luzes naturais.
+    - Pedras duras.
+    - Pontes quebradas.
+    - Gemas raras.
+    - Slimes.
+
+Objetivo:
+    Introduzir minerios melhores e areas mais perigosas.
+
+
+17.4 Regiao 4 - Templo Subterraneo
+----------------------------------------------------------------------
+
+Area misteriosa e mais dificil.
+
+Elementos:
+
+    - Armadilhas.
+    - Portas trancadas.
+    - Reliquias lendarias.
+    - Inimigos mais fortes.
+    - Salas antigas.
+
+Objetivo:
+    Servir como area avancada da campanha.
+
+Para a primeira versao comercial, tres regioes ja podem ser suficientes.
+
+
+======================================================================
+18. OBJETIVOS DE EXPLORACAO
+======================================================================
+
+Cada area deve ter um objetivo claro.
+
+Exemplos:
+
+    - Encontrar uma reliquia.
+    - Coletar 10 gemas.
+    - Abrir o bau dourado.
+    - Encontrar a saida secreta.
+    - Coletar 500 moedas.
+    - Chegar ate a camara antiga.
+    - Derrotar uma criatura especifica.
+    - Sobreviver e voltar para a entrada.
+    - Encontrar fragmentos de mapa.
+
+O objetivo atual deve aparecer no HUD.
+
+
+======================================================================
+19. ESTRUTURA DAS AREAS 3D
+======================================================================
+
+Cada area de exploracao deve conter:
+
+    - Ponto inicial.
+    - Caminho principal.
+    - Rotas alternativas.
+    - Rochas mineraveis.
+    - Minerios visiveis.
+    - Tesouros escondidos.
+    - Inimigos simples.
+    - Armadilhas.
+    - Objetivo principal.
+    - Saida ou retorno.
+
+Tamanho recomendado para o prototipo:
+
+    - Area pequena.
+    - Poucos caminhos.
+    - 10 a 20 objetos mineraveis.
+    - 1 tipo de inimigo.
+    - 1 tipo de armadilha.
+    - 1 reliquia principal.
+
+Tamanho recomendado para fases completas:
+
+    - Area media.
+    - Varios caminhos.
+    - 30 a 60 objetos mineraveis.
+    - 2 ou 3 tipos de inimigos.
+    - Tesouros opcionais.
+    - Segredos.
+
+
+======================================================================
+20. COLECAO DE RELIQUIAS
+======================================================================
+
+O jogo deve ter uma tela de colecao, como um pequeno museu.
+
+Cada reliquia encontrada aparece com:
+
+    - Nome.
+    - Modelo ou icone.
+    - Descricao curta.
+    - Raridade.
+    - Local onde foi encontrada.
+
+Exemplos:
+
+    Reliquia                Raridade        Descricao
+    ------------------------------------------------------------------
+    Mascara Dourada         Rara            Mascara usada por reis antigos.
+    Calice de Pedra         Comum           Calice ritualistico subterraneo.
+    Idolo de Cristal        Epica           Artefato que brilha com energia.
+    Coroa Partida           Lendaria        Fragmento de uma antiga coroa.
+    Mapa Rasgado            Comum           Mostra tuneis esquecidos.
+    Anel do Mineiro         Rara            Pertenceu a um explorador famoso.
+
+A colecao aumenta a vontade de continuar jogando.
+
+
+======================================================================
+21. MODOS DE JOGO
+======================================================================
+
+21.1 Modo Campanha
+----------------------------------------------------------------------
+
+Sequencia de missoes organizadas por regioes.
+
+Objetivos:
+
+    - Completar tarefas.
+    - Encontrar reliquias.
+    - Melhorar equipamentos.
+    - Liberar novas areas.
+
+
+21.2 Modo Infinito
+----------------------------------------------------------------------
+
+Uma mina gerada de forma procedural ou semi-procedural.
+
+Objetivos:
+
+    - Coletar o maximo possivel.
+    - Sobreviver o maximo possivel.
+    - Ir cada vez mais fundo.
+    - Competir em ranking.
+
+
+21.3 Desafio Diario
+----------------------------------------------------------------------
+
+Uma area gerada com seed fixa para todos os jogadores.
+
+Objetivos:
+
+    - Melhor pontuacao.
+    - Melhor tempo.
+    - Mais tesouros encontrados.
+
+Para a primeira versao, campanha e modo infinito simples ja sao suficientes.
+
+
+======================================================================
+22. PONTUACAO
+======================================================================
+
+A pontuacao pode considerar:
+
+    - Moedas coletadas.
+    - Gemas coletadas.
+    - Minerios raros.
+    - Reliquias encontradas.
+    - Tempo de conclusao.
+    - Energia restante.
+    - Vida restante.
+    - Inimigos derrotados.
+    - Segredos encontrados.
+
+Exemplo:
+
+    Acao                   Pontos
+    ------------------------------------------------------------------
+    Moeda coletada         +10
+    Gema coletada          +50
+    Minerio raro           +100
+    Reliquia comum         +500
+    Reliquia rara          +1500
+    Completar missao       +1000
+    Segredo encontrado     +750
+    Bonus de tempo         Variavel
+    Bonus de energia       Variavel
+
+
+======================================================================
+23. RANKING
+======================================================================
+
+Rankings possiveis:
+
+    - Maior pontuacao no modo infinito.
+    - Melhor tempo por area.
+    - Mais reliquias encontradas.
+    - Melhor pontuacao no desafio diario.
+
+Para Steam, pode usar Leaderboards futuramente.
+Para itch.io, pode manter ranking local ou servidor proprio.
+
+
+======================================================================
+24. CONTROLES
+======================================================================
+
+24.1 Teclado e Mouse
+----------------------------------------------------------------------
+
+    Acao                       Tecla / Controle
+    ------------------------------------------------------------------
+    Mover                      WASD
+    Controlar camera           Mouse
+    Correr                     Shift
+    Pular                      Espaco
+    Interagir                  E
+    Usar picareta              Botao esquerdo do mouse
+    Ataque com arma            Botao esquerdo ou tecla propria
+    Usar item rapido           1, 2, 3
+    Abrir mapa                 M
+    Abrir inventario           I
+    Pausar                     Esc
+
+
+24.2 Controle / Gamepad
+----------------------------------------------------------------------
+
+    Acao                       Botao
+    ------------------------------------------------------------------
+    Mover                      Analogico esquerdo
+    Controlar camera           Analogico direito
+    Interagir                  A / X
+    Usar picareta              RT / R2
+    Ataque                     X / Quadrado
+    Usar item                  B / Circulo
+    Trocar item                LB / RB
+    Pular                      A / X, se houver pulo
+    Pausar                     Start
+
+
+======================================================================
+25. INTERFACE
+======================================================================
+
+25.1 HUD Principal
+----------------------------------------------------------------------
+
+Elementos:
+
+    - Coracoes de vida.
+    - Barra de energia.
+    - Quantidade de moedas.
+    - Quantidade de gemas.
+    - Objetivo atual.
+    - Item equipado.
+    - Ferramenta equipada.
+    - Mini mapa opcional.
+    - Indicador de interacao.
+
+
+25.2 Tela de Fim de Exploracao
+----------------------------------------------------------------------
+
+Mostrar:
+
+    - Objetivo concluido.
+    - Moedas coletadas.
+    - Gemas coletadas.
+    - Minerios coletados.
+    - Reliquias encontradas.
+    - Tempo.
+    - Bonus.
+    - Botao para continuar.
+    - Botao para loja/upgrades.
+
+
+25.3 Tela de Upgrades
+----------------------------------------------------------------------
+
+Mostrar:
+
+    - Personagem.
+    - Ferramentas.
+    - Nivel atual dos upgrades.
+    - Custo dos upgrades.
+    - Efeito de cada upgrade.
+
+
+25.4 Tela de Colecao
+----------------------------------------------------------------------
+
+Mostrar:
+
+    - Reliquias encontradas.
+    - Espacos vazios para reliquias nao descobertas.
+    - Descricao de cada item.
+    - Raridade.
+
+
+======================================================================
+26. DIRECAO DE ARTE
+======================================================================
+
+26.1 Estilo Visual
+----------------------------------------------------------------------
+
+O jogo agora e 3D completo.
+
+Estilo sugerido:
+
+    - Low poly 3D.
+    - Visual colorido e limpo.
+    - Modelos simples e carismaticos.
+    - Texturas leves.
+    - Ambientes legiveis.
+    - Tesouros com brilho e destaque.
+    - Interface clara.
+
+O jogo deve parecer bonito, mas nao precisa ser realista.
+
+A direcao ideal e um 3D simples, estilizado e eficiente, parecido com jogos
+indie de aventura casual.
+
+
+26.2 Paleta Inicial
+----------------------------------------------------------------------
+
+    - Marrom para terra e trilhas.
+    - Cinza para pedra.
+    - Dourado para tesouros.
+    - Azul e roxo para gemas.
+    - Verde para cura e natureza.
+    - Laranja para tochas e cavernas iluminadas.
+    - Azul escuro para areas misteriosas.
+
+
+26.3 Personagem
+----------------------------------------------------------------------
+
+O personagem deve ser simpatico, facil de reconhecer e bem legivel em terceira
+pessoa.
+
+Elementos visuais:
+
+    - Chapeu ou capacete de minerador.
+    - Mochila.
+    - Picareta nas costas ou na mao.
+    - Botas.
+    - Lanterna.
+    - Roupa simples de explorador.
+
+
+26.4 Feedback Visual
+----------------------------------------------------------------------
+
+Efeitos importantes:
+
+    - Particulas ao quebrar rochas.
+    - Poeira ao caminhar.
+    - Brilho em gemas e tesouros.
+    - Rachaduras progressivas em rochas.
+    - Tremor leve ao usar bomba.
+    - Piscar vermelho ao tomar dano.
+    - Efeito de coleta ao pegar moeda ou gema.
+    - Luz da lanterna em cavernas escuras.
+
+
+======================================================================
+27. AUDIO
+======================================================================
+
+27.1 Musica
+----------------------------------------------------------------------
+
+A trilha deve ter clima de aventura subterranea.
+
+Caracteristicas:
+
+    - Misteriosa, mas nao assustadora demais.
+    - Leve e agradavel.
+    - Loop curto ou medio.
+    - Instrumentos simples.
+    - Percussao leve.
+    - Cordas suaves.
+    - Pads atmosfericos.
+    - Sons de caverna ao fundo.
+
+
+27.2 Efeitos Sonoros
+----------------------------------------------------------------------
+
+Efeitos importantes:
+
+    - Passos no chao.
+    - Passos em pedra.
+    - Picareta batendo na rocha.
+    - Rocha quebrando.
+    - Cristal quebrando.
+    - Moeda coletada.
+    - Gema coletada.
+    - Bau abrindo.
+    - Reliquia encontrada.
+    - Dano recebido.
+    - Bomba explodindo.
+    - Inimigo se movendo.
+    - Tocha queimando.
+    - Vento em cavernas.
+    - Eco em tuneis.
+
+
+======================================================================
+28. GERACAO PROCEDURAL
+======================================================================
+
+A geracao procedural pode ser usada no futuro, principalmente no modo infinito.
+
+Para a primeira versao, o ideal e usar areas manuais ou semi-manuais.
+
+Vantagens de areas manuais:
+
+    - Melhor controle da experiencia.
+    - Menos risco de bugs.
+    - Menos chance de caminhos impossiveis.
+    - Melhor composicao visual.
+
+Uso futuro de geracao procedural:
+
+    - Distribuir rochas.
+    - Distribuir minerios.
+    - Criar cavernas simples.
+    - Gerar modo infinito.
+    - Variar posicao de tesouros.
+
+Regras do gerador:
+
+    - Sempre deve existir caminho ate o objetivo.
+    - Tesouros devem ficar em locais alcancaveis.
+    - Nao colocar inimigos fortes perto do inicio.
+    - Nao bloquear saida com rocha impossivel.
+    - Distribuir energia e vida de forma justa.
+
+
+======================================================================
+29. ESCOPO DA PRIMEIRA VERSAO JOGAVEL
+======================================================================
+
+29.1 Prototipo Minimo
+----------------------------------------------------------------------
+
+Objetivo:
+    Validar se explorar em terceira pessoa, minerar e coletar e divertido.
+
+Conteudo:
+
+    - 1 personagem 3D.
+    - Camera em terceira pessoa.
+    - Movimento basico.
+    - 1 area pequena.
+    - Picareta funcionando.
+    - Rochas quebraveis.
+    - Moedas e gemas.
+    - Energia.
+    - Vida.
+    - 1 inimigo simples.
+    - 1 armadilha.
+    - 1 objetivo: encontrar reliquia.
+    - Tela simples de fim de exploracao.
+
+
+29.2 Vertical Slice
+----------------------------------------------------------------------
+
+Objetivo:
+    Parecer um jogo real em pequena escala.
+
+Conteudo:
+
+    - Vila pequena.
+    - 1 regiao visual completa.
+    - 5 missoes.
+    - 2 inimigos.
+    - 2 armadilhas.
+    - 3 ferramentas.
+    - 5 upgrades.
+    - 5 reliquias.
+    - Tela de upgrades.
+    - Tela de colecao.
+    - HUD completo.
+    - Musica e efeitos basicos.
+
+
+29.3 Versao Comercial Inicial
+----------------------------------------------------------------------
+
+Conteudo sugerido:
+
+    - Vila central.
+    - 3 regioes.
+    - 20 a 30 missoes.
+    - 4 inimigos.
+    - 4 armadilhas.
+    - 5 tipos de objetos mineraveis.
+    - 8 upgrades.
+    - 20 reliquias.
+    - Modo campanha.
+    - Modo infinito simples.
+    - Ranking local ou Steam Leaderboard.
+    - Conquistas Steam.
+
+
+======================================================================
+30. CONQUISTAS STEAM
+======================================================================
+
+Exemplos:
+
+    Conquista               Condicao
+    ------------------------------------------------------------------
+    First Dig               Quebrar a primeira rocha
+    Treasure Hunter         Encontrar a primeira reliquia
+    Gem Collector           Coletar 100 gemas
+    Deep Explorer           Completar 10 missoes
+    Master Miner            Melhorar a picareta ao maximo
+    Lucky Find              Encontrar uma reliquia rara
+    Bomb Expert             Quebrar 50 rochas com bombas
+    No Scratch              Completar uma missao sem tomar dano
+    Energy Saver            Completar uma missao com mais de 50% de energia
+    Relic Master            Completar a colecao
+    Cave Walker             Explorar todas as cavernas da primeira regiao
+
+
+======================================================================
+31. MONETIZACAO
+======================================================================
+
+O jogo sera vendido por preco fixo baixo.
+
+Preco sugerido:
+
+    - US$ 2.00 na Steam e itch.io.
+
+Sem microtransacoes.
+
+Possiveis expansoes futuras:
+
+    - Novas regioes.
+    - Novas reliquias.
+    - Novos personagens.
+    - Modo desafio diario.
+    - Novos inimigos.
+    - Novas ferramentas.
+
+
+======================================================================
+32. RISCOS DO PROJETO
+======================================================================
+
+32.1 Risco: gameplay repetitivo
+----------------------------------------------------------------------
+
+Solucoes:
+
+    - Variar objetivos.
+    - Adicionar upgrades.
+    - Adicionar reliquias colecionaveis.
+    - Criar pistas visuais.
+    - Usar baus e segredos.
+    - Alternar areas abertas e cavernas.
+
+
+32.2 Risco: camera atrapalhar
+----------------------------------------------------------------------
+
+Solucoes:
+
+    - Usar SpringArm3D ou sistema equivalente.
+    - Fazer a camera aproximar ao colidir com paredes.
+    - Evitar corredores apertados demais.
+    - Permitir ajuste de sensibilidade.
+    - Posicionar a camera levemente acima do personagem.
+
+
+32.3 Risco: escopo 3D crescer demais
+----------------------------------------------------------------------
+
+Solucoes:
+
+    - Comecar com uma area pequena.
+    - Usar low poly.
+    - Reaproveitar modelos.
+    - Criar poucas mecanicas no inicio.
+    - Evitar mundo aberto gigante na primeira versao.
+    - Focar no loop de minerar e coletar.
+
+
+32.4 Risco: parecer simples demais
+----------------------------------------------------------------------
+
+Solucoes:
+
+    - Caprichar no feedback visual.
+    - Fazer a mineracao ser gostosa.
+    - Criar boas recompensas.
+    - Ter progressao clara.
+    - Criar uma vila charmosa.
+    - Usar reliquias como objetivo de colecao.
+
+
+32.5 Risco: geracao procedural injusta
+----------------------------------------------------------------------
+
+Solucoes:
+
+    - Comecar com areas manuais.
+    - Usar procedural apenas no modo infinito.
+    - Validar caminhos gerados.
+    - Garantir saida e objetivo alcancaveis.
+
+
+======================================================================
+33. ROADMAP SUGERIDO
+======================================================================
+
+Fase 1 - Prototipo 3D
+----------------------------------------------------------------------
+
+    - Movimento do personagem.
+    - Camera em terceira pessoa.
+    - Colisao basica.
+    - Picareta.
+    - Rocha quebravel.
+    - Coleta de moedas/gemas.
+    - Energia.
+
+
+Fase 2 - Gameplay Basico
+----------------------------------------------------------------------
+
+    - Vida.
+    - Inimigo simples.
+    - Armadilha simples.
+    - Bau.
+    - Reliquia.
+    - Fim de missao.
+
+
+Fase 3 - Vila e Progressao
+----------------------------------------------------------------------
+
+    - Vila pequena.
+    - NPCs basicos.
+    - Tarefas.
+    - Loja.
+    - Upgrades.
+    - Colecao de reliquias.
+
+
+Fase 4 - Conteudo
+----------------------------------------------------------------------
+
+    - 3 regioes.
+    - Mais missoes.
+    - Mais rochas.
+    - Mais minerios.
+    - Mais inimigos.
+    - Mais reliquias.
+
+
+Fase 5 - Polimento
+----------------------------------------------------------------------
+
+    - Sons.
+    - Musica.
+    - Particulas.
+    - Animacoes.
+    - UI final.
+    - Menu principal.
+    - Configuracoes.
+    - Balanceamento.
+
+
+Fase 6 - Publicacao
+----------------------------------------------------------------------
+
+    - Build Windows.
+    - Build Linux.
+    - Pagina itch.io.
+    - Pagina Steam.
+    - Trailer curto.
+    - Screenshots.
+    - Conquistas.
+
+
+======================================================================
+34. IDENTIDADE DO JOGO
+======================================================================
+
+Relic Miner deve ser um jogo sobre prazer imediato.
+
+O jogador deve sentir que:
+
+    - Explorar e gostoso.
+    - Minerar e satisfatorio.
+    - Coletar e recompensador.
+    - Encontrar tesouro e emocionante.
+    - Melhorar ferramentas da vontade de continuar.
+    - Cada missao termina deixando vontade de jogar a proxima.
+
+O jogo nao precisa ser enorme. Ele precisa ser agradavel, bem acabado e
+viciante dentro de uma proposta simples.
+
+
+======================================================================
+35. RESUMO FINAL
+======================================================================
+
+Relic Miner e um jogo 3D em terceira pessoa de mineracao, exploracao e caca ao
+tesouro.
+
+O jogador controla um minerador/explorador em um mundo 3D estilizado. Ele sai
+de uma vila central para explorar minas, cavernas, ruinas e regioes perigosas.
+Durante a exploracao, usa sua picareta para quebrar rochas, coletar gemas,
+encontrar reliquias, abrir passagens e melhorar suas ferramentas.
+
+A camera fica atras do personagem, em uma perspectiva de terceira pessoa,
+permitindo que o jogador veja o explorador andando pelo mundo, investigando
+paredes, observando cavernas e interagindo com objetos do ambiente.
+
+A forca do jogo esta em um loop simples e satisfatorio:
+
+    Explorar -> minerar -> descobrir -> coletar -> melhorar -> explorar de novo
+
+O projeto deve comecar pequeno, com um prototipo focado na sensacao de andar em
+terceira pessoa, usar a picareta, quebrar rochas e encontrar recompensas. Se
+essa base ficar divertida, o restante do jogo pode crescer com vila, NPCs,
+missoes, upgrades, regioes, reliquias e rankings.
+

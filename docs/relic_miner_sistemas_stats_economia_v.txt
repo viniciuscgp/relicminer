@@ -1,0 +1,1806 @@
+RELIC MINER - SISTEMAS DE STATS, ECONOMIA, SOBREVIVENCIA E IA
+Versao 2 - Ajustada para jogo 3D medieval em terceira pessoa, com foco roguelike.
+
+======================================================================
+1. OBJETIVO DESTE DOCUMENTO
+======================================================================
+
+Este documento resume os sistemas principais de Relic Miner 3D, com foco em:
+
+    - Stats do jogador.
+    - Formula de level e XP.
+    - Combate com HP, ataque e defesa.
+    - Economia escassa baseada em moeda medieval.
+    - Inventario, peso, armas, ferramentas e roupas.
+    - Sobrevivencia: fome, folego, agua, peso e desgaste.
+    - NPCs com nomes, funcoes e dialogos basicos.
+    - Inimigos internos e externos, com levels, stats e locais.
+    - Sistema de alerta e estados dos inimigos.
+    - Pocoes, plantas e ingredientes.
+    - Sistema de salvamento dificil, baseado em Pedra de Registro.
+
+Relic Miner deve ser um jogo de exploracao medieval, dificil, com elementos
+roguelike. O jogador precisa preparar cada expedicao, pois recursos sao raros,
+itens gastam, inimigos sao perigosos e salvar o progresso nao deve ser facil.
+
+Filosofia principal:
+
+    Tudo tem peso.
+    Tudo pode acabar.
+    Tudo que e valioso deve exigir risco.
+    O mundo deve parecer antigo, medieval e perigoso.
+    Sobreviver tambem e parte da recompensa.
+
+
+======================================================================
+2. ESTILO DO MUNDO
+======================================================================
+
+Relic Miner se passa em um mundo medieval de fantasia leve.
+
+Nao existem:
+
+    - Lanternas eletricas.
+    - Baterias.
+    - Armas de fogo modernas.
+    - Equipamentos tecnologicos.
+
+Existem:
+
+    - Tochas.
+    - Lamparinas simples.
+    - Velas.
+    - Picaretas.
+    - Espadas.
+    - Facas.
+    - Bastoes.
+    - Arcos simples no futuro, se desejado.
+    - Pedras arremessaveis.
+    - Pocoes.
+    - Ervas.
+    - Ingredientes raros.
+    - Minerios.
+    - Reliquias.
+    - Baús antigos.
+    - Runas e pedras magicas.
+
+A luz dentro de cavernas deve ser um recurso importante. A tocha ilumina, mas
+gasta. Se apagar, o jogador fica vulneravel, enxerga menos e pode se perder.
+
+
+======================================================================
+3. STATS PRINCIPAIS DO PLAYER
+======================================================================
+
+O jogador possui stats simples e claros.
+
+---------------------------------------------------------------------
+3.1 Stats principais
+---------------------------------------------------------------------
+
+Level
+    Nivel geral do personagem.
+    Representa experiencia acumulada em exploracao, mineracao, combate,
+    sobrevivencia, tarefas e descoberta de locais.
+
+XP
+    Experiencia acumulada.
+    Ao atingir o valor necessario, o jogador sobe de level.
+
+HP
+    Vida do jogador.
+    Se chegar a zero, o jogador morre.
+    Como o jogo tem proposta roguelike, a morte deve ser perigosa.
+
+Ataque
+    Valor base usado para calcular dano fisico.
+    E aumentado por level, arma equipada e pocoes.
+
+Defesa
+    Reduz dano recebido.
+    Vem de roupas, protecoes simples, buffs e level.
+
+Energia / Folego
+    Usada para correr, atacar repetidamente, minerar, nadar e escalar.
+    Se a energia estiver baixa, o jogador fica mais lento e vulneravel.
+
+Fome
+    Necessidade de comer.
+    Se a fome baixar muito, a energia recupera lentamente.
+    Se a fome zerar, o jogador perde HP aos poucos.
+
+Oxigenio
+    Usado debaixo da agua.
+    O jogador aguenta apenas 10 segundos submerso sem ajuda.
+    Apos isso, comeca a perder HP rapidamente.
+
+Peso carregado
+    Soma do peso de todos os itens no inventario.
+    O jogador tem limite confortavel e limite maximo absoluto.
+
+Velocidade
+    Afetada por peso, fome, terreno, agua, ferimentos e armaduras.
+
+Mineracao
+    Capacidade de quebrar pedra, minerio e obstaculos.
+    Depende principalmente da picareta.
+
+Resistencia
+    Pode ser dividida futuramente em resistencia a veneno, frio, calor e medo.
+
+
+---------------------------------------------------------------------
+3.2 Valores iniciais sugeridos
+---------------------------------------------------------------------
+
+Player Level 1:
+
+    HP maximo:                  100
+    Ataque base:                5
+    Defesa base:                1
+    Energia maxima:             100
+    Fome maxima:                100
+    Oxigenio submerso:          10 segundos
+    Peso confortavel:           22 kg
+    Peso maximo absoluto:       32 kg
+    Velocidade em terra:        100%
+    Velocidade nadando:         45%
+    Velocidade mergulhando:     30%
+
+Observacao importante:
+    Se o jogador passar do peso maximo absoluto, ele para de andar.
+    Nesse estado, ele nao consegue se mover e precisa jogar itens no chao
+    ate voltar para um peso carregavel.
+
+
+======================================================================
+4. SISTEMA DE PESO
+======================================================================
+
+O peso e um dos sistemas mais importantes do jogo.
+
+O jogador nao deve conseguir carregar tudo. Ele precisa escolher o que vale a
+pena levar e o que precisa abandonar.
+
+---------------------------------------------------------------------
+4.1 Faixas de peso
+---------------------------------------------------------------------
+
+Ate 70% do peso confortavel:
+    Movimento normal.
+    Consumo normal de energia.
+
+De 70% a 100% do peso confortavel:
+    Movimento levemente mais lento.
+    Maior gasto de energia ao correr, minerar e nadar.
+
+Acima do peso confortavel:
+    Movimento lento.
+    Ataques mais lentos.
+    Nado muito prejudicado.
+    Energia recupera mais devagar.
+
+Acima do peso maximo absoluto:
+    O jogador nao anda.
+    O jogador nao consegue correr, nadar ou atacar corretamente.
+    A unica solucao e jogar itens no chao.
+
+Frase de feedback sugerida:
+    "Peso demais. Voce precisa largar alguma coisa."
+
+
+---------------------------------------------------------------------
+4.2 Exemplos de peso de itens
+---------------------------------------------------------------------
+
+Moeda de cobre:             0.01 kg
+Pedra pequena:              0.3 kg
+Galho:                      0.2 kg
+Tocha:                      0.5 kg
+Faca:                       0.8 kg
+Espada curta:               2.0 kg
+Bastao:                     1.5 kg
+Picareta simples:           3.0 kg
+Picareta de ferro:          4.0 kg
+Minerio comum:              1.2 kg
+Minerio raro:               1.8 kg
+Reliquia pequena:           1.0 kg
+Reliquia pesada:            4.0 kg
+Pocao pequena:              0.4 kg
+Comida simples:             0.3 kg
+Camisa simples:             0.5 kg
+Calca de pano:              0.7 kg
+Gorro de la:                0.2 kg
+Sapato de couro:            0.8 kg
+
+
+======================================================================
+5. FORMULA DE LEVEL E XP
+======================================================================
+
+A formula precisa ser simples, previsivel e facil de balancear.
+
+Formula recomendada:
+
+    XP necessario para o proximo level = 100 + (level_atual - 1) * 80 + (level_atual - 1)^2 * 20
+
+Exemplos:
+
+    Level 1 -> 2:      100 XP
+    Level 2 -> 3:      200 XP
+    Level 3 -> 4:      340 XP
+    Level 4 -> 5:      520 XP
+    Level 5 -> 6:      740 XP
+    Level 6 -> 7:      1000 XP
+    Level 7 -> 8:      1300 XP
+    Level 8 -> 9:      1640 XP
+    Level 9 -> 10:     2020 XP
+    Level 10 -> 11:    2440 XP
+
+Essa formula funciona bem porque o comeco evolui rapido, mas depois exige
+mais exploracao e risco.
+
+
+---------------------------------------------------------------------
+5.1 Ganhos por level
+---------------------------------------------------------------------
+
+A cada level:
+
+    HP maximo:              +5
+    Energia maxima:         +3
+    Ataque base:            +1 a cada 2 levels
+    Defesa base:            +1 a cada 4 levels
+    Peso confortavel:       +1 kg a cada 3 levels
+
+Exemplo:
+
+    Level 1:
+        HP 100, Ataque 5, Defesa 1, Energia 100
+
+    Level 5:
+        HP 120, Ataque 7, Defesa 2, Energia 112
+
+    Level 10:
+        HP 145, Ataque 10, Defesa 3, Energia 127
+
+
+======================================================================
+6. COMBATE
+======================================================================
+
+Cada criatura viva possui:
+
+    - Level
+    - HP
+    - Ataque
+    - Defesa
+    - Estado atual
+
+Quando o HP chega a zero, morre.
+
+---------------------------------------------------------------------
+6.1 Formula simples de dano
+---------------------------------------------------------------------
+
+Dano base:
+
+    dano = ataque_do_atacante + dano_da_arma - defesa_do_alvo
+
+Dano minimo:
+
+    Se o resultado for menor que 1, causar pelo menos 1 de dano.
+
+Exemplo:
+
+    Player ataque 5
+    Espada curta dano 8
+    Inimigo defesa 3
+
+    dano = 5 + 8 - 3
+    dano = 10
+
+
+---------------------------------------------------------------------
+6.2 Tipos de ataque do player
+---------------------------------------------------------------------
+
+Ataque leve
+    Rapido.
+    Gasta pouca energia.
+    Dano menor.
+
+Ataque forte
+    Mais lento.
+    Gasta mais energia.
+    Pode empurrar inimigos pequenos.
+
+Arremesso
+    Usado para pedras, facas ou pequenos objetos.
+    Gasta o item ou exige buscar depois.
+
+Ataque com ferramenta
+    Picareta pode causar dano, mas e lenta.
+    Boa contra criaturas duras ou pequenas pedras vivas.
+
+Bloqueio futuro
+    Pode ser adicionado se houver escudos.
+    Nao e necessario no primeiro prototipo.
+
+
+======================================================================
+7. INVENTARIO E EQUIPAMENTOS
+======================================================================
+
+O jogador possui dois tipos principais de inventario:
+
+    1. Inventario de itens.
+    2. Inventario de equipamento vestido.
+
+---------------------------------------------------------------------
+7.1 Inventario de itens
+---------------------------------------------------------------------
+
+Tudo que o jogador pega no mundo vai primeiro para o inventario de itens.
+
+Exemplos:
+
+    - Moedas.
+    - Armas.
+    - Pedras.
+    - Galhos.
+    - Tochas.
+    - Minerios.
+    - Reliquias.
+    - Chaves.
+    - Comida.
+    - Pocoes.
+    - Plantas.
+    - Ferramentas.
+    - Roupas.
+
+Para vestir uma roupa, ela precisa estar primeiro no inventario de itens.
+Depois o jogador move para o slot de equipamento.
+
+
+---------------------------------------------------------------------
+7.2 Slots de equipamento
+---------------------------------------------------------------------
+
+Mao direita
+    Usada para atacar ou usar ferramenta.
+    Pode equipar:
+        - Espada.
+        - Faca.
+        - Bastao.
+        - Picareta.
+        - Pedra para arremessar.
+        - Galho.
+        - Machado futuro.
+
+Mao esquerda
+    Usada principalmente para suporte.
+    Pode equipar:
+        - Tocha.
+        - Lamparina.
+        - Pequeno escudo futuro.
+        - Item de missao.
+
+Corpo
+    Camisa, tunica, couro leve ou armadura simples.
+
+Pernas
+    Calca de pano, calca reforcada ou couro.
+
+Cabeca
+    Gorro, capuz, elmo leve ou chapeu.
+
+Pes
+    Sapato, bota simples ou bota reforcada.
+
+
+---------------------------------------------------------------------
+7.3 Desgaste e consumo
+---------------------------------------------------------------------
+
+Tudo no jogo deve gastar ou quebrar.
+
+Tocha
+    Apaga com o tempo.
+    Pode apagar mais rapido na chuva ou dentro da agua.
+
+Lamparina
+    Usa oleo.
+    Dura mais que tocha, mas o oleo e caro.
+
+Espada
+    Perde durabilidade ao bater.
+    Pode quebrar.
+    Pode ser consertada no ferreiro.
+
+Faca
+    Mais fraca, mas leve.
+    Pode ser usada para arremessar.
+
+Bastao
+    Barato, facil de achar, mas fraco.
+
+Pedra
+    Pode ser arremessada.
+    Nao e municao infinita.
+    O jogador precisa pegar pedras no mundo.
+
+Picareta
+    Gasta ao minerar.
+    Pode quebrar.
+    Pode ser melhorada ou consertada.
+
+Roupas
+    Podem perder durabilidade ao receber dano.
+    Roupas simples protegem pouco, mas ajudam contra frio e peso baixo.
+
+
+======================================================================
+8. AGUA, NADO E MERGULHO
+======================================================================
+
+A agua deve ser perigosa, principalmente em cavernas e rios subterraneos.
+
+---------------------------------------------------------------------
+8.1 Regras basicas
+---------------------------------------------------------------------
+
+O jogador pode:
+
+    - Andar em agua rasa.
+    - Nadar em agua funda.
+    - Mergulhar em pontos especificos.
+
+Quando estiver submerso:
+
+    Oxigenio maximo inicial: 10 segundos.
+
+Apos 10 segundos:
+
+    O jogador comeca a perder HP rapidamente.
+
+Dano sugerido sem oxigenio:
+
+    -5 HP por segundo nos primeiros 3 segundos.
+    -10 HP por segundo depois disso.
+
+O movimento na agua e lento:
+
+    Agua rasa:          70% da velocidade normal.
+    Nadando:            45% da velocidade normal.
+    Mergulhando:        30% da velocidade normal.
+
+Peso afeta muito a agua.
+Se o jogador estiver pesado demais, nadar pode ser quase impossivel.
+
+
+---------------------------------------------------------------------
+8.2 Itens relacionados a agua
+---------------------------------------------------------------------
+
+Pocao de Folego
+    Aumenta tempo submerso temporariamente.
+
+Pocao de Corpo Leve
+    Reduz penalidade de peso na agua.
+
+Corda
+    Pode ajudar a sair de buracos ou cavernas alagadas.
+
+Tocha
+    Apaga ao entrar na agua.
+
+Lamparina protegida
+    Pode sobreviver a chuva, mas nao a mergulho completo.
+
+
+======================================================================
+9. ECONOMIA E MOEDA
+======================================================================
+
+A moeda principal do jogo sera medieval.
+
+Nome sugerido:
+
+    Coroa
+
+Tipos:
+
+    Coroa de cobre
+    Coroa de prata
+    Coroa de ouro
+
+Conversao simples:
+
+    100 coroas de cobre = 1 coroa de prata
+    100 coroas de prata = 1 coroa de ouro
+
+Para simplificar no HUD, o jogo pode mostrar tudo como "Coroas".
+
+---------------------------------------------------------------------
+9.1 Filosofia da economia
+---------------------------------------------------------------------
+
+Dinheiro deve ser escasso.
+
+O jogador nao deve comprar tudo facilmente. Ele precisa escolher:
+
+    - Comprar comida ou consertar arma?
+    - Comprar tocha ou guardar para picareta melhor?
+    - Vender uma reliquia ou entregar para um NPC?
+    - Comprar pocao ou arriscar sem ela?
+
+A economia precisa criar decisao.
+
+
+---------------------------------------------------------------------
+9.2 Como ganhar moeda
+---------------------------------------------------------------------
+
+Buscar item para NPC
+    Recompensa baixa a media.
+    Mais seguro que explorar aleatoriamente.
+
+Vender minerios
+    Fonte principal no inicio.
+    Minerios pesam muito, entao o jogador nao consegue carregar muitos.
+
+Vender plantas
+    Pouco dinheiro, mas util no comeco.
+
+Vender partes de criaturas
+    Couro, presas, ossos, veneno, asas.
+    Depende do inimigo.
+
+Cacar
+    Pode dar carne, couro e ossos.
+    Risco medio.
+
+Pescar
+    Fonte lenta, mas mais segura.
+    Peixes podem ser vendidos ou usados como comida.
+
+Vender reliquias
+    Da muito dinheiro, mas pode prejudicar colecao ou quests.
+
+Abrir baus
+    Pode conter moedas, mas deve ser raro.
+
+Encontrar moedas antigas
+    Pequenas quantidades em ruinas.
+
+
+---------------------------------------------------------------------
+9.3 Valores sugeridos
+---------------------------------------------------------------------
+
+Pao simples:                 3 coroas
+Pedaco de carne seca:         8 coroas
+Tocha simples:                5 coroas
+Oleo de lamparina:            12 coroas
+Pocao simples de cura:        25 coroas
+Pocao de folego:              40 coroas
+Conserto de faca:             10 coroas
+Conserto de espada curta:     30 coroas
+Conserto de picareta:         35 coroas
+Picareta simples:             50 coroas
+Picareta de ferro:            180 coroas
+Espada curta usada:           90 coroas
+Bota simples:                 25 coroas
+Mochila reforcada:            150 coroas
+
+Venda de itens:
+
+Pedra comum:                  0 coroas ou nao compra
+Minerio de cobre:             4 coroas
+Minerio de ferro:             8 coroas
+Gema comum:                   25 coroas
+Gema rara:                    80 coroas
+Pele de lobo:                 15 coroas
+Presa de javali:              10 coroas
+Asa de morcego:               4 coroas
+Veneno de aranha:             20 coroas
+Reliquea comum:               120 coroas
+Reliquea rara:                400 coroas
+
+Observacao:
+    O preco de compra sempre deve ser bem maior que o preco de venda.
+    Isso evita que o jogador fique rico rapido.
+
+
+======================================================================
+10. NPCS PRINCIPAIS
+======================================================================
+
+Todos os NPCs devem ter dialogo basico, mesmo que simples.
+Eles podem dar informacoes sobre o mundo, vender, comprar, melhorar ou consertar.
+
+---------------------------------------------------------------------
+10.1 Breno Martel - Ferreiro
+---------------------------------------------------------------------
+
+Local:
+    Vila de Pedra Alta, perto da forja.
+
+Funcao:
+    - Vende armas simples.
+    - Vende picaretas.
+    - Melhora ferramentas.
+    - Conserta itens quebrados.
+    - Compra minerios.
+
+Dialogo basico:
+    "Se sua lamina falhar la embaixo, nao culpe os deuses. Culpe quem nao cuidou dela."
+
+Informacoes que pode dar:
+    - Onde encontrar ferro.
+    - Quais cavernas possuem rocha dura.
+    - Que tipo de picareta quebra certo minerio.
+
+Servicos:
+    - Consertar espada.
+    - Consertar picareta.
+    - Melhorar picareta.
+    - Comprar minerios.
+
+
+---------------------------------------------------------------------
+10.2 Mira Valeverde - Herbalista
+---------------------------------------------------------------------
+
+Local:
+    Cabana perto do bosque.
+
+Funcao:
+    - Vende pocoes.
+    - Compra plantas.
+    - Ensina receitas.
+    - Cria pocoes se o jogador trouxer ingredientes.
+
+Dialogo basico:
+    "Toda raiz tem uma historia. Algumas curam. Outras matam. Aprenda a diferenca."
+
+Informacoes que pode dar:
+    - Onde encontrar plantas raras.
+    - Como criar pocao de folego.
+    - Quais plantas sao venenosas.
+
+Servicos:
+    - Criar pocao.
+    - Comprar ervas.
+    - Vender receitas.
+
+
+---------------------------------------------------------------------
+10.3 Oren Passolargo - Comerciante
+---------------------------------------------------------------------
+
+Local:
+    Praca da vila.
+
+Funcao:
+    - Compra e vende itens gerais.
+    - Vende comida, corda, tocha, oleo e mochilas.
+    - Compra reliquias comuns por preco baixo.
+
+Dialogo basico:
+    "Tudo tem preco. Principalmente aquilo que voce acha que nao precisa."
+
+Informacoes que pode dar:
+    - Boatos sobre baus.
+    - Locais perigosos.
+    - Pessoas precisando de ajuda.
+
+Servicos:
+    - Vender suprimentos.
+    - Comprar itens gerais.
+    - Avaliar reliquias simples.
+
+
+---------------------------------------------------------------------
+10.4 Irma Celina - Guardiã do Registro
+---------------------------------------------------------------------
+
+Local:
+    Pequeno santuario de pedra na vila.
+
+Funcao:
+    - Explica o sistema de salvamento.
+    - Ensina sobre Pedra de Registro.
+    - Pode criar uma Pedra de Registro usando ingredientes raros.
+
+Dialogo basico:
+    "A memoria do mundo nao aceita qualquer nome. Para ser lembrado, voce precisa pagar o preco."
+
+Informacoes que pode dar:
+    - Como salvar.
+    - Onde encontrar fragmentos de registro.
+    - Quais baus podem conter pedra rara.
+
+Servicos:
+    - Criar Pedra de Registro.
+    - Ativar ponto de salvamento.
+    - Explicar consequencias da morte.
+
+
+---------------------------------------------------------------------
+10.5 Tavio Varalonga - Cacador
+---------------------------------------------------------------------
+
+Local:
+    Entrada do bosque.
+
+Funcao:
+    - Compra peles, carne e presas.
+    - Da tarefas de caca.
+    - Ensina sobre inimigos externos.
+
+Dialogo basico:
+    "Na floresta, o bicho que voce nao ve e quase sempre o que esta vendo voce."
+
+Informacoes que pode dar:
+    - Onde ha lobos.
+    - Como evitar javalis.
+    - Quais criaturas fogem do fogo.
+
+Servicos:
+    - Comprar partes de animais.
+    - Vender armadilhas simples futuramente.
+    - Dar tarefas de caca.
+
+
+---------------------------------------------------------------------
+10.6 Nara Linha-d'Agua - Pescadora
+---------------------------------------------------------------------
+
+Local:
+    Lago Velho ou pier da vila.
+
+Funcao:
+    - Vende vara de pesca.
+    - Compra peixes.
+    - Da informacoes sobre rios, lagoas e cavernas alagadas.
+
+Dialogo basico:
+    "A agua sempre devolve algo. O problema e que as vezes ela cobra primeiro."
+
+Informacoes que pode dar:
+    - Onde pescar.
+    - Onde existem passagens submersas.
+    - Quais aguas sao perigosas.
+
+Servicos:
+    - Comprar peixes.
+    - Vender iscas.
+    - Ensinar pontos de pesca.
+
+
+---------------------------------------------------------------------
+10.7 Edrik Mapa-Velho - Cartografo
+---------------------------------------------------------------------
+
+Local:
+    Pequena torre ou sala de mapas.
+
+Funcao:
+    - Vende mapas incompletos.
+    - Compra fragmentos de mapa.
+    - Marca locais provaveis de ruinas.
+
+Dialogo basico:
+    "Um mapa nunca mostra tudo. Se mostrasse, ninguem precisaria de coragem."
+
+Informacoes que pode dar:
+    - Posicoes de ruinas.
+    - Entradas alternativas.
+    - Locais ainda nao explorados.
+
+Servicos:
+    - Atualizar mapa.
+    - Comprar fragmentos.
+    - Revelar pontos de interesse.
+
+
+======================================================================
+11. SISTEMA DE DIALOGO DOS NPCS
+======================================================================
+
+Cada NPC deve ter uma estrutura simples de conversa.
+
+Opcoes basicas:
+
+    1. Conversar
+    2. Comprar
+    3. Vender
+    4. Servicos
+    5. Tarefas
+    6. Sair
+
+Nem todos precisam ter todas as opcoes.
+
+---------------------------------------------------------------------
+11.1 Conversa basica
+---------------------------------------------------------------------
+
+Todo NPC deve ter pelo menos:
+
+    - Saudacao.
+    - Frase sobre sua funcao.
+    - Dica sobre o mundo.
+    - Comentario quando o jogador esta machucado, pobre ou carregando peso.
+
+Exemplo:
+
+NPC Ferreiro:
+
+    Saudacao:
+        "Veio consertar alguma coisa ou quebrar mais uma?"
+
+    Dica:
+        "Rocha escura nao abre com picareta fraca. Voce so vai perder ferramenta."
+
+    Jogador sem dinheiro:
+        "Sem coroas? Entao volte com minerio. Ferro sempre tem valor."
+
+
+---------------------------------------------------------------------
+11.2 Tarefas
+---------------------------------------------------------------------
+
+Tipos de tarefa:
+
+    - Buscar item.
+    - Entregar item.
+    - Cacar criatura.
+    - Pescar peixe raro.
+    - Coletar planta.
+    - Encontrar lugar.
+    - Recuperar reliquia.
+    - Limpar area perigosa.
+
+As tarefas devem pagar pouco no inicio e melhor conforme risco.
+
+Exemplo:
+
+    Tarefa: Trazer 5 Minerios de Ferro
+    NPC: Breno Martel
+    Local: Mina Baixa
+    Recompensa: 35 coroas + 50 XP
+
+    Tarefa: Coletar 3 Raizes Azuis
+    NPC: Mira Valeverde
+    Local: Bosque Umido
+    Recompensa: 20 coroas + receita de Pocao Fraca de Cura
+
+
+======================================================================
+12. SISTEMA DE SALVAMENTO ROGUELIKE
+======================================================================
+
+Relic Miner deve ser dificil. Salvar nao deve ser automatico em qualquer lugar.
+
+O sistema principal usa a Pedra de Registro.
+
+---------------------------------------------------------------------
+12.1 Pedra de Registro
+---------------------------------------------------------------------
+
+A Pedra de Registro e um item raro que permite salvar o progresso em pontos
+especificos do mundo.
+
+Ela pode ser:
+
+    - Encontrada raramente em baus.
+    - Criada com ingredientes raros.
+    - Recebida como recompensa de tarefa muito dificil.
+
+Ela nao deve ser comum.
+
+Uso:
+
+    O jogador encontra um Altar de Registro.
+    Se tiver uma Pedra de Registro, pode consumir a pedra para salvar.
+
+Opcao mais dificil:
+    Cada Pedra de Registro salva apenas uma vez.
+
+Opcao um pouco mais amigavel:
+    A pedra ativa um altar, e esse altar vira ponto fixo de salvamento.
+
+Minha recomendacao:
+    Para o primeiro prototipo, usar a opcao dificil:
+    uma Pedra de Registro = um salvamento.
+
+
+---------------------------------------------------------------------
+12.2 Receita da Pedra de Registro
+---------------------------------------------------------------------
+
+Receita sugerida:
+
+    1 Fragmento de Runa Antiga
+    2 Cristais de Memoria
+    3 Musgos Prateados
+    1 Gema Azul Rachada
+    50 coroas para a Irma Celina consagrar
+
+Locais dos ingredientes:
+
+    Fragmento de Runa Antiga:
+        Ruinas Antigas, baus raros, inimigos guardioes.
+
+    Cristal de Memoria:
+        Caverna de Cristal, veios raros.
+
+    Musgo Prateado:
+        Bosque Sombrio, perto de pedras antigas.
+
+    Gema Azul Rachada:
+        Minas profundas ou venda muito rara no comerciante.
+
+
+---------------------------------------------------------------------
+12.3 Morte do jogador
+---------------------------------------------------------------------
+
+Quando o jogador morre:
+
+    - Volta para o ultimo salvamento.
+    - Perde itens coletados depois do ultimo salvamento.
+    - Pode manter conhecimento de mapa ja descoberto, se desejado.
+    - Pode manter XP apenas ate o ultimo salvamento.
+
+Opcao mais dura:
+    Tudo volta ao ultimo salvamento.
+
+Opcao recomendada:
+    Progresso permanente de conhecimento pode ficar.
+    Itens e XP voltam ao ultimo salvamento.
+
+Isso mantem o jogo dificil, mas nao totalmente frustrante.
+
+
+======================================================================
+13. INIMIGOS E CRIATURAS
+======================================================================
+
+Os inimigos devem existir dentro e fora das cavernas.
+Alguns vivem no mundo aberto, bosques, rios, ruinas, campos e montanhas.
+
+Cada inimigo possui:
+
+    - Nome.
+    - Local.
+    - Level.
+    - HP.
+    - Ataque.
+    - Defesa.
+    - Comportamento.
+    - Loot.
+    - XP.
+
+---------------------------------------------------------------------
+13.1 Inimigos externos - mundo aberto
+---------------------------------------------------------------------
+
+Nome: Rato do Campo
+Local: Arredores da Vila, celeiros, trilhas.
+Level: 1
+HP: 12
+Ataque: 3
+Defesa: 0
+Comportamento: foge se ferido, ataca se encurralado.
+Loot: Carne pequena, pele ruim.
+XP: 3
+
+Nome: Javali Cinzento
+Local: Bosque Claro, campos com arbustos.
+Level: 2
+HP: 45
+Ataque: 10
+Defesa: 2
+Comportamento: patrulha, pode investir se alertado.
+Loot: Carne, presa, couro grosso.
+XP: 18
+
+Nome: Lobo Magro
+Local: Bosque Sombrio, trilhas afastadas.
+Level: 3
+HP: 55
+Ataque: 13
+Defesa: 2
+Comportamento: persegue em media distancia, pode uivar para alertar outros.
+Loot: Pele de lobo, carne, dente.
+XP: 25
+
+Nome: Bandido Esfarrapado
+Local: Estrada Velha, ruinas externas.
+Level: 3
+HP: 70
+Ataque: 12
+Defesa: 3
+Comportamento: ve o jogador de longe, persegue, foge se HP baixo.
+Loot: Moedas, faca velha, pano rasgado.
+XP: 30
+
+Nome: Arqueiro Bandido
+Local: Acampamentos abandonados, torres quebradas.
+Level: 4
+HP: 55
+Ataque: 16
+Defesa: 2
+Comportamento: mantem distancia e atira.
+Loot: Flechas, moedas, arco simples futuro.
+XP: 40
+
+Nome: Urso Pardo
+Local: Bosque Profundo, cavernas rasas.
+Level: 6
+HP: 180
+Ataque: 28
+Defesa: 6
+Comportamento: territorial, ataca se o jogador chegar perto.
+Loot: Pele pesada, garra, carne grande.
+XP: 120
+
+Nome: Corvo Agourento
+Local: Cemiterios antigos, ruinas abertas.
+Level: 2
+HP: 20
+Ataque: 7
+Defesa: 1
+Comportamento: voa baixo, ataca e recua.
+Loot: Pena negra, olho de corvo.
+XP: 12
+
+Nome: Espantalho Vivo
+Local: Campos abandonados.
+Level: 5
+HP: 90
+Ataque: 18
+Defesa: 5
+Comportamento: fica parado ate o jogador se aproximar.
+Loot: Palha antiga, madeira seca, runa fraca.
+XP: 70
+
+
+---------------------------------------------------------------------
+13.2 Inimigos de cavernas e minas
+---------------------------------------------------------------------
+
+Nome: Morcego de Mina
+Local: Entrada de cavernas, tetos baixos.
+Level: 1
+HP: 18
+Ataque: 5
+Defesa: 0
+Comportamento: patrulha pequena area, ataca se ouvir barulho.
+Loot: Asa de morcego.
+XP: 6
+
+Nome: Rato de Pedra
+Local: Minas abandonadas.
+Level: 2
+HP: 25
+Ataque: 7
+Defesa: 1
+Comportamento: rapido, foge da luz forte.
+Loot: Dente pequeno, carne ruim.
+XP: 10
+
+Nome: Aranha de Fenda
+Local: Fendas, tuneis escuros.
+Level: 3
+HP: 40
+Ataque: 11
+Defesa: 2
+Comportamento: espera escondida, pode envenenar.
+Loot: Veneno de aranha, seda.
+XP: 28
+
+Nome: Slime Terroso
+Local: Cavernas umidas.
+Level: 3
+HP: 65
+Ataque: 8
+Defesa: 4
+Comportamento: lento, bloqueia caminho.
+Loot: Gosma terrosa.
+XP: 24
+
+Nome: Cobra de Ruina
+Local: Ruinas antigas e salas quentes.
+Level: 4
+HP: 45
+Ataque: 14
+Defesa: 2
+Comportamento: ataca rapido ao chegar perto.
+Loot: Veneno, pele de cobra.
+XP: 35
+
+Nome: Escaravelho de Pedra
+Local: Ruinas e templos subterraneos.
+Level: 5
+HP: 100
+Ataque: 16
+Defesa: 8
+Comportamento: protege baus e corredores.
+Loot: Casca dura, fragmento antigo.
+XP: 80
+
+Nome: Mineiro Perdido
+Local: Minas profundas.
+Level: 5
+HP: 90
+Ataque: 18
+Defesa: 4
+Comportamento: humanoide hostil, usa picareta velha.
+Loot: Picareta gasta, moedas, minerio.
+XP: 75
+
+Nome: Guardiao de Runa
+Local: Altares antigos e salas de reliquia.
+Level: 7
+HP: 220
+Ataque: 30
+Defesa: 10
+Comportamento: defende local especifico, nao persegue longe.
+Loot: Fragmento de Runa Antiga, gema rara.
+XP: 180
+
+Nome: Verme da Rocha
+Local: Tuneis profundos.
+Level: 8
+HP: 260
+Ataque: 34
+Defesa: 12
+Comportamento: sente vibracao, surge do chao.
+Loot: Mandibula, carne estranha, cristal interno.
+XP: 240
+
+
+---------------------------------------------------------------------
+13.3 Inimigos aquaticos
+---------------------------------------------------------------------
+
+Nome: Sanguessuga Grande
+Local: Pocos, rios lentos, cavernas alagadas.
+Level: 2
+HP: 22
+Ataque: 6
+Defesa: 1
+Comportamento: aproxima lentamente na agua.
+Loot: Sanguessuga, fluido escuro.
+XP: 12
+
+Nome: Peixe-Cego Mordedor
+Local: Lagos subterraneos.
+Level: 3
+HP: 35
+Ataque: 10
+Defesa: 1
+Comportamento: ataca em grupo pequeno.
+Loot: Carne de peixe, escama palida.
+XP: 20
+
+Nome: Afogado Antigo
+Local: Ruinas submersas.
+Level: 6
+HP: 130
+Ataque: 22
+Defesa: 6
+Comportamento: lento fora da agua, perigoso dentro dela.
+Loot: Osso antigo, moeda oxidada, alga negra.
+XP: 110
+
+
+---------------------------------------------------------------------
+13.4 Posicao dos inimigos no mapa
+---------------------------------------------------------------------
+
+Vila de Pedra Alta:
+    Sem inimigos dentro da vila.
+    Ratos podem aparecer em celeiros como tutorial.
+
+Campos Baixos:
+    Rato do Campo.
+    Javali Cinzento.
+    Corvo Agourento.
+
+Bosque Claro:
+    Javali Cinzento.
+    Lobo Magro em pequena quantidade.
+    Plantas basicas.
+
+Bosque Sombrio:
+    Lobo Magro.
+    Urso Pardo.
+    Espantalho Vivo.
+    Plantas raras.
+
+Estrada Velha:
+    Bandido Esfarrapado.
+    Arqueiro Bandido.
+    Corvo Agourento.
+
+Mina Baixa:
+    Morcego de Mina.
+    Rato de Pedra.
+    Slime Terroso.
+
+Ruinas Antigas:
+    Cobra de Ruina.
+    Escaravelho de Pedra.
+    Guardiao de Runa.
+
+Caverna Umida:
+    Slime Terroso.
+    Aranha de Fenda.
+    Sanguessuga Grande.
+
+Lago Velho:
+    Peixe-Cego Mordedor em areas profundas.
+    Sanguessuga Grande.
+
+Minas Profundas:
+    Mineiro Perdido.
+    Verme da Rocha.
+    Guardiao de Runa.
+
+
+======================================================================
+14. SISTEMA DE ALERTA E IA DOS INIMIGOS
+======================================================================
+
+Os inimigos podem reagir ao jogador por visao ou som.
+
+---------------------------------------------------------------------
+14.1 Percepcao por visao
+---------------------------------------------------------------------
+
+Cada inimigo possui:
+
+    - Campo de visao.
+    - Distancia maxima de visao.
+    - Angulo de visao.
+
+Exemplo:
+
+    Lobo:
+        Distancia de visao: 14 metros
+        Angulo: 120 graus
+
+    Morcego:
+        Visao baixa, mas boa audicao.
+
+    Bandido:
+        Visao longa em area aberta.
+
+A escuridao pode reduzir a chance do inimigo ver o jogador.
+A tocha pode ajudar o jogador a enxergar, mas tambem facilita ser visto.
+
+
+---------------------------------------------------------------------
+14.2 Percepcao por som
+---------------------------------------------------------------------
+
+Acoes que geram som:
+
+    - Correr.
+    - Minerar.
+    - Quebrar pedra.
+    - Cair de altura.
+    - Atacar.
+    - Jogar pedra.
+    - Abrir bau.
+    - Usar bomba futura.
+
+Som sugerido por acao:
+
+    Andar devagar:       2 metros
+    Andar normal:        5 metros
+    Correr:              10 metros
+    Minerar terra:       8 metros
+    Minerar pedra:       14 metros
+    Quebrar minerio:     16 metros
+    Grito de dano:       12 metros
+    Pedra arremessada:   som no ponto de impacto
+
+Inimigos podem investigar o local do som.
+
+
+---------------------------------------------------------------------
+14.3 Estados possiveis dos inimigos
+---------------------------------------------------------------------
+
+IDLE
+    Inimigo parado ou fazendo animacao simples.
+    Exemplo: javali fuçando o chao, bandido sentado, morcego pendurado.
+
+PATROL
+    Inimigo anda por uma rota curta.
+    Usado para lobos, bandidos, escaravelhos e guardas.
+
+ALERT
+    Inimigo percebeu algo.
+    Ele para, olha na direcao do som ou movimento.
+    Pode ir investigar.
+
+INVESTIGATE
+    Inimigo vai ate o ultimo ponto onde viu ou ouviu algo.
+    Se encontrar o jogador, entra em CHASE ou ATTACK.
+    Se nao encontrar, volta para PATROL ou IDLE.
+
+CHASE
+    Inimigo persegue o jogador.
+    Usado quando viu claramente ou foi atacado.
+
+ATTACK
+    Inimigo esta perto o suficiente para atacar.
+    Pode atacar em intervalos.
+
+FLEE
+    Inimigo foge.
+    Usado para criaturas fracas, inimigos feridos ou assustados por fogo.
+
+RETURN
+    Inimigo volta para sua area original.
+    Evita perseguir o jogador infinitamente.
+
+STUNNED
+    Inimigo fica atordoado por golpe forte, pedra na cabeca ou armadilha.
+
+DEAD
+    Inimigo morreu.
+    Pode gerar loot.
+
+
+---------------------------------------------------------------------
+14.4 Transicoes simples
+---------------------------------------------------------------------
+
+IDLE -> ALERT
+    Quando ouve som ou ve movimento distante.
+
+ALERT -> INVESTIGATE
+    Quando decide verificar o local.
+
+INVESTIGATE -> CHASE
+    Quando encontra o jogador.
+
+CHASE -> ATTACK
+    Quando chega perto o suficiente.
+
+ATTACK -> CHASE
+    Quando o jogador se afasta.
+
+CHASE -> RETURN
+    Quando o jogador fica longe demais.
+
+ATTACK -> FLEE
+    Quando o inimigo esta com HP baixo e seu tipo permite fuga.
+
+ANY -> DEAD
+    Quando HP chega a zero.
+
+
+---------------------------------------------------------------------
+14.5 Personalidade por tipo de inimigo
+---------------------------------------------------------------------
+
+Ratos:
+    Fogem mais do que atacam.
+
+Javali:
+    Entra em ALERT e depois investe.
+
+Lobo:
+    Persegue e tenta circular.
+
+Bandido:
+    Pode perseguir, atacar e fugir se estiver quase morto.
+
+Morcego:
+    Reage mais a som do que visao.
+
+Aranha:
+    Fica escondida e ataca de perto.
+
+Guardiao de Runa:
+    Nao foge e nao persegue longe.
+
+Urso:
+    Agressivo apenas se invadirem territorio.
+
+
+======================================================================
+15. POCOES
+======================================================================
+
+Pocoes devem ser uteis, mas nao abundantes.
+Elas podem ser compradas por caro, encontradas raramente ou criadas com plantas.
+
+---------------------------------------------------------------------
+15.1 Lista de pocoes
+---------------------------------------------------------------------
+
+Pocao Fraca de Cura
+    Efeito: Recupera 25 HP.
+    Ingredientes: Folha Vermelha + Agua Limpa.
+    Local da receita: Mira Valeverde.
+
+Pocao de Cura
+    Efeito: Recupera 60 HP.
+    Ingredientes: Folha Vermelha + Raiz Doce + Flor Clara.
+
+Pocao de Folego
+    Efeito: Aumenta tempo submerso de 10 para 25 segundos por 2 minutos.
+    Ingredientes: Alga Azul + Gota de Caverna + Flor Clara.
+
+Pocao de Corpo Leve
+    Efeito: Reduz penalidade de peso por 3 minutos.
+    Ingredientes: Pena Negra + Musgo Prateado + Raiz Fina.
+
+Pocao de Forca
+    Efeito: +5 ataque por 2 minutos.
+    Ingredientes: Raiz Forte + Sangue de Javali + Folha Amarga.
+
+Pocao de Pele Dura
+    Efeito: +4 defesa por 2 minutos.
+    Ingredientes: Casca de Carvalho + Mineral Moido + Musgo Cinza.
+
+Pocao Antiveneno
+    Efeito: Remove veneno e previne novo veneno por 1 minuto.
+    Ingredientes: Folha Amarga + Veneno de Aranha + Agua Limpa.
+
+Pocao de Visao Noturna
+    Efeito: Melhora visao no escuro por 3 minutos.
+    Ingredientes: Cogumelo Luminoso + Olho de Corvo + Alga Negra.
+
+Pocao de Calor
+    Efeito: Protege contra frio por 5 minutos.
+    Ingredientes: Pimenta Selvagem + Raiz Forte + Oleo Simples.
+
+Pocao de Silencio
+    Efeito: Reduz som dos passos por 2 minutos.
+    Ingredientes: Musgo Macio + Flor Cinzenta + Pena Negra.
+
+Pocao Instavel
+    Efeito: Efeito aleatorio bom ou ruim.
+    Ingredientes: Qualquer mistura errada.
+    Observacao: Pode ser usada como risco divertido.
+
+
+======================================================================
+16. PLANTAS E INGREDIENTES
+======================================================================
+
+As plantas devem ter locais especificos para incentivar exploracao.
+
+---------------------------------------------------------------------
+16.1 Lista de plantas
+---------------------------------------------------------------------
+
+Folha Vermelha
+    Local: Bosque Claro, beira de trilhas.
+    Uso: Pocoes de cura.
+    Raridade: Comum.
+
+Raiz Doce
+    Local: Campos Baixos, perto de arvores pequenas.
+    Uso: Cura melhorada, comida.
+    Raridade: Comum.
+
+Flor Clara
+    Local: Perto de riachos e clareiras.
+    Uso: Cura e Pocao de Folego.
+    Raridade: Media.
+
+Alga Azul
+    Local: Lago Velho, cavernas alagadas.
+    Uso: Pocao de Folego.
+    Raridade: Media.
+
+Gota de Caverna
+    Local: Estalactites em cavernas umidas.
+    Uso: Pocoes aquaticas.
+    Raridade: Media.
+
+Musgo Prateado
+    Local: Bosque Sombrio, pedras antigas, ruinas externas.
+    Uso: Pedra de Registro e Pocoes de Corpo Leve.
+    Raridade: Rara.
+
+Raiz Fina
+    Local: Encostas e barrancos.
+    Uso: Corpo Leve e Silencio.
+    Raridade: Media.
+
+Raiz Forte
+    Local: Montanhas baixas e cavernas secas.
+    Uso: Pocao de Forca e Pocao de Calor.
+    Raridade: Media.
+
+Folha Amarga
+    Local: Areas com aranhas e mato escuro.
+    Uso: Antiveneno.
+    Raridade: Media.
+
+Casca de Carvalho
+    Local: Arvores antigas no Bosque Claro e Bosque Sombrio.
+    Uso: Pele Dura.
+    Raridade: Comum.
+
+Musgo Cinza
+    Local: Paredes de mina e ruinas umidas.
+    Uso: Pele Dura.
+    Raridade: Comum.
+
+Cogumelo Luminoso
+    Local: Cavernas escuras, tuneis profundos.
+    Uso: Visao Noturna.
+    Raridade: Rara.
+
+Alga Negra
+    Local: Ruinas submersas e pocos escuros.
+    Uso: Visao Noturna e pocoes perigosas.
+    Raridade: Rara.
+
+Pimenta Selvagem
+    Local: Campos secos e encostas ensolaradas.
+    Uso: Pocao de Calor.
+    Raridade: Media.
+
+Musgo Macio
+    Local: Bosques fechados e pedras umidas.
+    Uso: Pocao de Silencio.
+    Raridade: Media.
+
+Flor Cinzenta
+    Local: Cemiterios antigos, ruinas abandonadas.
+    Uso: Silencio e pocoes sombrias.
+    Raridade: Rara.
+
+
+======================================================================
+17. FERRAMENTAS, ARMAS E ITENS USAVEIS
+======================================================================
+
+---------------------------------------------------------------------
+17.1 Ferramentas
+---------------------------------------------------------------------
+
+Picareta Simples
+    Necessaria para minerar pedra fraca e minerio comum.
+    Baixo custo, baixa durabilidade.
+
+Picareta de Ferro
+    Quebra rochas mais duras.
+    Mais pesada.
+
+Picareta de Aco
+    Melhor durabilidade e mineracao.
+    Cara.
+
+Picareta Antiga
+    Item raro.
+    Pode quebrar pedras especiais.
+
+Faca
+    Rapida, leve e fraca.
+    Pode ser arremessada.
+
+Espada Curta
+    Boa arma inicial.
+    Peso medio.
+
+Bastao
+    Barato, pode ser feito com galho forte.
+    Bom para empurrar inimigos pequenos.
+
+Pedra
+    Pode ser equipada na mao direita e arremessada.
+    Util para distrair inimigos ou causar dano pequeno.
+
+Tocha
+    Equipada na mao esquerda.
+    Ilumina.
+    Apaga com o tempo.
+    Apaga na agua.
+
+Lamparina
+    Equipada na mao esquerda.
+    Usa oleo.
+    Mais duravel que tocha.
+
+Corda
+    Ajuda em buracos, descidas e areas de risco.
+    Pode ser consumida em algumas situacoes.
+
+
+======================================================================
+18. ROUPAS E ARMADURAS LEVES
+======================================================================
+
+O jogador pode usar:
+
+    - Camisa.
+    - Calca.
+    - Gorro.
+    - Sapato ou bota.
+
+Esses itens ficam primeiro no inventario de itens.
+Para vestir, o jogador move para o inventario de equipamento.
+
+---------------------------------------------------------------------
+18.1 Exemplos
+---------------------------------------------------------------------
+
+Camisa de Pano
+    Defesa: +0
+    Peso: 0.5 kg
+    Efeito: Nenhum, roupa basica.
+
+Tunica Grossa
+    Defesa: +1
+    Peso: 1.0 kg
+    Efeito: pequena protecao contra frio.
+
+Colete de Couro
+    Defesa: +3
+    Peso: 2.5 kg
+    Efeito: boa protecao inicial.
+
+Calca de Pano
+    Defesa: +0
+    Peso: 0.7 kg
+
+Calca Reforcada
+    Defesa: +1
+    Peso: 1.4 kg
+
+Gorro de La
+    Defesa: +0
+    Peso: 0.2 kg
+    Efeito: protege levemente contra frio.
+
+Capuz de Couro
+    Defesa: +1
+    Peso: 0.6 kg
+
+Sapato Simples
+    Defesa: +0
+    Peso: 0.8 kg
+
+Bota de Couro
+    Defesa: +1
+    Peso: 1.3 kg
+    Efeito: reduz penalidade em terreno ruim.
+
+Bota Reforcada
+    Defesa: +2
+    Peso: 2.0 kg
+    Efeito: melhor contra espinhos e pedras.
+
+
+======================================================================
+19. COMIDA E FOME
+======================================================================
+
+O jogador precisa comer.
+
+A fome maxima e 100.
+Ela cai com o tempo, principalmente ao:
+
+    - Correr.
+    - Minerar.
+    - Nadar.
+    - Lutar.
+    - Carregar muito peso.
+
+---------------------------------------------------------------------
+19.1 Efeitos da fome
+---------------------------------------------------------------------
+
+Fome acima de 60:
+    Normal.
+
+Fome entre 30 e 60:
+    Energia recupera um pouco mais devagar.
+
+Fome entre 1 e 30:
+    Energia recupera muito devagar.
+    Ataques e mineracao ficam mais cansativos.
+
+Fome em 0:
+    Jogador perde HP lentamente.
+
+---------------------------------------------------------------------
+19.2 Comidas
+---------------------------------------------------------------------
+
+Pao Seco
+    Recupera 15 fome.
+    Barato.
+
+Carne Seca
+    Recupera 35 fome.
+    Mais cara.
+
+Peixe Assado
+    Recupera 30 fome.
+    Pode ser feito pescando.
+
+Ensopado da Vila
+    Recupera 60 fome.
+    Comprado na taverna.
+
+Cogumelo Comestivel
+    Recupera 10 fome.
+    Pode ter risco se for cogumelo errado.
+
+Fruta Silvestre
+    Recupera 8 fome.
+    Encontrada em bosques.
+
+
+======================================================================
+20. ESCOPO RECOMENDADO PARA O PRIMEIRO PROTOTIPO
+======================================================================
+
+Para nao crescer demais, o primeiro prototipo deve ter:
+
+    - Player com HP, energia, fome, peso e oxigenio.
+    - Inventario simples com peso.
+    - Mao direita e mao esquerda.
+    - Picareta, espada curta, pedra e tocha.
+    - Tocha que apaga com tempo.
+    - Agua com limite de 10 segundos submerso.
+    - Peso maximo que impede movimento.
+    - 3 NPCs: Ferreiro, Herbalista e Comerciante.
+    - 6 inimigos: rato, javali, lobo, morcego, aranha e bandido.
+    - IA com IDLE, ALERT, INVESTIGATE, CHASE, ATTACK, FLEE e DEAD.
+    - 4 pocoes: Cura Fraca, Folego, Forca e Antiveneno.
+    - 6 plantas: Folha Vermelha, Flor Clara, Alga Azul, Folha Amarga, Raiz Forte e Musgo Prateado.
+    - Pedra de Registro como sistema de salvamento dificil.
+    - Uma vila pequena, um bosque e uma mina inicial.
+
+Isso ja valida o coracao do jogo:
+
+    Preparar -> explorar -> arriscar -> coletar -> sobreviver -> salvar.
+
+
+======================================================================
+21. RESUMO FINAL
+======================================================================
+
+Relic Miner 3D deve ser um jogo medieval de exploracao, mineracao e sobrevivencia,
+com dificuldade roguelike e economia escassa.
+
+O jogador nao e um heroi poderoso no inicio. Ele e um explorador tentando
+sobreviver em um mundo perigoso.
+
+Ele precisa:
+
+    - Comer.
+    - Controlar peso.
+    - Usar luz com cuidado.
+    - Minerar com ferramenta adequada.
+    - Escolher o que carrega.
+    - Evitar inimigos fortes.
+    - Usar pocoes no momento certo.
+    - Ganhar moeda com esforco.
+    - Salvar apenas quando conseguir uma Pedra de Registro.
+
+A experiencia desejada e:
+
+    Entrar em uma mina ou bosque deve parecer uma decisao importante.
+    Voltar vivo com alguns itens bons deve ser uma vitoria.
+    Encontrar uma Pedra de Registro deve ser emocionante.
+    Conseguir melhorar uma ferramenta deve parecer progresso real.
+
