@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://buoshjnl2yl65"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://dk6vu5h5w7eki" path="res://scenes/components/land_marker.gd" id="1_2ega0"]
+[ext_resource type="Script" path="res://scenes/editor_tools/land_marker.gd" id="1_2ega0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goijd"]
 albedo_color = Color(1, 0.40123826, 0.7655953, 1)

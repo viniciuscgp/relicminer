@@ -2,7 +2,7 @@
 extends VBoxContainer
 
 
-const STREET_MAKER_SCENE := "res://scenes/components/street_maker.tscn"
+const STREET_MAKER_SCENE := "res://scenes/editor_tools/street_maker.tscn"
 const TERRAIN_HEIGHT := 0
 const TERRAIN_CONTROL := 1
 const NO_TEXTURE_ID := -1

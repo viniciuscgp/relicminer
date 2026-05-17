@@ -2,7 +2,7 @@
 extends VBoxContainer
 
 
-const LAKE_MARKER_SCENE := "res://scenes/components/lake_marker.tscn"
+const LAKE_MARKER_SCENE := "res://scenes/editor_tools/lake_marker.tscn"
 const GENERATED_ROOT_NAME := "GeneratedWater"
 const SURVEY_RIVER_PREFIX := "SurveyRiver_"
 const WATER_AREA_GROUP := "water_volume"
