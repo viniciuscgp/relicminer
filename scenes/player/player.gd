@@ -5,25 +5,39 @@ extends CharacterBody3D
 @export var jump_velocity := 14.5
 @export var mouse_sensitivity := 0.0025
 @export var gamepad_look_sensitivity := 3.0
+@export_range(10.0, 89.0, 1.0) var max_look_angle_degrees := 65.0
+@export_range(0.0, 60.0, 0.5) var look_smoothing := 18.0
 @export var acceleration := 18.0
 @export var friction := 22.0
 
 @onready var stats: Node = get_node_or_null("PlayerStats")
+@onready var camera_pivot: Node3D = get_node_or_null("CameraPivot")
 @onready var underwater_environment: Node = get_node_or_null("CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
+
+var _camera_pitch := 0.0
+var _target_camera_pitch := 0.0
 
 
 func _ready() -> void:
+	if camera_pivot != null:
+		_camera_pitch = camera_pivot.rotation.x
+		_target_camera_pitch = _camera_pitch
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * mouse_sensitivity)
+func _process(delta: float) -> void:
+	_apply_camera_pitch(delta)
 
+
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("release_mouse"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		_add_camera_pitch(-event.relative.y * mouse_sensitivity)
 
 
 func _physics_process(delta: float) -> void:
@@ -36,6 +50,10 @@ func _physics_process(delta: float) -> void:
 	var look_axis := Input.get_axis("look_left", "look_right")
 	if not is_zero_approx(look_axis):
 		rotate_y(-look_axis * gamepad_look_sensitivity * delta)
+
+	var look_vertical_axis := Input.get_axis("look_up", "look_down")
+	if not is_zero_approx(look_vertical_axis):
+		_add_camera_pitch(-look_vertical_axis * gamepad_look_sensitivity * delta)
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction := (global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -58,6 +76,31 @@ func _physics_process(delta: float) -> void:
 
 func _can_move() -> bool:
 	return stats == null or not bool(stats.call("is_over_absolute_weight"))
+
+
+func _add_camera_pitch(amount: float) -> void:
+	if camera_pivot == null:
+		return
+
+	var max_angle := deg_to_rad(max_look_angle_degrees)
+	_target_camera_pitch = clampf(
+		_target_camera_pitch + amount,
+		-max_angle,
+		max_angle
+	)
+
+
+func _apply_camera_pitch(delta: float) -> void:
+	if camera_pivot == null:
+		return
+
+	if look_smoothing <= 0.0:
+		_camera_pitch = _target_camera_pitch
+	else:
+		var weight := 1.0 - exp(-look_smoothing * delta)
+		_camera_pitch = lerpf(_camera_pitch, _target_camera_pitch, weight)
+
+	camera_pivot.rotation.x = _camera_pitch
 
 
 func _is_underwater() -> bool:
