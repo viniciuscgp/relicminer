@@ -40,8 +40,8 @@ materials/extract_path=""
 _subresources={
 "materials": {
 "@MATERIAL:0": {
-"use_external/enabled": true,
-"use_external/path": "res://demo/assets/materials/M_rock30.tres"
+"use_external/enabled": false,
+"use_external/path": ""
 }
 }
 }
