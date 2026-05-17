@@ -24,10 +24,17 @@ var _settings := {}
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = 20
 	_audio_manager = get_node_or_null("/root/AudioManager")
 	_settings = _get_audio_settings()
 	_apply_settings_to_controls()
 	_connect_controls()
+	_configure_focus()
+
+
+func focus_first() -> void:
+	apply_button.grab_focus()
 
 
 func _connect_controls() -> void:
@@ -136,3 +143,21 @@ func _on_restore_pressed() -> void:
 func _on_back_pressed() -> void:
 	close_requested.emit()
 	hide()
+
+
+func _configure_focus() -> void:
+	for control in [
+		music_on_button,
+		music_off_button,
+		sfx_on_button,
+		sfx_off_button,
+		music_volume_slider,
+		sfx_volume_slider,
+		master_volume_slider,
+		keyboard_button,
+		joystick_button,
+		apply_button,
+		restore_button,
+		back_button,
+	]:
+		control.focus_mode = Control.FOCUS_ALL

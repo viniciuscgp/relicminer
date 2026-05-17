@@ -54,11 +54,13 @@ func _resolve_player_links() -> void:
 func _build_ui() -> void:
 	var root := Control.new()
 	root.name = "Root"
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(root)
 
 	var panel := PanelContainer.new()
 	panel.name = "Panel"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.custom_minimum_size = Vector2(315.0, 154.0)
 	panel.offset_left = 16.0
 	panel.offset_top = 16.0
@@ -68,6 +70,7 @@ func _build_ui() -> void:
 	root.add_child(panel)
 
 	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_theme_constant_override("margin_left", 12)
 	margin.add_theme_constant_override("margin_top", 10)
 	margin.add_theme_constant_override("margin_right", 12)
@@ -75,10 +78,12 @@ func _build_ui() -> void:
 	panel.add_child(margin)
 
 	var rows := VBoxContainer.new()
+	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_theme_constant_override("separation", 6)
 	margin.add_child(rows)
 
 	_level_label = Label.new()
+	_level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_level_label.add_theme_font_size_override("font_size", 15)
 	rows.add_child(_level_label)
 
@@ -92,21 +97,25 @@ func _build_ui() -> void:
 	_oxygen_label = _oxygen_bar.get_meta("label") as Label
 
 	_weight_label = Label.new()
+	_weight_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_weight_label.add_theme_font_size_override("font_size", 12)
 	rows.add_child(_weight_label)
 
 
 func _add_meter(parent: Control, title: String, color: Color) -> ProgressBar:
 	var row := VBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override("separation", 2)
 	parent.add_child(row)
 
 	var label := Label.new()
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.text = title
 	label.add_theme_font_size_override("font_size", 12)
 	row.add_child(label)
 
 	var bar := ProgressBar.new()
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.custom_minimum_size = Vector2(0.0, 9.0)
 	bar.show_percentage = false
 	bar.add_theme_stylebox_override("background", _make_bar_style(Color(0.02, 0.025, 0.03, 0.9)))
