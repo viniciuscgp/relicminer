@@ -1,40 +1,21 @@
-extends CharacterBody3D
+extends "res://scenes/components/actor_body.gd"
 class_name EnemyBase
 
 signal died(enemy: Node)
 signal loot_opened(actor_inventory: Node, enemy_inventory: Node)
 signal loot_open_failed(reason: String)
 
-@export var stats_path: NodePath = NodePath("CombatStats")
-@export var inventory_path: NodePath = NodePath("Inventory")
 @export var loot_after_death := true
 @export var disable_collision_on_death := true
 
-@onready var stats: Node = get_node_or_null(stats_path)
-@onready var inventory: Node = get_node_or_null(inventory_path)
-
 
 func _ready() -> void:
-	if stats != null and stats.has_signal("died"):
-		stats.connect("died", _on_stats_died)
-
-
-func get_stats() -> Node:
-	return stats
-
-
-func get_inventory() -> Node:
-	return inventory
+	if combat_stats != null and combat_stats.has_signal("died"):
+		combat_stats.connect("died", _on_stats_died)
 
 
 func is_dead() -> bool:
-	return stats != null and stats.has_method("is_dead") and bool(stats.call("is_dead"))
-
-
-func take_damage(raw_damage: float) -> float:
-	if stats == null or not stats.has_method("take_damage"):
-		return 0.0
-	return float(stats.call("take_damage", raw_damage))
+	return combat_stats != null and combat_stats.has_method("is_dead") and bool(combat_stats.call("is_dead"))
 
 
 func can_open_loot(actor_inventory: Node = null) -> bool:

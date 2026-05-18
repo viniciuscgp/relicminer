@@ -15,7 +15,10 @@
 [ext_resource type="Resource" path="res://resources/items/small_stone.tres" id="13_stone"]
 [ext_resource type="Resource" path="res://resources/items/copper_crown.tres" id="14_crown"]
 [ext_resource type="PackedScene" path="res://scenes/ui/player_menus.tscn" id="15_menus"]
-[ext_resource type="Script" path="res://scenes/components/inventory_dropper.gd" id="16_dropper"]
+[ext_resource type="Script" uid="uid://c8tr8n7j781pn" path="res://scenes/components/inventory_dropper.gd" id="16_dropper"]
+[ext_resource type="Script" uid="uid://denivmfdkdn22" path="res://scenes/components/actor_interactor.gd" id="17_interactor"]
+[ext_resource type="Script" uid="uid://dhcq8ljht1tfn" path="res://scenes/components/rigid_body_pusher.gd" id="18_pusher"]
+[ext_resource type="Script" uid="uid://6qasyvo7d48y" path="res://scenes/components/player_controller.gd" id="19_controller"]
 
 [sub_resource type="Resource" id="ItemStack_pickaxe"]
 script = ExtResource("7_stack")
@@ -72,8 +75,21 @@ capacity_slots = 18
 max_weight_kg = 32.0
 starting_items = Array[Resource]([SubResource("ItemStack_pickaxe"), SubResource("ItemStack_sword"), SubResource("ItemStack_torch"), SubResource("ItemStack_bread"), SubResource("ItemStack_potion"), SubResource("ItemStack_stone"), SubResource("ItemStack_crown")])
 
-[node name="InventoryDropper" type="Node" parent="."]
+[node name="InventoryDropper" type="Node" parent="." unique_id=939449834]
 script = ExtResource("16_dropper")
+
+[node name="Interactor" type="Node" parent="." unique_id=1074997997]
+script = ExtResource("17_interactor")
+aim_source_path = NodePath("../CameraPivot/SpringArm3D/Camera3D")
+
+[node name="RigidBodyPusher" type="Node" parent="." unique_id=599342985]
+script = ExtResource("18_pusher")
+
+[node name="PlayerController" type="Node" parent="." unique_id=1156572493]
+script = ExtResource("19_controller")
+speed = 10.0
+jump_velocity = 8.0
+look_smoothing = 9.0
 
 [node name="PlayerStats" parent="." unique_id=302393514 instance=ExtResource("5_stats")]
 inventory_path = NodePath("../Inventory")
