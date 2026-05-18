@@ -1,6 +1,7 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/items/world/weak_healing_potion_world.tscn" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -8,9 +9,9 @@ id = &"weak_healing_potion"
 display_name = "Pocao Fraca de Cura"
 description = "Recupera uma pequena quantidade de vida."
 kind = 6
+world_scene = ExtResource("2")
 weight_kg = 0.4
 stack_limit = 6
 buy_price = 25
 sell_price = 8
 hp_restore = 25.0
-

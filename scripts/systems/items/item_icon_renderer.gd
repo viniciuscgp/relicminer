@@ -77,6 +77,8 @@ static func _render_scene_to_texture(scene: PackedScene, item: Resource) -> Text
 	if tree == null:
 		return null
 
+	await tree.process_frame
+
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(ICON_SIZE, ICON_SIZE)
 	viewport.transparent_bg = true

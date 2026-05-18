@@ -11382,7 +11382,7 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 371.05493, 42.281754, 1157.4558)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.794586, 13.092018, 1157.4558)
 
 [node name="Markers" type="Node3D" parent="." unique_id=980118374]
 
@@ -11805,6 +11805,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2793.465, -0.00012207031, 134
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2793.465, -0.00012207031, 1346.7739)
 
 [node name="Lake" type="Node3D" parent="." unique_id=309140861]
+visible = false
 
 [node name="LakeMarker" parent="Lake" unique_id=2128076817 instance=ExtResource("15_atjdx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120.427376, 0, 1155.7454)

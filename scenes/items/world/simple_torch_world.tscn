@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/items/item_world_base.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_handle"]
+albedo_color = Color(0.3, 0.16, 0.07, 1)
+roughness = 0.82
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_flame"]
+albedo_color = Color(1, 0.42, 0.08, 1)
+emission_enabled = true
+emission = Color(1, 0.32, 0.04, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_torch_handle"]
+top_radius = 0.055
+bottom_radius = 0.055
+height = 0.62
+
+[sub_resource type="SphereMesh" id="SphereMesh_torch_flame"]
+radius = 0.12
+height = 0.22
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_simple_torch"]
+radius = 0.09
+height = 0.74
+
+[node name="SimpleTorchWorld" type="RigidBody3D"]
+mass = 0.5
+script = ExtResource("1")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Handle" type="MeshInstance3D" parent="Visual"]
+material_override = SubResource("StandardMaterial3D_torch_handle")
+mesh = SubResource("CylinderMesh_torch_handle")
+
+[node name="FlamePlaceholder" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame")
+mesh = SubResource("SphereMesh_torch_flame")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+light_color = Color(1, 0.55, 0.25, 1)
+light_energy = 0.7
+omni_range = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_simple_torch")

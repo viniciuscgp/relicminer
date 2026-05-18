@@ -2,6 +2,8 @@ extends CanvasLayer
 
 signal close_requested
 
+const ItemIconRenderer := preload("res://scripts/systems/items/item_icon_renderer.gd")
+
 const KIND_KEYS := {
 	0: "item.kind.misc",
 	1: "item.kind.currency",
@@ -15,10 +17,10 @@ const KIND_KEYS := {
 	9: "item.kind.armor",
 }
 
-@export var player_path: NodePath = NodePath("../..")
+@export var actor_path: NodePath = NodePath("../..")
 @export var visible_slot_count := 30
 @export var slot_columns := 5
-@export var slot_size := Vector2(68, 54)
+@export var slot_size := Vector2(72, 64)
 
 @onready var title_label: Label = %TitleLabel
 @onready var weight_label: Label = %WeightLabel
@@ -40,6 +42,7 @@ const KIND_KEYS := {
 @onready var close_button: Button = %CloseButton
 
 var _inventory: Node
+var _inventory_dropper: Node
 var _stats: Node
 var _slot_style: StyleBox
 var _slot_focus_style: StyleBox
@@ -58,7 +61,7 @@ func _ready() -> void:
 	_prepare_slot_styles()
 	close_button.pressed.connect(_on_close_pressed)
 	close_button.focus_mode = Control.FOCUS_ALL
-	_resolve_player_links()
+	_resolve_actor_links()
 	_apply_localization()
 	refresh()
 
@@ -117,15 +120,16 @@ func refresh() -> void:
 	_configure_slot_focus()
 
 
-func _resolve_player_links() -> void:
-	var player := get_node_or_null(player_path)
-	if player == null:
-		player = get_parent()
-	if player == null:
+func _resolve_actor_links() -> void:
+	var actor := get_node_or_null(actor_path)
+	if actor == null:
+		actor = get_parent()
+	if actor == null:
 		return
 
-	_inventory = player.get_node_or_null("Inventory")
-	_stats = player.get_node_or_null("PlayerStats")
+	_inventory = actor.get_node_or_null("Inventory")
+	_inventory_dropper = actor.get_node_or_null("InventoryDropper")
+	_stats = actor.get_node_or_null("PlayerStats")
 
 	if _inventory != null and _inventory.has_signal("changed"):
 		_inventory.connect("changed", refresh)
@@ -137,7 +141,7 @@ func _update_weight() -> void:
 	if _stats != null and _stats.has_method("get_carried_weight_kg"):
 		var carried := float(_stats.call("get_carried_weight_kg"))
 		var maximum := float(_stats.call("get_absolute_weight_kg"))
-		weight_label.text = "%s %.0f/%.0f" % [_text("ui.inventory.weight"), carried, maximum]
+		weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.inventory.weight"), carried, maximum]
 		weight_help_label.text = "%s: %.1f/%.1f" % [_text("ui.inventory.current_weight"), carried, maximum]
 		return
 
@@ -197,18 +201,28 @@ func _make_slot(stack: Resource, index: int) -> Button:
 
 	var item: Resource = stack.get("item")
 	var amount := int(stack.get("amount"))
+	var icon_rect := TextureRect.new()
+	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon_rect.custom_minimum_size = Vector2(0, 34)
+	icon_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.texture = ItemIconRenderer.get_icon_or_fallback(item)
+	content.add_child(icon_rect)
+	_load_slot_icon(item, icon_rect)
+
 	var name_label := Label.new()
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	name_label.custom_minimum_size = Vector2(0, 30)
+	name_label.custom_minimum_size = Vector2(0, 14)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.text = _get_item_name(item)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.clip_text = true
-	name_label.max_lines_visible = 2
+	name_label.max_lines_visible = 1
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 9)
+	name_label.add_theme_font_size_override("font_size", 8)
 	content.add_child(name_label)
 
 	var amount_label := Label.new()
@@ -221,6 +235,16 @@ func _make_slot(stack: Resource, index: int) -> Button:
 	content.add_child(amount_label)
 
 	return slot
+
+
+func _load_slot_icon(item: Resource, icon_rect: TextureRect) -> void:
+	if item == null:
+		return
+
+	var texture: Texture2D = await ItemIconRenderer.bake_icon_async(item)
+	if not is_instance_valid(icon_rect):
+		return
+	icon_rect.texture = texture
 
 
 func _on_slot_pressed(index: int, slot: Button) -> void:
@@ -378,7 +402,15 @@ func _use_selected_item() -> void:
 
 
 func _drop_selected_item() -> void:
-	_consume_selected_item()
+	var stack := _get_stack_at(_selected_index)
+	if stack == null or bool(stack.call("is_empty")):
+		return
+
+	if _inventory_dropper == null or not _inventory_dropper.has_method("drop_stack"):
+		return
+
+	if bool(_inventory_dropper.call("drop_stack", stack, 1)):
+		call_deferred("_refresh_after_item_change")
 
 
 func _consume_selected_item() -> void:
@@ -392,7 +424,12 @@ func _consume_selected_item() -> void:
 
 	var removed := int(_inventory.call("remove_item", item.get("id"), 1))
 	if removed > 0:
-		call_deferred("focus_first")
+		call_deferred("_refresh_after_item_change")
+
+
+func _refresh_after_item_change() -> void:
+	refresh()
+	focus_first()
 
 
 func _on_close_pressed() -> void:

@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://byahdcblxgt4a"]
+
+[ext_resource type="Script" uid="uid://bhkn8k21q2nl1" path="res://scenes/items/item_world_base.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pickaxe_handle"]
+albedo_color = Color(0.36, 0.2, 0.09, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_pickaxe_handle"]
+size = Vector3(0.08, 0.08, 0.86)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pickaxe_head"]
+albedo_color = Color(0.45, 0.46, 0.44, 1)
+metallic = 0.45
+roughness = 0.38
+
+[sub_resource type="BoxMesh" id="BoxMesh_pickaxe_head"]
+size = Vector3(0.64, 0.08, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pickaxe_tip"]
+size = Vector3(0.16, 0.08, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_simple_pickaxe"]
+size = Vector3(0.78, 0.28, 0.98)
+
+[node name="SimplePickaxeWorld" type="RigidBody3D" unique_id=1038771789]
+mass = 3.0
+continuous_cd = true
+script = ExtResource("1")
+durability = 100.0
+
+[node name="Visual" type="Node3D" parent="." unique_id=854526335]
+
+[node name="Handle" type="MeshInstance3D" parent="Visual" unique_id=322855071]
+material_override = SubResource("StandardMaterial3D_pickaxe_handle")
+mesh = SubResource("BoxMesh_pickaxe_handle")
+
+[node name="Head" type="MeshInstance3D" parent="Visual" unique_id=88493216]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.36)
+material_override = SubResource("StandardMaterial3D_pickaxe_head")
+mesh = SubResource("BoxMesh_pickaxe_head")
+
+[node name="TipLeft" type="MeshInstance3D" parent="Visual" unique_id=743660258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36, 0, -0.36)
+material_override = SubResource("StandardMaterial3D_pickaxe_head")
+mesh = SubResource("BoxMesh_pickaxe_tip")
+
+[node name="TipRight" type="MeshInstance3D" parent="Visual" unique_id=268459173]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 0, -0.36)
+material_override = SubResource("StandardMaterial3D_pickaxe_head")
+mesh = SubResource("BoxMesh_pickaxe_tip")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=624981000]
+shape = SubResource("BoxShape3D_simple_pickaxe")

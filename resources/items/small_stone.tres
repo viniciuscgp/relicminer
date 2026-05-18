@@ -1,6 +1,7 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/items/world/small_stone_world.tscn" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -8,7 +9,7 @@ id = &"small_stone"
 display_name = "Pedra Pequena"
 description = "Pode ser arremessada para distrair ou causar dano baixo."
 kind = 0
+world_scene = ExtResource("2")
 weight_kg = 0.3
 stack_limit = 12
 weapon_damage = 2
-

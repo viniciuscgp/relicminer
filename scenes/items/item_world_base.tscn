@@ -12,7 +12,7 @@ size = Vector3(0.35, 0.35, 0.35)
 [sub_resource type="SphereShape3D" id="SphereShape3D_item"]
 radius = 0.45
 
-[node name="ItemWorldBase" type="Area3D"]
+[node name="ItemWorldBase" type="RigidBody3D"]
 script = ExtResource("1")
 
 [node name="Visual" type="MeshInstance3D" parent="."]

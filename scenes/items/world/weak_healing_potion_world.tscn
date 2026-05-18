@@ -1,0 +1,51 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/items/item_world_base.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_potion_glass"]
+albedo_color = Color(0.55, 0.78, 0.95, 0.45)
+transparency = 1
+roughness = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_potion_liquid"]
+albedo_color = Color(0.85, 0.08, 0.18, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_potion_cork"]
+albedo_color = Color(0.36, 0.2, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_potion_body"]
+radius = 0.17
+height = 0.27
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_potion_cork"]
+top_radius = 0.055
+bottom_radius = 0.055
+height = 0.12
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_weak_healing_potion"]
+radius = 0.2
+
+[node name="WeakHealingPotionWorld" type="RigidBody3D"]
+mass = 0.4
+script = ExtResource("1")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Bottle" type="MeshInstance3D" parent="Visual"]
+material_override = SubResource("StandardMaterial3D_potion_glass")
+mesh = SubResource("SphereMesh_potion_body")
+
+[node name="LiquidPlaceholder" type="MeshInstance3D" parent="Visual"]
+scale = Vector3(0.82, 0.55, 0.82)
+material_override = SubResource("StandardMaterial3D_potion_liquid")
+mesh = SubResource("SphereMesh_potion_body")
+
+[node name="Cork" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+material_override = SubResource("StandardMaterial3D_potion_cork")
+mesh = SubResource("CylinderMesh_potion_cork")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_weak_healing_potion")
