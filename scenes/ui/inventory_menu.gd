@@ -43,6 +43,7 @@ const KIND_KEYS := {
 
 var _inventory: Node
 var _inventory_dropper: Node
+var _equipment: Node
 var _stats: Node
 var _slot_style: StyleBox
 var _slot_focus_style: StyleBox
@@ -50,6 +51,9 @@ var _slot_selected_style: StyleBox
 var _slot_buttons: Array[Button] = []
 var _selected_index := -1
 var _localization_manager: Node
+var _equipment_icon_rects := {}
+var _equipment_empty_icons := {}
+var _equipment_slot_labels := {}
 
 
 func _ready() -> void:
@@ -61,6 +65,7 @@ func _ready() -> void:
 	_prepare_slot_styles()
 	close_button.pressed.connect(_on_close_pressed)
 	close_button.focus_mode = Control.FOCUS_ALL
+	_prepare_equipment_labels()
 	_resolve_actor_links()
 	_apply_localization()
 	refresh()
@@ -101,6 +106,7 @@ func refresh() -> void:
 
 	title_label.text = _get_inventory_display_name()
 	_update_weight()
+	_update_equipment_labels()
 
 	var slots: Array = _inventory.get("slots")
 	empty_label.visible = slots.is_empty()
@@ -129,10 +135,13 @@ func _resolve_actor_links() -> void:
 
 	_inventory = actor.get_node_or_null("Inventory")
 	_inventory_dropper = actor.get_node_or_null("InventoryDropper")
+	_equipment = actor.get_node_or_null("Equipment")
 	_stats = actor.get_node_or_null("PlayerStats")
 
 	if _inventory != null and _inventory.has_signal("changed"):
 		_inventory.connect("changed", refresh)
+	if _equipment != null and _equipment.has_signal("changed"):
+		_equipment.connect("changed", _update_equipment_labels)
 	if _stats != null and _stats.has_signal("changed"):
 		_stats.connect("changed", _update_weight)
 
@@ -398,6 +407,15 @@ func _get_kind_name(item: Resource) -> String:
 
 
 func _use_selected_item() -> void:
+	var stack := _get_stack_at(_selected_index)
+	if stack == null or bool(stack.call("is_empty")):
+		return
+
+	if _equipment != null and _equipment.has_method("equip_stack"):
+		if bool(_equipment.call("equip_stack", stack)):
+			_update_equipment_labels()
+			return
+
 	_consume_selected_item()
 
 
@@ -459,18 +477,161 @@ func _prepare_slot_styles() -> void:
 		_slot_selected_style.border_width_bottom = 2
 
 
+func _prepare_equipment_labels() -> void:
+	_prepare_equipment_slot(head_label, &"head")
+	_prepare_equipment_slot(right_hand_label, &"right_hand")
+	_prepare_equipment_slot(torso_label, &"torso")
+	_prepare_equipment_slot(left_hand_label, &"left_hand")
+	_prepare_equipment_slot(legs_label, &"legs")
+	_prepare_equipment_slot(accessory_label, &"accessory")
+	_prepare_equipment_slot(feet_label, &"feet")
+	_prepare_equipment_slot(accessory_2_label, &"accessory_2")
+
+
+func _prepare_equipment_slot(label: Label, slot: StringName) -> void:
+	if label == null:
+		return
+
+	var panel := label.get_parent() as PanelContainer
+	if panel == null:
+		return
+
+	panel.custom_minimum_size = Vector2(96, 72)
+
+	if panel.has_node("SlotMargin"):
+		_equipment_slot_labels[slot] = label
+		_equipment_icon_rects[slot] = panel.get_node("SlotMargin/SlotContent/IconBox/ItemIcon")
+		_equipment_empty_icons[slot] = panel.get_node("SlotMargin/SlotContent/IconBox/EmptyIcon")
+		return
+
+	panel.remove_child(label)
+
+	var margin := MarginContainer.new()
+	margin.name = "SlotMargin"
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 5)
+	margin.add_theme_constant_override("margin_top", 5)
+	margin.add_theme_constant_override("margin_right", 5)
+	margin.add_theme_constant_override("margin_bottom", 5)
+	panel.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.name = "SlotContent"
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 2)
+	margin.add_child(content)
+
+	var icon_box := CenterContainer.new()
+	icon_box.name = "IconBox"
+	icon_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon_box.custom_minimum_size = Vector2(0, 38)
+	icon_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	icon_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(icon_box)
+
+	var item_icon := TextureRect.new()
+	item_icon.name = "ItemIcon"
+	item_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_icon.custom_minimum_size = Vector2(36, 36)
+	item_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	item_icon.visible = false
+	icon_box.add_child(item_icon)
+
+	var empty_icon := Label.new()
+	empty_icon.name = "EmptyIcon"
+	empty_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	empty_icon.text = "<>"
+	empty_icon.modulate = Color(0.42, 0.36, 0.25, 0.9)
+	empty_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	empty_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	empty_icon.add_theme_font_size_override("font_size", 16)
+	icon_box.add_child(empty_icon)
+
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.custom_minimum_size = Vector2(0, 20)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.clip_text = true
+	label.max_lines_visible = 2
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 9)
+	content.add_child(label)
+
+	_equipment_slot_labels[slot] = label
+	_equipment_icon_rects[slot] = item_icon
+	_equipment_empty_icons[slot] = empty_icon
+
+
 func _apply_localization() -> void:
 	equipment_title.text = _text("ui.inventory.equipment")
 	inventory_title.text = _text("ui.inventory.inventory")
-	head_label.text = _text("ui.inventory.head")
-	right_hand_label.text = _text("ui.inventory.right_hand")
-	torso_label.text = _text("ui.inventory.torso")
-	left_hand_label.text = _text("ui.inventory.left_hand")
-	legs_label.text = _text("ui.inventory.legs")
-	accessory_label.text = _text("ui.inventory.accessory")
-	feet_label.text = _text("ui.inventory.feet")
-	accessory_2_label.text = _text("ui.inventory.accessory")
 	empty_label.text = _text("ui.inventory.empty")
+	_update_equipment_labels()
+
+
+func _update_equipment_labels() -> void:
+	_update_equipment_slot(&"head", "ui.inventory.head")
+	_update_equipment_slot(&"right_hand", "ui.inventory.right_hand")
+	_update_equipment_slot(&"torso", "ui.inventory.torso")
+	_update_equipment_slot(&"left_hand", "ui.inventory.left_hand")
+	_update_equipment_slot(&"legs", "ui.inventory.legs")
+	_update_equipment_slot(&"accessory", "ui.inventory.accessory")
+	_update_equipment_slot(&"feet", "ui.inventory.feet")
+	_update_equipment_slot(&"accessory_2", "ui.inventory.accessory")
+
+
+func _update_equipment_slot(slot: StringName, label_key: String) -> void:
+	var label := _equipment_slot_labels.get(slot) as Label
+	if label != null:
+		label.text = _text(label_key)
+
+	var icon_rect := _equipment_icon_rects.get(slot) as TextureRect
+	var empty_icon := _equipment_empty_icons.get(slot) as Label
+	if icon_rect == null or empty_icon == null:
+		return
+
+	var item := _get_equipped_item_for_slot(slot)
+	if item == null:
+		icon_rect.texture = null
+		icon_rect.hide()
+		empty_icon.show()
+		if label != null:
+			label.tooltip_text = _text(label_key)
+		return
+
+	icon_rect.texture = ItemIconRenderer.get_icon_or_fallback(item)
+	icon_rect.show()
+	empty_icon.hide()
+	if label != null:
+		label.tooltip_text = "%s: %s" % [_text(label_key), _get_item_name(item)]
+	_load_equipment_icon(slot, item)
+
+
+func _get_equipped_item_for_slot(slot: StringName) -> Resource:
+	if _equipment == null or not _equipment.has_method("get_equipped_item"):
+		return null
+	return _equipment.call("get_equipped_item", slot) as Resource
+
+
+func _load_equipment_icon(slot: StringName, item: Resource) -> void:
+	if item == null:
+		return
+
+	var texture: Texture2D = await ItemIconRenderer.bake_icon_async(item)
+	var current_item := _get_equipped_item_for_slot(slot)
+	if current_item != item:
+		return
+
+	var icon_rect := _equipment_icon_rects.get(slot) as TextureRect
+	if icon_rect == null or not is_instance_valid(icon_rect):
+		return
+	icon_rect.texture = texture
 
 
 func _on_language_changed(_language: String) -> void:

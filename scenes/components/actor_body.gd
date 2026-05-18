@@ -7,6 +7,7 @@ class_name ActorBody
 @export var inventory_dropper_path: NodePath = NodePath("InventoryDropper")
 @export var interactor_path: NodePath = NodePath("Interactor")
 @export var rigid_body_pusher_path: NodePath = NodePath("RigidBodyPusher")
+@export var equipment_path: NodePath = NodePath("Equipment")
 
 @onready var inventory: Node = get_node_or_null(inventory_path)
 @onready var stats: Node = get_node_or_null(stats_path)
@@ -14,6 +15,7 @@ class_name ActorBody
 @onready var inventory_dropper: Node = get_node_or_null(inventory_dropper_path)
 @onready var interactor: Node = get_node_or_null(interactor_path)
 @onready var rigid_body_pusher: Node = get_node_or_null(rigid_body_pusher_path)
+@onready var equipment: Node = get_node_or_null(equipment_path)
 
 
 func get_inventory() -> Node:
@@ -30,6 +32,10 @@ func get_combat_stats() -> Node:
 	if combat_stats != null:
 		return combat_stats
 	return stats
+
+
+func get_equipment() -> Node:
+	return equipment
 
 
 func can_move() -> bool:
@@ -55,6 +61,24 @@ func interact() -> void:
 func push_rigid_body_collisions(move_direction: Vector3) -> void:
 	if rigid_body_pusher != null and rigid_body_pusher.has_method("push_collisions"):
 		rigid_body_pusher.call("push_collisions", self, move_direction)
+
+
+func use_equipped_primary() -> bool:
+	if equipment == null or not equipment.has_method("use_primary"):
+		return false
+	return bool(equipment.call("use_primary"))
+
+
+func use_equipped_secondary() -> bool:
+	if equipment == null or not equipment.has_method("use_secondary"):
+		return false
+	return bool(equipment.call("use_secondary"))
+
+
+func throw_equipped() -> bool:
+	if equipment == null or not equipment.has_method("throw_equipped"):
+		return false
+	return bool(equipment.call("throw_equipped"))
 
 
 func drop_stack(stack: Resource, amount := 1) -> bool:

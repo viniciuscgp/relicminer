@@ -1,6 +1,11 @@
 extends Resource
 class_name ItemDefinition
 
+const ItemAction := preload("res://scripts/systems/items/actions/item_action.gd")
+const MeleeItemAction := preload("res://scripts/systems/items/actions/melee_item_action.gd")
+const ThrowItemAction := preload("res://scripts/systems/items/actions/throw_item_action.gd")
+const ConsumeItemAction := preload("res://scripts/systems/items/actions/consume_item_action.gd")
+
 enum Kind {
 	MISC,
 	CURRENCY,
@@ -22,6 +27,7 @@ enum Kind {
 @export_group("Presentation")
 @export var icon: Texture2D
 @export var world_scene: PackedScene
+@export var held_scene: PackedScene
 @export var generate_icon_from_world_scene := true
 
 @export_group("Inventory")
@@ -31,6 +37,11 @@ enum Kind {
 @export var sell_price := 0
 
 @export_group("Equipment")
+@export var default_equipment_slot: StringName
+@export var held_position := Vector3.ZERO
+@export var held_rotation_degrees := Vector3.ZERO
+@export var held_scale := Vector3.ONE
+@export var actions: Array[Resource] = []
 @export var weapon_damage := 0
 @export var defense_bonus := 0
 @export var durability_max := 0.0
@@ -84,6 +95,61 @@ func create_world_instance(amount := 1, durability := -1.0) -> Node:
 	if instance.has_method("setup"):
 		instance.call("setup", self, amount, durability)
 	return instance
+
+
+func create_held_instance(amount := 1, durability := -1.0) -> Node3D:
+	var source_scene := held_scene if held_scene != null else world_scene
+	if source_scene == null:
+		return null
+
+	var instance := source_scene.instantiate() as Node3D
+	if instance == null:
+		return null
+	if instance.has_method("setup"):
+		instance.call("setup", self, amount, durability)
+	return instance
+
+
+func get_default_equipment_slot() -> StringName:
+	if default_equipment_slot != &"":
+		return default_equipment_slot
+	if kind == Kind.LIGHT:
+		return &"left_hand"
+	return &"right_hand"
+
+
+func get_action_for_trigger(trigger: StringName) -> Resource:
+	for action in actions:
+		if action == null:
+			continue
+		if action.get("trigger") == trigger:
+			return action
+	return _create_default_action(trigger)
+
+
+func _create_default_action(trigger: StringName) -> Resource:
+	if trigger == ItemAction.TRIGGER_THROW:
+		return ThrowItemAction.new()
+
+	if trigger == ItemAction.TRIGGER_PRIMARY:
+		if kind == Kind.WEAPON or kind == Kind.TOOL:
+			var slash := MeleeItemAction.new()
+			slash.display_name = "Slash"
+			slash.animation_name = &"slash"
+			return slash
+		if kind == Kind.FOOD or kind == Kind.POTION:
+			return ConsumeItemAction.new()
+
+	if trigger == ItemAction.TRIGGER_SECONDARY and (kind == Kind.WEAPON or kind == Kind.TOOL):
+		var thrust := MeleeItemAction.new()
+		thrust.trigger = ItemAction.TRIGGER_SECONDARY
+		thrust.display_name = "Thrust"
+		thrust.animation_name = &"thrust"
+		thrust.range = 2.2
+		thrust.damage_multiplier = 1.15
+		return thrust
+
+	return null
 
 
 func _get_localization_manager() -> Node:

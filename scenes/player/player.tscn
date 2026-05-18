@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cthdl0i46to8p"]
 
 [ext_resource type="Script" uid="uid://7bhmvai7g1r5" path="res://scenes/player/player.gd" id="1_3vyb7"]
-[ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scenes/player/river_survey_recorder.gd" id="2_lsa8m"]
+[ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scenes/editor_tools/river_survey_recorder.gd" id="2_lsa8m"]
 [ext_resource type="PackedScene" uid="uid://dtxucqa7t3oe6" path="res://scenes/components/UnderwaterEnvironment.tscn" id="3_6n8mq"]
 [ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="4_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_stats.tscn" id="5_stats"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://denivmfdkdn22" path="res://scenes/components/actor_interactor.gd" id="17_interactor"]
 [ext_resource type="Script" uid="uid://dhcq8ljht1tfn" path="res://scenes/components/rigid_body_pusher.gd" id="18_pusher"]
 [ext_resource type="Script" uid="uid://6qasyvo7d48y" path="res://scenes/components/player_controller.gd" id="19_controller"]
+[ext_resource type="Script" path="res://scenes/components/equipment_component.gd" id="20_equipment"]
 
 [sub_resource type="Resource" id="ItemStack_pickaxe"]
 script = ExtResource("7_stack")
@@ -77,6 +78,11 @@ starting_items = Array[Resource]([SubResource("ItemStack_pickaxe"), SubResource(
 
 [node name="InventoryDropper" type="Node" parent="." unique_id=939449834]
 script = ExtResource("16_dropper")
+drop_distance = 1.26
+
+[node name="Equipment" type="Node" parent="." unique_id=971635141]
+script = ExtResource("20_equipment")
+aim_source_path = NodePath("../CameraPivot/SpringArm3D/Camera3D")
 
 [node name="Interactor" type="Node" parent="." unique_id=1074997997]
 script = ExtResource("17_interactor")
@@ -97,6 +103,14 @@ inventory_path = NodePath("../Inventory")
 [node name="PlayerHUD" parent="." unique_id=383144626 instance=ExtResource("6_hud")]
 
 [node name="PlayerMenus" parent="." unique_id=397086250 instance=ExtResource("15_menus")]
+
+[node name="EquipmentSockets" type="Node3D" parent="." unique_id=1534144422]
+
+[node name="RightHandSocket" type="Node3D" parent="EquipmentSockets" unique_id=421344219]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 0.34, 0.82, -0.42)
+
+[node name="LeftHandSocket" type="Node3D" parent="EquipmentSockets" unique_id=130889749]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, -0.34, 0.82, -0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=800391728]
 material_override = SubResource("StandardMaterial3D_3vyb7")

@@ -165,10 +165,10 @@ static func _compute_world_aabb(root: Node) -> AABB:
 	var first := true
 
 	for node in _walk(root):
-		if not node is VisualInstance3D:
+		if not node is MeshInstance3D:
 			continue
 
-		var visual := node as VisualInstance3D
+		var visual := node as MeshInstance3D
 		var local := visual.get_aabb()
 		if local.size == Vector3.ZERO:
 			continue
