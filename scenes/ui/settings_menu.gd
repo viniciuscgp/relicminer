@@ -47,6 +47,7 @@ func _connect_controls() -> void:
 	master_volume_slider.value_changed.connect(_set_master_volume)
 	keyboard_button.pressed.connect(_set_input_mode.bind("keyboard"))
 	joystick_button.pressed.connect(_set_input_mode.bind("joystick"))
+	vibration_button.toggled.connect(_set_vibration_enabled)
 	apply_button.pressed.connect(_on_apply_pressed)
 	restore_button.pressed.connect(_on_restore_pressed)
 	back_button.pressed.connect(_on_back_pressed)
@@ -62,6 +63,8 @@ func _get_audio_settings() -> Dictionary:
 		"sfx_volume": 0.8,
 		"music_enabled": true,
 		"sfx_enabled": true,
+		"input_mode": "keyboard",
+		"vibration_enabled": false,
 	}
 
 
@@ -71,6 +74,9 @@ func _apply_settings_to_controls() -> void:
 	var music_volume := float(_settings.get("music_volume", 0.7))
 	var sfx_volume := float(_settings.get("sfx_volume", 0.8))
 	var master_volume := float(_settings.get("master_volume", 0.75))
+	var input_mode := str(_settings.get("input_mode", "keyboard"))
+	var joystick := input_mode == "joystick"
+	var vibration_enabled := bool(_settings.get("vibration_enabled", false))
 
 	music_on_button.button_pressed = music_enabled
 	music_off_button.button_pressed = not music_enabled
@@ -79,10 +85,10 @@ func _apply_settings_to_controls() -> void:
 	music_volume_slider.value = music_volume * 100.0
 	sfx_volume_slider.value = sfx_volume * 100.0
 	master_volume_slider.value = master_volume * 100.0
-	keyboard_button.button_pressed = true
-	joystick_button.button_pressed = false
-	vibration_button.disabled = true
-	vibration_button.button_pressed = false
+	keyboard_button.button_pressed = not joystick
+	joystick_button.button_pressed = joystick
+	vibration_button.disabled = not joystick
+	vibration_button.button_pressed = joystick and vibration_enabled
 	_refresh_volume_labels()
 
 
@@ -115,11 +121,17 @@ func _set_master_volume(value: float) -> void:
 
 func _set_input_mode(mode: String) -> void:
 	var joystick := mode == "joystick"
+	_settings["input_mode"] = mode
 	keyboard_button.button_pressed = not joystick
 	joystick_button.button_pressed = joystick
 	vibration_button.disabled = not joystick
 	if not joystick:
 		vibration_button.button_pressed = false
+		_settings["vibration_enabled"] = false
+
+
+func _set_vibration_enabled(enabled: bool) -> void:
+	_settings["vibration_enabled"] = enabled and not vibration_button.disabled
 
 
 func _refresh_volume_labels() -> void:
@@ -156,6 +168,7 @@ func _configure_focus() -> void:
 		master_volume_slider,
 		keyboard_button,
 		joystick_button,
+		vibration_button,
 		apply_button,
 		restore_button,
 		back_button,

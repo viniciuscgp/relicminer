@@ -13,6 +13,8 @@ const DEFAULT_SFX_VOLUME := 0.8
 const DEFAULT_MUSIC_ENABLED := true
 const DEFAULT_SFX_ENABLED := true
 const DEFAULT_MAX_SFX_PLAYERS := 16
+const DEFAULT_INPUT_MODE := "keyboard"
+const DEFAULT_VIBRATION_ENABLED := false
 
 var master_volume := DEFAULT_MASTER_VOLUME
 var music_volume := DEFAULT_MUSIC_VOLUME
@@ -20,6 +22,8 @@ var sfx_volume := DEFAULT_SFX_VOLUME
 var music_enabled := DEFAULT_MUSIC_ENABLED
 var sfx_enabled := DEFAULT_SFX_ENABLED
 var max_sfx_players := DEFAULT_MAX_SFX_PLAYERS
+var input_mode := DEFAULT_INPUT_MODE
+var vibration_enabled := DEFAULT_VIBRATION_ENABLED
 
 var _music_player: AudioStreamPlayer
 var _sfx_players: Array[AudioStreamPlayer] = []
@@ -94,6 +98,8 @@ func apply_settings(settings: Dictionary, save := true) -> void:
 	sfx_volume = clampf(float(settings.get("sfx_volume", sfx_volume)), 0.0, 1.0)
 	music_enabled = bool(settings.get("music_enabled", music_enabled))
 	sfx_enabled = bool(settings.get("sfx_enabled", sfx_enabled))
+	input_mode = str(settings.get("input_mode", input_mode))
+	vibration_enabled = bool(settings.get("vibration_enabled", vibration_enabled))
 	_apply_to_audio_server()
 
 	if save:
@@ -107,6 +113,8 @@ func get_settings() -> Dictionary:
 		"sfx_volume": sfx_volume,
 		"music_enabled": music_enabled,
 		"sfx_enabled": sfx_enabled,
+		"input_mode": input_mode,
+		"vibration_enabled": vibration_enabled,
 	}
 
 
@@ -117,6 +125,8 @@ func restore_defaults(save := true) -> void:
 		"sfx_volume": DEFAULT_SFX_VOLUME,
 		"music_enabled": DEFAULT_MUSIC_ENABLED,
 		"sfx_enabled": DEFAULT_SFX_ENABLED,
+		"input_mode": DEFAULT_INPUT_MODE,
+		"vibration_enabled": DEFAULT_VIBRATION_ENABLED,
 	}, save)
 
 
@@ -127,6 +137,8 @@ func save_settings() -> void:
 	config.set_value("audio", "sfx_volume", sfx_volume)
 	config.set_value("audio", "music_enabled", music_enabled)
 	config.set_value("audio", "sfx_enabled", sfx_enabled)
+	config.set_value("input", "input_mode", input_mode)
+	config.set_value("input", "vibration_enabled", vibration_enabled)
 	config.save(SETTINGS_PATH)
 
 
@@ -140,6 +152,8 @@ func load_settings() -> void:
 	sfx_volume = clampf(float(config.get_value("audio", "sfx_volume", DEFAULT_SFX_VOLUME)), 0.0, 1.0)
 	music_enabled = bool(config.get_value("audio", "music_enabled", DEFAULT_MUSIC_ENABLED))
 	sfx_enabled = bool(config.get_value("audio", "sfx_enabled", DEFAULT_SFX_ENABLED))
+	input_mode = str(config.get_value("input", "input_mode", DEFAULT_INPUT_MODE))
+	vibration_enabled = bool(config.get_value("input", "vibration_enabled", DEFAULT_VIBRATION_ENABLED))
 
 
 func _ensure_bus(bus_name: String) -> void:

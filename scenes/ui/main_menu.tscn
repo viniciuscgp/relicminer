@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1"]
-[ext_resource type="Texture2D" path="res://icon.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/background_5.jpg" id="2"]
+[ext_resource type="Texture2D" path="res://assets/logo.png" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
@@ -45,18 +46,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
-
-[node name="BackgroundColor" type="ColorRect" parent="Background"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.045, 0.038, 0.03, 1)
 
 [node name="Shade" type="ColorRect" parent="."]
 layout_mode = 1
@@ -88,22 +80,13 @@ theme_override_constants/separation = 24
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Emblem" type="TextureRect" parent="Content/Layout/TitleRow"]
-custom_minimum_size = Vector2(92, 92)
+[node name="Logo" type="TextureRect" parent="Content/Layout/TitleRow"]
+custom_minimum_size = Vector2(520, 150)
 layout_mode = 2
 mouse_filter = 2
-texture = ExtResource("2")
+texture = ExtResource("3")
 expand_mode = 1
 stretch_mode = 5
-
-[node name="Title" type="Label" parent="Content/Layout/TitleRow"]
-custom_minimum_size = Vector2(430, 150)
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
-theme_override_font_sizes/font_size = 58
-text = "Relic Miner"
-vertical_alignment = 1
 
 [node name="MenuPanel" type="PanelContainer" parent="Content/Layout"]
 custom_minimum_size = Vector2(360, 0)
