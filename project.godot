@@ -43,6 +43,7 @@ config/icon="res://icon.svg"
 
 SimpleGrass="*uid://bfq0snth8sj3h"
 AudioManager="*res://scripts/systems/audio/audio_manager.gd"
+LocalizationManager="*res://scripts/systems/localization/localization_manager.gd"
 
 [display]
 

@@ -5,6 +5,7 @@ extends CanvasLayer
 
 var _stats: Node
 var _inventory: Node
+var _localization_manager: Node
 var _elapsed := 0.0
 
 var _level_label: Label
@@ -20,6 +21,9 @@ var _oxygen_bar: ProgressBar
 
 
 func _ready() -> void:
+	_localization_manager = get_node_or_null("/root/LocalizationManager")
+	if _localization_manager != null and _localization_manager.has_signal("language_changed"):
+		_localization_manager.connect("language_changed", _on_language_changed)
 	_build_ui()
 	_resolve_player_links()
 	_refresh()
@@ -89,11 +93,11 @@ func _build_ui() -> void:
 
 	_hp_bar = _add_meter(rows, "HP", Color(0.78, 0.16, 0.14))
 	_hp_label = _hp_bar.get_meta("label") as Label
-	_energy_bar = _add_meter(rows, "Energia", Color(0.9, 0.68, 0.18))
+	_energy_bar = _add_meter(rows, "ui.hud.energy", Color(0.9, 0.68, 0.18))
 	_energy_label = _energy_bar.get_meta("label") as Label
-	_hunger_bar = _add_meter(rows, "Fome", Color(0.33, 0.72, 0.33))
+	_hunger_bar = _add_meter(rows, "ui.hud.hunger", Color(0.33, 0.72, 0.33))
 	_hunger_label = _hunger_bar.get_meta("label") as Label
-	_oxygen_bar = _add_meter(rows, "Folego", Color(0.23, 0.57, 0.86))
+	_oxygen_bar = _add_meter(rows, "ui.hud.breath", Color(0.23, 0.57, 0.86))
 	_oxygen_label = _oxygen_bar.get_meta("label") as Label
 
 	_weight_label = Label.new()
@@ -110,7 +114,8 @@ func _add_meter(parent: Control, title: String, color: Color) -> ProgressBar:
 
 	var label := Label.new()
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.text = title
+	label.text = _meter_title(title)
+	label.set_meta("title_key", title)
 	label.add_theme_font_size_override("font_size", 12)
 	row.add_child(label)
 
@@ -152,20 +157,36 @@ func _make_bar_style(color: Color) -> StyleBoxFlat:
 
 func _refresh() -> void:
 	if _stats == null:
-		_level_label.text = "Level --"
+		_level_label.text = "%s --" % _text("ui.hud.level")
 		return
 
-	_level_label.text = "Level %d  XP %d/%d" % [_stats.level, _stats.xp, int(_stats.call("get_xp_required_for_next_level"))]
+	_level_label.text = "%s %d  XP %d/%d" % [_text("ui.hud.level"), _stats.level, _stats.xp, int(_stats.call("get_xp_required_for_next_level"))]
 	_set_meter(_hp_bar, _hp_label, "HP", _stats.current_hp, float(_stats.call("get_max_hp")))
-	_set_meter(_energy_bar, _energy_label, "Energia", _stats.current_energy, float(_stats.call("get_max_energy")))
-	_set_meter(_hunger_bar, _hunger_label, "Fome", _stats.current_hunger, _stats.max_hunger)
-	_set_meter(_oxygen_bar, _oxygen_label, "Folego", _stats.current_oxygen, float(_stats.call("get_max_oxygen")))
+	_set_meter(_energy_bar, _energy_label, "ui.hud.energy", _stats.current_energy, float(_stats.call("get_max_energy")))
+	_set_meter(_hunger_bar, _hunger_label, "ui.hud.hunger", _stats.current_hunger, _stats.max_hunger)
+	_set_meter(_oxygen_bar, _oxygen_label, "ui.hud.breath", _stats.current_oxygen, float(_stats.call("get_max_oxygen")))
 
 	var carried: float = float(_stats.call("get_carried_weight_kg"))
-	_weight_label.text = "Peso %.1f/%.1f kg" % [carried, float(_stats.call("get_absolute_weight_kg"))]
+	_weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.hud.weight"), carried, float(_stats.call("get_absolute_weight_kg"))]
 
 
 func _set_meter(bar: ProgressBar, label: Label, title: String, value: float, maximum: float) -> void:
 	bar.max_value = maxf(1.0, maximum)
 	bar.value = clampf(value, 0.0, bar.max_value)
-	label.text = "%s %.0f/%.0f" % [title, value, maximum]
+	label.text = "%s %.0f/%.0f" % [_meter_title(title), value, maximum]
+
+
+func _meter_title(title: String) -> String:
+	if title.begins_with("ui."):
+		return _text(title)
+	return title
+
+
+func _on_language_changed(_language: String) -> void:
+	_refresh()
+
+
+func _text(key: String, args: Array = []) -> String:
+	if _localization_manager != null and _localization_manager.has_method("text"):
+		return str(_localization_manager.call("text", key, args))
+	return key

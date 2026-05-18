@@ -87,13 +87,15 @@ layout_mode = 2
 theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Root/Center/Panel/Margin/Content" unique_id=857639116]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
 theme_override_font_sizes/font_size = 30
-text = "CONFIGURACOES"
+text = "SETTINGS"
 horizontal_alignment = 1
 
 [node name="AudioTitle" type="Label" parent="Root/Center/Panel/Margin/Content" unique_id=1751169322]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
 theme_override_font_sizes/font_size = 20
@@ -109,11 +111,12 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="MusicLabel" type="Label" parent="Root/Center/Panel/Margin/Content/AudioRows/MusicToggleRow" unique_id=697229636]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(210, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 theme_override_font_sizes/font_size = 15
-text = "Musica"
+text = "Music"
 vertical_alignment = 1
 
 [node name="MusicOnButton" type="Button" parent="Root/Center/Panel/Margin/Content/AudioRows/MusicToggleRow" unique_id=1714448410]
@@ -140,6 +143,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="SfxLabel" type="Label" parent="Root/Center/Panel/Margin/Content/AudioRows/SfxToggleRow" unique_id=1260098235]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(210, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
@@ -171,10 +175,11 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="MusicVolumeLabel" type="Label" parent="Root/Center/Panel/Margin/Content/AudioRows/MusicVolumeRow" unique_id=1889042392]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Volume da Musica"
+text = "Music Volume"
 vertical_alignment = 1
 
 [node name="MusicVolumeSlider" type="HSlider" parent="Root/Center/Panel/Margin/Content/AudioRows/MusicVolumeRow" unique_id=1950194613]
@@ -197,10 +202,11 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="SfxVolumeLabel" type="Label" parent="Root/Center/Panel/Margin/Content/AudioRows/SfxVolumeRow" unique_id=1292933183]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Volume dos Sons"
+text = "Sound Volume"
 vertical_alignment = 1
 
 [node name="SfxVolumeSlider" type="HSlider" parent="Root/Center/Panel/Margin/Content/AudioRows/SfxVolumeRow" unique_id=626851142]
@@ -223,10 +229,11 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="MasterVolumeLabel" type="Label" parent="Root/Center/Panel/Margin/Content/AudioRows/MasterVolumeRow" unique_id=230853175]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Volume Geral"
+text = "Master Volume"
 vertical_alignment = 1
 
 [node name="MasterVolumeSlider" type="HSlider" parent="Root/Center/Panel/Margin/Content/AudioRows/MasterVolumeRow" unique_id=1463928608]
@@ -245,11 +252,36 @@ text = "75%"
 vertical_alignment = 1
 
 [node name="InputTitle" type="Label" parent="Root/Center/Panel/Margin/Content" unique_id=1042728790]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
 theme_override_font_sizes/font_size = 20
-text = "Entrada"
+text = "Input"
 horizontal_alignment = 1
+
+[node name="LanguageRow" type="HBoxContainer" parent="Root/Center/Panel/Margin/Content" unique_id=191767543]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LanguageLabel" type="Label" parent="Root/Center/Panel/Margin/Content/LanguageRow" unique_id=311933453]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
+text = "Language"
+vertical_alignment = 1
+
+[node name="LanguageOption" type="OptionButton" parent="Root/Center/Panel/Margin/Content/LanguageRow" unique_id=793731075]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 2
+selected = 0
+popup/item_0/text = "English"
+popup/item_0/id = 0
+popup/item_1/text = "Portugues"
+popup/item_1/id = 1
 
 [node name="InputRows" type="VBoxContainer" parent="Root/Center/Panel/Margin/Content" unique_id=227772219]
 layout_mode = 2
@@ -260,7 +292,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 button_pressed = true
-text = "Teclado + Mouse"
+text = "Keyboard + Mouse"
 
 [node name="JoystickButton" type="CheckButton" parent="Root/Center/Panel/Margin/Content/InputRows" unique_id=2098396384]
 unique_name_in_owner = true
@@ -273,7 +305,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.46, 0.38, 1)
 disabled = true
-text = "Vibracao"
+text = "Vibration"
 
 [node name="Footer" type="HBoxContainer" parent="Root/Center/Panel/Margin/Content" unique_id=620578402]
 layout_mode = 2
@@ -286,7 +318,7 @@ custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-text = "Aplicar"
+text = "Apply"
 
 [node name="RestoreButton" type="Button" parent="Root/Center/Panel/Margin/Content/Footer" unique_id=489772849]
 unique_name_in_owner = true
@@ -294,7 +326,7 @@ custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-text = "Restaurar Padroes"
+text = "Restore Defaults"
 
 [node name="BackButton" type="Button" parent="Root/Center/Panel/Margin/Content/Footer" unique_id=949921974]
 unique_name_in_owner = true
@@ -302,4 +334,4 @@ custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
-text = "Voltar"
+text = "Back"

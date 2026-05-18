@@ -20,6 +20,9 @@ func get_display_name() -> String:
 	if item == null:
 		return "Item"
 
+	if item.has_method("get_display_name"):
+		return str(item.call("get_display_name"))
+
 	var item_name := str(item.get("display_name"))
 	if item_name.is_empty():
 		return str(item.get("id"))
@@ -28,16 +31,16 @@ func get_display_name() -> String:
 
 func try_pickup(actor_inventory: Node) -> int:
 	if item == null:
-		pickup_failed.emit("Este item nao possui definicao.")
+		pickup_failed.emit(_text("message.item.no_definition"))
 		return 0
 
 	if actor_inventory == null or not actor_inventory.has_method("add_item"):
-		pickup_failed.emit("O alvo nao possui inventario.")
+		pickup_failed.emit(_text("message.target.no_inventory"))
 		return 0
 
 	var added := int(actor_inventory.call("add_item", item, amount, durability))
 	if added <= 0:
-		pickup_failed.emit("Inventario cheio.")
+		pickup_failed.emit(_text("message.inventory.full"))
 		return 0
 
 	amount -= added
@@ -47,3 +50,10 @@ func try_pickup(actor_inventory: Node) -> int:
 		queue_free()
 
 	return added
+
+
+func _text(key: String) -> String:
+	var localization := get_node_or_null("/root/LocalizationManager")
+	if localization != null and localization.has_method("text"):
+		return str(localization.call("text", key))
+	return key

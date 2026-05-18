@@ -2,17 +2,17 @@ extends CanvasLayer
 
 signal close_requested
 
-const KIND_NAMES := {
-	0: "Comum",
-	1: "Moeda",
-	2: "Arma",
-	3: "Ferramenta",
-	4: "Luz",
-	5: "Comida",
-	6: "Pocao",
-	7: "Chave",
-	8: "Material",
-	9: "Armadura",
+const KIND_KEYS := {
+	0: "item.kind.misc",
+	1: "item.kind.currency",
+	2: "item.kind.weapon",
+	3: "item.kind.tool",
+	4: "item.kind.light",
+	5: "item.kind.food",
+	6: "item.kind.potion",
+	7: "item.kind.key",
+	8: "item.kind.material",
+	9: "item.kind.armor",
 }
 
 @export var player_path: NodePath = NodePath("../..")
@@ -23,6 +23,16 @@ const KIND_NAMES := {
 @onready var title_label: Label = %TitleLabel
 @onready var weight_label: Label = %WeightLabel
 @onready var weight_help_label: Label = %WeightHelpLabel
+@onready var equipment_title: Label = %EquipmentTitle
+@onready var inventory_title: Label = %InventoryTitle
+@onready var head_label: Label = %HeadLabel
+@onready var right_hand_label: Label = %RightHandLabel
+@onready var torso_label: Label = %TorsoLabel
+@onready var left_hand_label: Label = %LeftHandLabel
+@onready var legs_label: Label = %LegsLabel
+@onready var accessory_label: Label = %AccessoryLabel
+@onready var feet_label: Label = %FeetLabel
+@onready var accessory_2_label: Label = %Accessory2Label
 @onready var slot_grid: GridContainer = %SlotGrid
 @onready var empty_label: Label = %EmptyLabel
 @onready var item_name_label: Label = %ItemNameLabel
@@ -36,15 +46,20 @@ var _slot_focus_style: StyleBox
 var _slot_selected_style: StyleBox
 var _slot_buttons: Array[Button] = []
 var _selected_index := -1
+var _localization_manager: Node
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 20
+	_localization_manager = get_node_or_null("/root/LocalizationManager")
+	if _localization_manager != null and _localization_manager.has_signal("language_changed"):
+		_localization_manager.connect("language_changed", _on_language_changed)
 	_prepare_slot_styles()
 	close_button.pressed.connect(_on_close_pressed)
 	close_button.focus_mode = Control.FOCUS_ALL
 	_resolve_player_links()
+	_apply_localization()
 	refresh()
 
 
@@ -73,15 +88,15 @@ func refresh() -> void:
 	_clear_slots()
 
 	if _inventory == null:
-		title_label.text = "Inventario"
+		title_label.text = _text("ui.inventory.inventory")
 		weight_label.text = ""
 		weight_help_label.text = ""
 		empty_label.show()
-		empty_label.text = "Inventario nao encontrado."
+		empty_label.text = _text("ui.inventory.missing")
 		_select_slot(-1)
 		return
 
-	title_label.text = str(_inventory.get("display_name"))
+	title_label.text = _get_inventory_display_name()
 	_update_weight()
 
 	var slots: Array = _inventory.get("slots")
@@ -122,14 +137,14 @@ func _update_weight() -> void:
 	if _stats != null and _stats.has_method("get_carried_weight_kg"):
 		var carried := float(_stats.call("get_carried_weight_kg"))
 		var maximum := float(_stats.call("get_absolute_weight_kg"))
-		weight_label.text = "Peso %.0f/%.0f" % [carried, maximum]
-		weight_help_label.text = "Peso atual: %.1f/%.1f" % [carried, maximum]
+		weight_label.text = "%s %.0f/%.0f" % [_text("ui.inventory.weight"), carried, maximum]
+		weight_help_label.text = "%s: %.1f/%.1f" % [_text("ui.inventory.current_weight"), carried, maximum]
 		return
 
 	if _inventory != null and _inventory.has_method("get_total_weight"):
 		var carried := float(_inventory.call("get_total_weight"))
-		weight_label.text = "Peso %.1f kg" % carried
-		weight_help_label.text = "Peso atual: %.1f kg" % carried
+		weight_label.text = "%s %.1f kg" % [_text("ui.inventory.weight"), carried]
+		weight_help_label.text = "%s: %.1f kg" % [_text("ui.inventory.current_weight"), carried]
 
 
 func _clear_slots() -> void:
@@ -252,8 +267,8 @@ func _select_slot(index: int) -> void:
 
 	var stack := _get_stack_at(index)
 	if stack == null or bool(stack.call("is_empty")):
-		item_name_label.text = "Espaco vazio"
-		item_detail_label.text = "Nenhum item neste slot."
+		item_name_label.text = _text("ui.inventory.empty_slot")
+		item_detail_label.text = _text("ui.inventory.no_item")
 		return
 
 	var item: Resource = stack.get("item")
@@ -313,6 +328,9 @@ func _get_item_name(item: Resource) -> String:
 	if item == null:
 		return "Item"
 
+	if item.has_method("get_display_name"):
+		return str(item.call("get_display_name"))
+
 	var display_name := str(item.get("display_name"))
 	if not display_name.is_empty():
 		return display_name
@@ -321,38 +339,38 @@ func _get_item_name(item: Resource) -> String:
 
 func _build_item_details(stack: Resource, item: Resource) -> String:
 	if item == null:
-		return "Item sem definicao."
+		return _text("ui.inventory.unknown_item")
 
 	var lines: Array[String] = []
-	var description := str(item.get("description"))
+	var description := _get_item_description(item)
 	if not description.is_empty():
 		lines.append(description)
 
 	var amount := int(stack.get("amount"))
 	var unit_weight := float(item.get("weight_kg"))
-	lines.append("Tipo: %s" % _get_kind_name(item))
-	lines.append("Quantidade: %d" % amount)
-	lines.append("Peso: %.2f kg cada | %.2f kg total" % [unit_weight, unit_weight * amount])
+	lines.append("%s: %s" % [_text("ui.inventory.type"), _get_kind_name(item)])
+	lines.append("%s: %d" % [_text("ui.inventory.amount"), amount])
+	lines.append(_text("ui.inventory.weight_line", [unit_weight, unit_weight * amount]))
 
 	var buy_price := int(item.get("buy_price"))
 	var sell_price := int(item.get("sell_price"))
 	if buy_price > 0 or sell_price > 0:
-		lines.append("Valor: compra %d | venda %d" % [buy_price, sell_price])
+		lines.append(_text("ui.inventory.value_line", [buy_price, sell_price]))
 
 	if stack.has_method("has_durability") and bool(stack.call("has_durability")):
 		var current := float(stack.call("get_durability"))
 		var maximum := float(item.get("durability_max"))
-		lines.append("Durabilidade: %.0f/%.0f" % [current, maximum])
+		lines.append("%s: %.0f/%.0f" % [_text("ui.inventory.durability"), current, maximum])
 
 	var item_id := str(item.get("id"))
 	if not item_id.is_empty():
-		lines.append("ID: %s" % item_id)
+		lines.append("%s: %s" % [_text("ui.inventory.id"), item_id])
 	return "\n".join(lines)
 
 
 func _get_kind_name(item: Resource) -> String:
 	var kind := int(item.get("kind"))
-	return KIND_NAMES.get(kind, "Item")
+	return _text(KIND_KEYS.get(kind, "item.kind.misc"))
 
 
 func _use_selected_item() -> void:
@@ -402,3 +420,47 @@ func _prepare_slot_styles() -> void:
 		_slot_selected_style.border_width_top = 2
 		_slot_selected_style.border_width_right = 2
 		_slot_selected_style.border_width_bottom = 2
+
+
+func _apply_localization() -> void:
+	equipment_title.text = _text("ui.inventory.equipment")
+	inventory_title.text = _text("ui.inventory.inventory")
+	head_label.text = _text("ui.inventory.head")
+	right_hand_label.text = _text("ui.inventory.right_hand")
+	torso_label.text = _text("ui.inventory.torso")
+	left_hand_label.text = _text("ui.inventory.left_hand")
+	legs_label.text = _text("ui.inventory.legs")
+	accessory_label.text = _text("ui.inventory.accessory")
+	feet_label.text = _text("ui.inventory.feet")
+	accessory_2_label.text = _text("ui.inventory.accessory")
+	empty_label.text = _text("ui.inventory.empty")
+
+
+func _on_language_changed(_language: String) -> void:
+	_apply_localization()
+	refresh()
+
+
+func _get_inventory_display_name() -> String:
+	var display_name := str(_inventory.get("display_name"))
+	if display_name == "Mochila":
+		return _text("ui.inventory.backpack")
+	if display_name == "Bau":
+		return _text("ui.inventory.chest")
+	if display_name == "Inventario do inimigo":
+		return _text("ui.inventory.enemy_inventory")
+	if display_name == "Inventory":
+		return _text("ui.inventory.inventory")
+	return display_name
+
+
+func _get_item_description(item: Resource) -> String:
+	if item.has_method("get_description"):
+		return str(item.call("get_description"))
+	return str(item.get("description"))
+
+
+func _text(key: String, args: Array = []) -> String:
+	if _localization_manager != null and _localization_manager.has_method("text"):
+		return str(_localization_manager.call("text", key, args))
+	return key

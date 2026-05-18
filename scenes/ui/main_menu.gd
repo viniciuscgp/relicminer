@@ -8,13 +8,19 @@ extends Control
 @onready var options_button: Button = %OptionsButton
 @onready var credits_button: Button = %CreditsButton
 @onready var quit_button: Button = %QuitButton
+@onready var footer_label: Label = %Footer
 @onready var settings_menu: CanvasLayer = %SettingsMenu
+
+var _localization_manager: Node
 
 
 func _ready() -> void:
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	settings_menu.hide()
+	_localization_manager = get_node_or_null("/root/LocalizationManager")
+	if _localization_manager != null and _localization_manager.has_signal("language_changed"):
+		_localization_manager.connect("language_changed", _on_language_changed)
 
 	continue_button.pressed.connect(_start_game)
 	new_game_button.pressed.connect(_start_game)
@@ -24,6 +30,7 @@ func _ready() -> void:
 	quit_button.pressed.connect(_quit_game)
 	settings_menu.close_requested.connect(_close_settings)
 	_configure_focus()
+	_apply_localization()
 	continue_button.grab_focus()
 
 
@@ -65,3 +72,23 @@ func _configure_focus() -> void:
 		button.focus_mode = Control.FOCUS_ALL
 		button.focus_neighbor_top = buttons[max(index - 1, 0)].get_path()
 		button.focus_neighbor_bottom = buttons[min(index + 1, buttons.size() - 1)].get_path()
+
+
+func _apply_localization() -> void:
+	continue_button.text = _text("ui.menu.continue")
+	new_game_button.text = _text("ui.menu.new_game")
+	load_button.text = _text("ui.menu.load_game")
+	options_button.text = _text("ui.menu.options")
+	credits_button.text = _text("ui.menu.credits")
+	quit_button.text = _text("ui.menu.quit")
+	footer_label.text = _text("ui.menu.version")
+
+
+func _on_language_changed(_language: String) -> void:
+	_apply_localization()
+
+
+func _text(key: String, args: Array = []) -> String:
+	if _localization_manager != null and _localization_manager.has_method("text"):
+		return str(_localization_manager.call("text", key, args))
+	return key

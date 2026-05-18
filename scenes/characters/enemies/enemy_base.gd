@@ -47,19 +47,19 @@ func can_open_loot(actor_inventory: Node = null) -> bool:
 
 func open_loot(actor_inventory: Node = null) -> bool:
 	if inventory == null:
-		loot_open_failed.emit("Este inimigo nao possui inventario.")
+		loot_open_failed.emit(_text("message.enemy.no_inventory"))
 		return false
 
 	if not loot_after_death or not is_dead():
-		loot_open_failed.emit("Ainda nao e possivel vasculhar este inimigo.")
+		loot_open_failed.emit(_text("message.enemy.cannot_loot_yet"))
 		return false
 
 	if not inventory.has_method("unlock_with"):
-		loot_open_failed.emit("Este inventario nao pode ser aberto.")
+		loot_open_failed.emit(_text("message.inventory.cannot_open"))
 		return false
 
 	if not bool(inventory.call("unlock_with", actor_inventory)):
-		loot_open_failed.emit("Trancado.")
+		loot_open_failed.emit(_text("message.locked"))
 		return false
 
 	loot_opened.emit(actor_inventory, inventory)
@@ -72,3 +72,10 @@ func _on_stats_died() -> void:
 			if child is CollisionShape3D:
 				child.disabled = true
 	died.emit(self)
+
+
+func _text(key: String) -> String:
+	var localization := get_node_or_null("/root/LocalizationManager")
+	if localization != null and localization.has_method("text"):
+		return str(localization.call("text", key))
+	return key

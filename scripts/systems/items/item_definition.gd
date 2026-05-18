@@ -62,6 +62,20 @@ func should_generate_icon() -> bool:
 	return generate_icon_from_world_scene and world_scene != null
 
 
+func get_display_name() -> String:
+	var localization := _get_localization_manager()
+	if localization != null and localization.has_method("item_name"):
+		return str(localization.call("item_name", self, display_name))
+	return display_name
+
+
+func get_description() -> String:
+	var localization := _get_localization_manager()
+	if localization != null and localization.has_method("item_description"):
+		return str(localization.call("item_description", self, description))
+	return description
+
+
 func create_world_instance(amount := 1, durability := -1.0) -> Node:
 	if world_scene == null:
 		return null
@@ -70,3 +84,10 @@ func create_world_instance(amount := 1, durability := -1.0) -> Node:
 	if instance.has_method("setup"):
 		instance.call("setup", self, amount, durability)
 	return instance
+
+
+func _get_localization_manager() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	return tree.root.get_node_or_null("LocalizationManager")

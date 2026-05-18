@@ -99,7 +99,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
 theme_override_font_sizes/font_size = 22
-text = "INVENTARIO"
+text = "INVENTORY"
 horizontal_alignment = 1
 
 [node name="RightSpacer" type="Control" parent="Root/Center/Panel/Margin/Content/TopBar"]
@@ -136,10 +136,11 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="EquipmentTitle" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
 theme_override_font_sizes/font_size = 17
-text = "EQUIPAMENTO"
+text = "EQUIPMENT"
 horizontal_alignment = 1
 
 [node name="EquipmentGrid" type="GridContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent"]
@@ -154,9 +155,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="HeadLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/HeadSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Cabeca"
+text = "Head"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -166,9 +168,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="RightHandLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/RightHandSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Mao Direita"
+text = "Right Hand"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -178,6 +181,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="TorsoLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/TorsoSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 text = "Torso"
@@ -190,9 +194,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="LeftHandLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/LeftHandSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Mao Esquerda"
+text = "Left Hand"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -202,9 +207,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="LegsLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/LegsSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Pernas"
+text = "Legs"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -214,9 +220,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="AccessoryLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/AccessorySlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Acessorio"
+text = "Accessory"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -226,9 +233,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="FeetLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/FeetSlot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Pes"
+text = "Feet"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -238,9 +246,10 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="Accessory2Label" type="Label" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid/Accessory2Slot"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Acessorio"
+text = "Accessory"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -264,11 +273,12 @@ theme_override_constants/separation = 6
 layout_mode = 2
 
 [node name="InventoryTitle" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/InventoryHeader"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
 theme_override_font_sizes/font_size = 17
-text = "INVENTARIO"
+text = "INVENTORY"
 horizontal_alignment = 1
 
 [node name="WeightLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/InventoryHeader"]
@@ -276,7 +286,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Peso 0/0"
+text = "Weight 0/0"
 horizontal_alignment = 2
 
 [node name="SlotGrid" type="GridContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
@@ -291,7 +301,7 @@ columns = 5
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
-text = "Inventario vazio."
+text = "Empty inventory."
 horizontal_alignment = 1
 
 [node name="DetailsPanel" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
@@ -320,7 +330,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
 theme_override_font_sizes/font_size = 14
-text = "Espaco vazio"
+text = "Empty slot"
 
 [node name="DetailsScroll" type="ScrollContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin/DetailsContent/TextContent"]
 custom_minimum_size = Vector2(0, 46)
@@ -335,7 +345,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.73, 0.65, 0.52, 1)
 theme_override_font_sizes/font_size = 11
-text = "Nenhum item neste slot."
+text = "No item in this slot."
 autowrap_mode = 2
 
 [node name="WeightHelpLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
@@ -343,5 +353,5 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.73, 0.65, 0.52, 1)
 theme_override_font_sizes/font_size = 12
-text = "Peso atual: 0/0"
+text = "Current weight: 0/0"
 autowrap_mode = 2

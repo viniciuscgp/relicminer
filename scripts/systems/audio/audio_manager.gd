@@ -15,6 +15,7 @@ const DEFAULT_SFX_ENABLED := true
 const DEFAULT_MAX_SFX_PLAYERS := 16
 const DEFAULT_INPUT_MODE := "keyboard"
 const DEFAULT_VIBRATION_ENABLED := false
+const DEFAULT_LANGUAGE := "en"
 
 var master_volume := DEFAULT_MASTER_VOLUME
 var music_volume := DEFAULT_MUSIC_VOLUME
@@ -24,6 +25,7 @@ var sfx_enabled := DEFAULT_SFX_ENABLED
 var max_sfx_players := DEFAULT_MAX_SFX_PLAYERS
 var input_mode := DEFAULT_INPUT_MODE
 var vibration_enabled := DEFAULT_VIBRATION_ENABLED
+var language := DEFAULT_LANGUAGE
 
 var _music_player: AudioStreamPlayer
 var _sfx_players: Array[AudioStreamPlayer] = []
@@ -100,6 +102,7 @@ func apply_settings(settings: Dictionary, save := true) -> void:
 	sfx_enabled = bool(settings.get("sfx_enabled", sfx_enabled))
 	input_mode = str(settings.get("input_mode", input_mode))
 	vibration_enabled = bool(settings.get("vibration_enabled", vibration_enabled))
+	language = str(settings.get("language", language))
 	_apply_to_audio_server()
 
 	if save:
@@ -115,6 +118,7 @@ func get_settings() -> Dictionary:
 		"sfx_enabled": sfx_enabled,
 		"input_mode": input_mode,
 		"vibration_enabled": vibration_enabled,
+		"language": language,
 	}
 
 
@@ -127,6 +131,7 @@ func restore_defaults(save := true) -> void:
 		"sfx_enabled": DEFAULT_SFX_ENABLED,
 		"input_mode": DEFAULT_INPUT_MODE,
 		"vibration_enabled": DEFAULT_VIBRATION_ENABLED,
+		"language": DEFAULT_LANGUAGE,
 	}, save)
 
 
@@ -139,6 +144,7 @@ func save_settings() -> void:
 	config.set_value("audio", "sfx_enabled", sfx_enabled)
 	config.set_value("input", "input_mode", input_mode)
 	config.set_value("input", "vibration_enabled", vibration_enabled)
+	config.set_value("game", "language", language)
 	config.save(SETTINGS_PATH)
 
 
@@ -154,6 +160,7 @@ func load_settings() -> void:
 	sfx_enabled = bool(config.get_value("audio", "sfx_enabled", DEFAULT_SFX_ENABLED))
 	input_mode = str(config.get_value("input", "input_mode", DEFAULT_INPUT_MODE))
 	vibration_enabled = bool(config.get_value("input", "vibration_enabled", DEFAULT_VIBRATION_ENABLED))
+	language = str(config.get_value("game", "language", DEFAULT_LANGUAGE))
 
 
 func _ensure_bus(bus_name: String) -> void:
