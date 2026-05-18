@@ -70,16 +70,16 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Root/Center"]
-custom_minimum_size = Vector2(890, 590)
+custom_minimum_size = Vector2(760, 500)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
 
 [node name="Content" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
 layout_mode = 2
@@ -98,7 +98,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 text = "INVENTARIO"
 horizontal_alignment = 1
 
@@ -117,10 +117,10 @@ text = "X"
 [node name="Body" type="HBoxContainer" parent="Root/Center/Panel/Margin/Content"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 
 [node name="EquipmentPanel" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body"]
-custom_minimum_size = Vector2(330, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -144,12 +144,12 @@ horizontal_alignment = 1
 
 [node name="EquipmentGrid" type="GridContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent"]
 layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 columns = 2
 
 [node name="HeadSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -161,7 +161,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="RightHandSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -173,7 +173,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TorsoSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -185,7 +185,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LeftHandSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -197,7 +197,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LegsSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -209,7 +209,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AccessorySlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -221,7 +221,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FeetSlot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -233,7 +233,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Accessory2Slot" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/EquipmentPanel/EquipmentMargin/EquipmentContent/EquipmentGrid"]
-custom_minimum_size = Vector2(120, 84)
+custom_minimum_size = Vector2(96, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
@@ -258,7 +258,7 @@ theme_override_constants/margin_bottom = 12
 
 [node name="InventoryContent" type="VBoxContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="InventoryHeader" type="HBoxContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
 layout_mode = 2
@@ -293,6 +293,50 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 text = "Inventario vazio."
 horizontal_alignment = 1
+
+[node name="DetailsPanel" type="PanelContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="DetailsMargin" type="MarginContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="DetailsContent" type="HBoxContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TextContent" type="VBoxContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin/DetailsContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="ItemNameLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin/DetailsContent/TextContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
+theme_override_font_sizes/font_size = 14
+text = "Espaco vazio"
+
+[node name="DetailsScroll" type="ScrollContainer" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin/DetailsContent/TextContent"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemDetailLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent/DetailsPanel/DetailsMargin/DetailsContent/TextContent/DetailsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.73, 0.65, 0.52, 1)
+theme_override_font_sizes/font_size = 11
+text = "Nenhum item neste slot."
+autowrap_mode = 2
 
 [node name="WeightHelpLabel" type="Label" parent="Root/Center/Panel/Margin/Content/Body/InventoryPanel/InventoryMargin/InventoryContent"]
 unique_name_in_owner = true

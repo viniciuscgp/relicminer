@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://cthdl0i46to8p"]
 
-[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_3vyb7"]
-[ext_resource type="Script" path="res://scenes/player/river_survey_recorder.gd" id="2_lsa8m"]
+[ext_resource type="Script" uid="uid://7bhmvai7g1r5" path="res://scenes/player/player.gd" id="1_3vyb7"]
+[ext_resource type="Script" uid="uid://ccski43qf4v8e" path="res://scenes/player/river_survey_recorder.gd" id="2_lsa8m"]
 [ext_resource type="PackedScene" uid="uid://dtxucqa7t3oe6" path="res://scenes/components/UnderwaterEnvironment.tscn" id="3_6n8mq"]
 [ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="4_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_stats.tscn" id="5_stats"]
-[ext_resource type="PackedScene" path="res://scenes/ui/player_hud.tscn" id="6_hud"]
-[ext_resource type="Script" path="res://scripts/systems/items/item_stack.gd" id="7_stack"]
+[ext_resource type="PackedScene" uid="uid://bpu4v5el4ayp7" path="res://scenes/ui/player_hud.tscn" id="6_hud"]
+[ext_resource type="Script" uid="uid://cnp603rmhuo8n" path="res://scripts/systems/items/item_stack.gd" id="7_stack"]
 [ext_resource type="Resource" path="res://resources/items/simple_pickaxe.tres" id="8_pickaxe"]
 [ext_resource type="Resource" path="res://resources/items/short_sword.tres" id="9_sword"]
 [ext_resource type="Resource" path="res://resources/items/simple_torch.tres" id="10_torch"]
@@ -16,27 +16,14 @@
 [ext_resource type="Resource" path="res://resources/items/copper_crown.tres" id="14_crown"]
 [ext_resource type="PackedScene" path="res://scenes/ui/player_menus.tscn" id="15_menus"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vyb7"]
-albedo_color = Color(1, 0.28235295, 1, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_u8vuu"]
-radius = 0.25
-height = 1.2
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3vyb7"]
-radius = 0.25
-height = 1.2
-
 [sub_resource type="Resource" id="ItemStack_pickaxe"]
 script = ExtResource("7_stack")
 item = ExtResource("8_pickaxe")
-amount = 1
 durability = 100.0
 
 [sub_resource type="Resource" id="ItemStack_sword"]
 script = ExtResource("7_stack")
 item = ExtResource("9_sword")
-amount = 1
 durability = 100.0
 
 [sub_resource type="Resource" id="ItemStack_torch"]
@@ -53,7 +40,6 @@ amount = 3
 [sub_resource type="Resource" id="ItemStack_potion"]
 script = ExtResource("7_stack")
 item = ExtResource("12_potion")
-amount = 1
 
 [sub_resource type="Resource" id="ItemStack_stone"]
 script = ExtResource("7_stack")
@@ -64,6 +50,17 @@ amount = 5
 script = ExtResource("7_stack")
 item = ExtResource("14_crown")
 amount = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vyb7"]
+albedo_color = Color(1, 0.28235295, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_u8vuu"]
+radius = 0.25
+height = 1.2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3vyb7"]
+radius = 0.25
+height = 1.2
 
 [node name="Player" type="CharacterBody3D" unique_id=817496980]
 script = ExtResource("1_3vyb7")
@@ -77,9 +74,9 @@ starting_items = Array[Resource]([SubResource("ItemStack_pickaxe"), SubResource(
 [node name="PlayerStats" parent="." unique_id=302393514 instance=ExtResource("5_stats")]
 inventory_path = NodePath("../Inventory")
 
-[node name="PlayerHUD" parent="." instance=ExtResource("6_hud")]
+[node name="PlayerHUD" parent="." unique_id=383144626 instance=ExtResource("6_hud")]
 
-[node name="PlayerMenus" parent="." instance=ExtResource("15_menus")]
+[node name="PlayerMenus" parent="." unique_id=397086250 instance=ExtResource("15_menus")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=800391728]
 material_override = SubResource("StandardMaterial3D_3vyb7")
@@ -100,7 +97,7 @@ margin = 0.25
 current = true
 fov = 70.0
 
-[node name="UnderwaterEnvironment" parent="CameraPivot/SpringArm3D/Camera3D" instance=ExtResource("3_6n8mq")]
+[node name="UnderwaterEnvironment" parent="CameraPivot/SpringArm3D/Camera3D" unique_id=860127035 instance=ExtResource("3_6n8mq")]
 
 [node name="RiverSurveyRecorder" type="Node3D" parent="." unique_id=1368953571]
 script = ExtResource("2_lsa8m")

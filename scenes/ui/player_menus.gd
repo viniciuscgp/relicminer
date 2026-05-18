@@ -1,6 +1,7 @@
 extends Node
 
 @export var pause_when_inventory_open := true
+@export_file("*.tscn") var main_menu_scene_path := "res://scenes/ui/main_menu.tscn"
 
 @onready var pause_menu: CanvasLayer = %PauseMenu
 @onready var inventory_menu: CanvasLayer = %InventoryMenu
@@ -18,6 +19,7 @@ func _ready() -> void:
 	pause_menu.resume_requested.connect(close_all)
 	pause_menu.inventory_requested.connect(_open_inventory_from_pause)
 	pause_menu.settings_requested.connect(open_settings)
+	pause_menu.abandon_requested.connect(abandon_game)
 	inventory_menu.close_requested.connect(_on_inventory_close_requested)
 	settings_menu.close_requested.connect(_on_settings_close_requested)
 
@@ -70,6 +72,13 @@ func close_all() -> void:
 	settings_menu.hide()
 	get_tree().paused = false
 	_set_ui_mode(false)
+
+
+func abandon_game() -> void:
+	_return_to_pause_after_inventory = false
+	get_tree().paused = false
+	_set_ui_mode(true)
+	get_tree().change_scene_to_file(main_menu_scene_path)
 
 
 func _toggle_pause_menu() -> void:
