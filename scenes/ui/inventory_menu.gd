@@ -169,7 +169,7 @@ func _set_active_inventory(inventory: Node) -> void:
 
 
 func _update_weight() -> void:
-	if _stats != null and _stats.has_method("get_carried_weight_kg"):
+	if _is_actor_inventory_active() and _stats != null and _stats.has_method("get_carried_weight_kg"):
 		var carried := float(_stats.call("get_carried_weight_kg"))
 		var maximum := float(_stats.call("get_absolute_weight_kg"))
 		weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.inventory.weight"), carried, maximum]
@@ -178,8 +178,13 @@ func _update_weight() -> void:
 
 	if _inventory != null and _inventory.has_method("get_total_weight"):
 		var carried := float(_inventory.call("get_total_weight"))
-		weight_label.text = "%s %.1f kg" % [_text("ui.inventory.weight"), carried]
-		weight_help_label.text = "%s: %.1f kg" % [_text("ui.inventory.current_weight"), carried]
+		var maximum := float(_inventory.get("max_weight_kg"))
+		if maximum > 0.0:
+			weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.inventory.weight"), carried, maximum]
+			weight_help_label.text = "%s: %.1f/%.1f kg" % [_text("ui.inventory.current_weight"), carried, maximum]
+		else:
+			weight_label.text = "%s %.1f kg" % [_text("ui.inventory.weight"), carried]
+			weight_help_label.text = "%s: %.1f kg" % [_text("ui.inventory.current_weight"), carried]
 
 
 func _clear_slots() -> void:

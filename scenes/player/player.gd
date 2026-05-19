@@ -1,2 +1,2 @@
-extends "res://scenes/components/actor_body.gd"
+extends "res://scenes/actors/actor_body.gd"
 class_name PlayerActor

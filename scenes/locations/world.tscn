@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://gsan06q7kakd" path="res://textures/terrain/ground037/rock023_alb_ht.png" id="4_1l4sk"]
 [ext_resource type="PackedScene" uid="uid://cthdl0i46to8p" path="res://scenes/player/player.tscn" id="5_1llb7"]
 [ext_resource type="Texture2D" uid="uid://c66g6d5v4tp7v" path="res://textures/terrain/ground037/rock023_nrm_rgh.png" id="5_eyg7e"]
-[ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://scenes/components/Environment.tscn" id="6_d6lop"]
+[ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://scenes/environment/Environment.tscn" id="6_d6lop"]
 [ext_resource type="Texture2D" uid="uid://bep6q472pwfdi" path="res://textures/terrain/Ground103_1K-PNG/Ground103_alb_ht.png" id="6_u7c30"]
 [ext_resource type="PackedScene" path="res://scenes/editor_tools/land_marker.tscn" id="7_jhfow"]
 [ext_resource type="Texture2D" uid="uid://c5w6kl22hp550" path="res://textures/terrain/Ground103_1K-PNG/Ground103_nrm_rgh.png" id="7_nbnoy"]
@@ -11384,7 +11384,7 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.794586, 1.28374, 1157.4558)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.794586, 0.7765527, 1157.4558)
 
 [node name="Markers" type="Node3D" parent="." unique_id=980118374]
 

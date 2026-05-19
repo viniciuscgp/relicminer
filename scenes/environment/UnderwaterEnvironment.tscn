@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dtxucqa7t3oe6"]
 
-[ext_resource type="Script" path="res://scenes/components/underwater_environment.gd" id="1_3ngc6"]
+[ext_resource type="Script" path="res://scenes/environment/underwater_environment.gd" id="1_3ngc6"]
 
 [node name="UnderwaterEnvironment" type="Node3D"]
 script = ExtResource("1_3ngc6")

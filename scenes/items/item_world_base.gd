@@ -1,7 +1,7 @@
 extends RigidBody3D
 class_name ItemWorldBase
 
-const InventoryComponentScene := preload("res://scenes/components/inventory_component.tscn")
+const InventoryComponentScene := preload("res://scenes/inventory/inventory_component.tscn")
 
 const MIN_PHYSICS_MASS := 0.1
 const MAX_PHYSICS_MASS := 50.0
@@ -102,6 +102,22 @@ func get_inventory() -> Node:
 	return inventory
 
 
+func get_base_weight_kg() -> float:
+	if item != null:
+		return float(item.get("weight_kg"))
+	return default_mass_kg
+
+
+func get_contents_weight_kg() -> float:
+	if not has_container_inventory() or not inventory.has_method("get_total_weight"):
+		return 0.0
+	return float(inventory.call("get_total_weight"))
+
+
+func get_total_weight() -> float:
+	return get_base_weight_kg() + get_contents_weight_kg()
+
+
 func can_open(actor_inventory: Node = null) -> bool:
 	if not has_container_inventory():
 		return false
@@ -161,11 +177,9 @@ func _apply_inventory_exports() -> void:
 
 
 func _apply_physics_from_item() -> void:
-	var weight := default_mass_kg
-	if item != null:
-		weight = float(item.get("weight_kg"))
-	if contents_affect_mass and has_container_inventory() and inventory.has_method("get_total_weight"):
-		weight += float(inventory.call("get_total_weight"))
+	var weight := get_base_weight_kg()
+	if contents_affect_mass:
+		weight += get_contents_weight_kg()
 
 	mass = clampf(weight, MIN_PHYSICS_MASS, MAX_PHYSICS_MASS)
 	linear_damp = _map_weight_to_range(weight, MIN_LINEAR_DAMP, MAX_LINEAR_DAMP)

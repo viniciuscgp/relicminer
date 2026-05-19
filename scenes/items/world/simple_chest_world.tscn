@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/items/world/simple_chest_world.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/inventory/inventory_component.tscn" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chest"]
 albedo_color = Color(0.36, 0.2, 0.1, 1)
@@ -28,6 +28,7 @@ default_mass_kg = 18.0
 has_inventory = true
 inventory_display_name = "Bau"
 capacity_slots = 12
+max_weight_kg = 60.0
 
 [node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
@@ -46,3 +47,4 @@ shape = SubResource("BoxShape3D_chest")
 [node name="InventoryComponent" parent="." instance=ExtResource("2")]
 display_name = "Bau"
 capacity_slots = 12
+max_weight_kg = 60.0
