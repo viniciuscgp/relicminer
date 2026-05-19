@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/environment/weather_profile.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"overcast"
+display_name = "Overcast"
+cloud_coverage = 0.92
+rain_intensity = 0.0
+fog_density = 0.008
+sky_tint = Color(0.72, 0.76, 0.8, 1)
+sun_energy_multiplier = 0.45
+moon_energy_multiplier = 0.35
+ambient_energy_multiplier = 0.68
+star_visibility_multiplier = 0.05
+wind_direction = Vector2(0.8, -0.45)
+wind_speed = 1.6

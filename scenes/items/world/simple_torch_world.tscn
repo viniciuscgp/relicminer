@@ -1,25 +1,55 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=13 format=3]
 
-[ext_resource type="Script" path="res://scenes/items/item_world_base.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/items/world/simple_torch_world.gd" id="1"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_handle"]
-albedo_color = Color(0.3, 0.16, 0.07, 1)
+albedo_color = Color(0.24, 0.125, 0.055, 1)
 roughness = 0.82
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_charred"]
+albedo_color = Color(0.035, 0.025, 0.018, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_band"]
+albedo_color = Color(0.34, 0.22, 0.12, 1)
+roughness = 0.7
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_flame"]
-albedo_color = Color(1, 0.42, 0.08, 1)
+transparency = 1
+albedo_color = Color(1, 0.42, 0.08, 0.86)
 emission_enabled = true
 emission = Color(1, 0.32, 0.04, 1)
-emission_energy_multiplier = 1.5
+emission_energy_multiplier = 3.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_flame_outer"]
+transparency = 1
+albedo_color = Color(1, 0.72, 0.16, 0.42)
+emission_enabled = true
+emission = Color(1, 0.48, 0.08, 1)
+emission_energy_multiplier = 1.9
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_torch_handle"]
-top_radius = 0.055
-bottom_radius = 0.055
-height = 0.62
+top_radius = 0.045
+bottom_radius = 0.065
+height = 0.72
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_torch_head"]
+top_radius = 0.105
+bottom_radius = 0.085
+height = 0.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_torch_band"]
+top_radius = 0.108
+bottom_radius = 0.108
+height = 0.035
 
 [sub_resource type="SphereMesh" id="SphereMesh_torch_flame"]
-radius = 0.12
+radius = 0.085
 height = 0.22
+
+[sub_resource type="SphereMesh" id="SphereMesh_torch_flame_outer"]
+radius = 0.14
+height = 0.28
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_simple_torch"]
 radius = 0.09
@@ -32,19 +62,49 @@ script = ExtResource("1")
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="Handle" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.996195, -0.0871557, 0, 0.0871557, 0.996195, 0, -0.06, 0)
 material_override = SubResource("StandardMaterial3D_torch_handle")
 mesh = SubResource("CylinderMesh_torch_handle")
+cast_shadow = 1
+
+[node name="CharredHead" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.996195, -0.0871557, 0, 0.0871557, 0.996195, 0, 0.34, 0)
+material_override = SubResource("StandardMaterial3D_torch_charred")
+mesh = SubResource("CylinderMesh_torch_head")
+cast_shadow = 1
+
+[node name="LowerBand" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.996195, -0.0871557, 0, 0.0871557, 0.996195, 0, 0.235, 0)
+material_override = SubResource("StandardMaterial3D_torch_band")
+mesh = SubResource("CylinderMesh_torch_band")
+cast_shadow = 1
+
+[node name="UpperBand" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0.996195, -0.0871557, 0, 0.0871557, 0.996195, 0, 0.43, 0)
+material_override = SubResource("StandardMaterial3D_torch_band")
+mesh = SubResource("CylinderMesh_torch_band")
+cast_shadow = 1
+
+[node name="OuterFlame" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(0.82, 0, 0, 0, 1.08, 0, 0, 0, 0.82, 0, 0.49, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame_outer")
+mesh = SubResource("SphereMesh_torch_flame_outer")
+cast_shadow = 0
 
 [node name="FlamePlaceholder" type="MeshInstance3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+transform = Transform3D(0.72, 0, 0, 0, 1.2, 0, 0, 0, 0.72, 0, 0.49, 0)
 material_override = SubResource("StandardMaterial3D_torch_flame")
 mesh = SubResource("SphereMesh_torch_flame")
+cast_shadow = 0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49, 0)
 light_color = Color(1, 0.55, 0.25, 1)
-light_energy = 0.7
-omni_range = 2.0
+light_energy = 2.45
+shadow_enabled = false
+shadow_bias = 0.03
+shadow_normal_bias = 1.0
+omni_range = 6.5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_simple_torch")

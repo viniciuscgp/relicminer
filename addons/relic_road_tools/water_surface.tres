@@ -23,3 +23,5 @@ shader_parameter/roughness = 0.065
 shader_parameter/metallic = 0.0
 shader_parameter/fresnel_strength = 0.4
 shader_parameter/fresnel_power = 3.0
+shader_parameter/moon_reflection_color = Color(0.5, 0.62, 1, 1)
+shader_parameter/moon_reflection_strength = 0.0

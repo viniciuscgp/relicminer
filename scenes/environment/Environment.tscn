@@ -1,4 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://bb2lp50sjndus"]
+[gd_scene format=3 uid="uid://bb2lp50sjndus"]
+
+[ext_resource type="Script" uid="uid://dhgh4u65gmbg3" path="res://scenes/environment/environment_controller.gd" id="1_controller"]
+[ext_resource type="Script" uid="uid://c3thavyh3pxqn" path="res://scenes/environment/cloud_layer.gd" id="2_clouds"]
+[ext_resource type="Script" uid="uid://u4l0yuwwjsca" path="res://scenes/environment/star_field.gd" id="3_stars"]
+[ext_resource type="Script" uid="uid://b55lt8uwbjxn5" path="res://scenes/environment/rain_controller.gd" id="4_rain"]
+[ext_resource type="Resource" path="res://resources/environment/weather_clear.tres" id="5_clear"]
+[ext_resource type="Resource" path="res://resources/environment/weather_cloudy.tres" id="6_cloudy"]
+[ext_resource type="Resource" path="res://resources/environment/weather_overcast.tres" id="7_overcast"]
+[ext_resource type="Resource" path="res://resources/environment/weather_rain.tres" id="8_rain"]
+[ext_resource type="Material" uid="uid://dkxtwx1c8r7nh" path="res://addons/relic_road_tools/water_surface.tres" id="9_water"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vibap"]
 sky_top_color = Color(0.192157, 0.282353, 0.509804, 1)
@@ -16,19 +26,50 @@ sky = SubResource("Sky_srg7c")
 ambient_light_source = 3
 ambient_light_color = Color(0.55, 0.55, 0.55, 1)
 ambient_light_sky_contribution = 0.3
+glow_enabled = true
+glow_intensity = 0.28
+glow_strength = 0.72
 tonemap_mode = 3
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_0gcl0"]
 
-[node name="Environment" type="Node3D"]
+[node name="Environment" type="Node3D" unique_id=1678276354]
+script = ExtResource("1_controller")
+current_hour = 16.28
+water_materials = Array[Material]([ExtResource("9_water")])
+weather_profiles = Array[Resource]([ExtResource("5_clear"), ExtResource("6_cloudy"), ExtResource("7_overcast"), ExtResource("8_rain")])
+night_ambient_energy = 0.095
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1587626605]
 environment = SubResource("Environment_8jcgm")
 camera_attributes = SubResource("CameraAttributesPractical_0gcl0")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="SunLight" type="DirectionalLight3D" parent="." unique_id=593318459]
 transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+light_color = Color(1, 0.9, 0.72, 1)
 shadow_enabled = true
-shadow_blur = 2.0
+shadow_bias = 0.025
+shadow_normal_bias = 1.15
+shadow_blur = 4.0
 directional_shadow_blend_splits = true
-directional_shadow_max_distance = 256.0
+directional_shadow_max_distance = 72.0
+
+[node name="MoonLight" type="DirectionalLight3D" parent="." unique_id=1592264661]
+light_color = Color(0.42, 0.52, 0.78, 1)
+light_energy = 0.0
+shadow_enabled = true
+shadow_bias = 0.025
+shadow_normal_bias = 1.15
+shadow_blur = 4.0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 48.0
+
+[node name="CloudLayer" type="MeshInstance3D" parent="." unique_id=2074919743]
+script = ExtResource("2_clouds")
+
+[node name="StarField" type="Node3D" parent="." unique_id=1289911612]
+script = ExtResource("3_stars")
+star_count = 120
+
+[node name="RainController" type="Node3D" parent="." unique_id=904025739]
+script = ExtResource("4_rain")

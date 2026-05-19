@@ -113,6 +113,7 @@ transform = Transform3D(1, 0, 0, 0, 0.9659258, -0.25881904, 0, 0.25881904, 0.965
 transform = Transform3D(1, 0, 0, 0, 0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, -0.34, 0.82, -0.42)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=800391728]
+cast_shadow = 1
 material_override = SubResource("StandardMaterial3D_3vyb7")
 mesh = SubResource("CapsuleMesh_u8vuu")
 

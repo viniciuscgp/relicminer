@@ -52,6 +52,12 @@ func _process(delta: float) -> void:
 	if not _runtime_environment or not _target:
 		return
 
+	if _world_environment.environment != _runtime_environment:
+		_original_environment = _world_environment.environment
+		_runtime_environment = _original_environment.duplicate(true) if _original_environment else Environment.new()
+		_world_environment.environment = _runtime_environment
+		_capture_original_fog()
+
 	_check_timer -= delta
 	if _check_timer <= 0.0:
 		_check_timer = maxf(check_interval, 0.02)
@@ -59,6 +65,8 @@ func _process(delta: float) -> void:
 
 	var target_blend := 1.0 if _underwater else 0.0
 	_blend = move_toward(_blend, target_blend, transition_speed * delta)
+	if _blend <= 0.001 and not _underwater:
+		_capture_original_fog()
 	_apply_underwater_blend(_blend)
 
 

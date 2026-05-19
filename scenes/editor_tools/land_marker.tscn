@@ -1,18 +1,24 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dksn0o4euxcxi"]
 
-[ext_resource type="Script" path="res://scenes/editor_tools/land_marker.gd" id="1_2ega0"]
+[ext_resource type="Script" uid="uid://dk6vu5h5w7eki" path="res://scenes/editor_tools/land_marker.gd" id="1_2ega0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goijd"]
-albedo_color = Color(1, 0.40123826, 0.7655953, 1)
-metallic = 0.69
-metallic_specular = 0.36
+transparency = 1
+albedo_color = Color(0.95, 0.58, 0.18, 0.72)
+metallic = 0.0
+roughness = 0.78
 emission_enabled = true
-emission = Color(0.5713575, 0.101425625, 0.5882354, 1)
+emission = Color(0.95, 0.36, 0.08, 1)
+emission_energy_multiplier = 0.35
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_2ega0"]
 material = SubResource("StandardMaterial3D_goijd")
+radius = 0.18
+height = 0.9
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_goijd"]
+radius = 0.18
+height = 0.9
 
 [node name="LandMarker" type="Node3D" unique_id=1308701578]
 script = ExtResource("1_2ega0")
@@ -26,7 +32,10 @@ mesh = SubResource("CapsuleMesh_2ega0")
 shape = SubResource("CapsuleShape3D_goijd")
 
 [node name="Label3D" type="Label3D" parent="." unique_id=542914773]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1713779, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.92, 0)
 billboard = 1
-text = "This is a Label"
-font_size = 64
+text = "Label"
+font_size = 42
+outline_size = 8
+modulate = Color(1, 0.86, 0.48, 1)
+outline_modulate = Color(0.08, 0.04, 0.01, 1)

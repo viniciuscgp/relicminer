@@ -16,6 +16,8 @@ uniform float roughness = 0.035;
 uniform float metallic = 0.0;
 uniform float fresnel_strength = 0.65;
 uniform float fresnel_power = 3.0;
+uniform vec4 moon_reflection_color : source_color = vec4(0.5, 0.62, 1.0, 1.0);
+uniform float moon_reflection_strength = 0.0;
 
 
 vec3 read_normal(sampler2D normal_texture, vec2 uv) {
@@ -43,6 +45,7 @@ void fragment() {
 	ROUGHNESS = roughness;
 	METALLIC = metallic;
 	SPECULAR = 0.95;
+	EMISSION = moon_reflection_color.rgb * moon_reflection_strength * fresnel * (0.45 + ripple * 0.55);
 	NORMAL_MAP = normalize(vec3(normal_sample.xy * wave_strength, normal_sample.z)) * 0.5 + 0.5;
 	NORMAL_MAP_DEPTH = 1.0;
 }
