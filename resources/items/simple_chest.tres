@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/items/world/simple_chest_world.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"simple_chest"
+display_name = "Bau Simples"
+description = "Container de madeira para guardar itens."
+kind = 0
+world_scene = ExtResource("2")
+weight_kg = 18.0
+stack_limit = 1
+buy_price = 30
+sell_price = 8

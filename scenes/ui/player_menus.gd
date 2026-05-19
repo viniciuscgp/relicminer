@@ -42,10 +42,12 @@ func open_pause_menu() -> void:
 	_focus_menu(pause_menu)
 
 
-func open_inventory() -> void:
+func open_inventory(inventory_override: Node = null) -> void:
 	_return_to_pause_after_inventory = false
 	pause_menu.hide()
 	settings_menu.hide()
+	if inventory_menu.has_method("set_inventory_override"):
+		inventory_menu.call("set_inventory_override", inventory_override)
 	if inventory_menu.has_method("refresh"):
 		inventory_menu.call("refresh")
 	inventory_menu.show()
@@ -70,6 +72,8 @@ func close_all() -> void:
 	pause_menu.hide()
 	inventory_menu.hide()
 	settings_menu.hide()
+	if inventory_menu.has_method("set_inventory_override"):
+		inventory_menu.call("set_inventory_override", null)
 	get_tree().paused = false
 	_set_ui_mode(false)
 
@@ -112,6 +116,8 @@ func _on_inventory_close_requested() -> void:
 		close_all()
 	else:
 		inventory_menu.hide()
+		if inventory_menu.has_method("set_inventory_override"):
+			inventory_menu.call("set_inventory_override", null)
 		_set_ui_mode(false)
 
 

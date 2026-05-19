@@ -46,6 +46,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if actor == null:
 		return
 
+	if not get_tree().paused and event.is_action_pressed("interact"):
+		if actor.has_method("interact") and bool(actor.call("interact")):
+			get_viewport().set_input_as_handled()
+			return
+
 	if not get_tree().paused and event.is_action_pressed("use_item"):
 		if actor.has_method("use_equipped_primary") and bool(actor.call("use_equipped_primary")):
 			get_viewport().set_input_as_handled()
@@ -60,11 +65,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		if actor.has_method("throw_equipped") and bool(actor.call("throw_equipped")):
 			get_viewport().set_input_as_handled()
 			return
-
-	if event.is_action_pressed("interact") and not get_tree().paused:
-		actor.interact()
-		get_viewport().set_input_as_handled()
-		return
 
 	if event is InputEventMouseButton and event.pressed:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

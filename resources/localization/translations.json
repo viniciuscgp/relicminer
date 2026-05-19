@@ -90,7 +90,9 @@
 	"message.locked": {"en": "Locked.", "pt": "Trancado."},
 	"message.enemy.no_inventory": {"en": "This enemy has no inventory.", "pt": "Este inimigo nao possui inventario."},
 	"message.enemy.cannot_loot_yet": {"en": "You cannot search this enemy yet.", "pt": "Ainda nao e possivel vasculhar este inimigo."},
+	"message.container.no_inventory": {"en": "This container has no inventory.", "pt": "Este container nao possui inventario."},
 	"message.inventory.cannot_open": {"en": "This inventory cannot be opened.", "pt": "Este inventario nao pode ser aberto."},
+	"message.inventory.cannot_pickup_non_empty_container": {"en": "Empty this container before picking it up.", "pt": "Esvazie este container antes de pega-lo."},
 	"message.item.no_definition": {"en": "This item has no definition.", "pt": "Este item nao possui definicao."},
 	"message.target.no_inventory": {"en": "The target has no inventory.", "pt": "O alvo nao possui inventario."},
 	"message.inventory.full": {"en": "Inventory full.", "pt": "Inventario cheio."}

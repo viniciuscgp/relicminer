@@ -16,6 +16,8 @@ const KIND_KEYS := {
 	8: "item.kind.material",
 	9: "item.kind.armor",
 }
+const KIND_FOOD := 5
+const KIND_POTION := 6
 
 @export var actor_path: NodePath = NodePath("../..")
 @export var visible_slot_count := 30
@@ -42,6 +44,8 @@ const KIND_KEYS := {
 @onready var close_button: Button = %CloseButton
 
 var _inventory: Node
+var _actor_inventory: Node
+var _inventory_override: Node
 var _inventory_dropper: Node
 var _equipment: Node
 var _stats: Node
@@ -91,6 +95,13 @@ func focus_first() -> void:
 	close_button.grab_focus()
 
 
+func set_inventory_override(inventory: Node = null) -> void:
+	_inventory_override = inventory
+	_set_active_inventory(_inventory_override if _inventory_override != null else _actor_inventory)
+	if is_node_ready():
+		refresh()
+
+
 func refresh() -> void:
 	var preferred_index := _selected_index
 	_clear_slots()
@@ -133,17 +144,28 @@ func _resolve_actor_links() -> void:
 	if actor == null:
 		return
 
-	_inventory = actor.get_node_or_null("Inventory")
+	_actor_inventory = actor.get_node_or_null("Inventory")
+	_set_active_inventory(_inventory_override if _inventory_override != null else _actor_inventory)
 	_inventory_dropper = actor.get_node_or_null("InventoryDropper")
 	_equipment = actor.get_node_or_null("Equipment")
 	_stats = actor.get_node_or_null("PlayerStats")
 
-	if _inventory != null and _inventory.has_signal("changed"):
-		_inventory.connect("changed", refresh)
 	if _equipment != null and _equipment.has_signal("changed"):
 		_equipment.connect("changed", _update_equipment_labels)
 	if _stats != null and _stats.has_signal("changed"):
 		_stats.connect("changed", _update_weight)
+
+
+func _set_active_inventory(inventory: Node) -> void:
+	var refresh_callable := Callable(self, "refresh")
+	if _inventory != null and _inventory.has_signal("changed"):
+		if _inventory.is_connected("changed", refresh_callable):
+			_inventory.disconnect("changed", refresh_callable)
+
+	_inventory = inventory
+	if _inventory != null and _inventory.has_signal("changed"):
+		if not _inventory.is_connected("changed", refresh_callable):
+			_inventory.connect("changed", refresh_callable)
 
 
 func _update_weight() -> void:
@@ -180,6 +202,7 @@ func _make_slot(stack: Resource, index: int) -> Button:
 		slot.add_theme_stylebox_override("focus", _slot_focus_style)
 	slot.focus_entered.connect(_select_slot.bind(index))
 	slot.pressed.connect(_on_slot_pressed.bind(index, slot))
+	slot.gui_input.connect(_on_slot_gui_input.bind(index, slot))
 
 	var margin := MarginContainer.new()
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -259,6 +282,19 @@ func _load_slot_icon(item: Resource, icon_rect: TextureRect) -> void:
 func _on_slot_pressed(index: int, slot: Button) -> void:
 	slot.grab_focus()
 	_select_slot(index)
+
+
+func _on_slot_gui_input(event: InputEvent, index: int, slot: Button) -> void:
+	var mouse_event := event as InputEventMouseButton
+	if mouse_event == null or not mouse_event.pressed or not mouse_event.double_click:
+		return
+	if mouse_event.button_index != MOUSE_BUTTON_LEFT:
+		return
+
+	slot.grab_focus()
+	_select_slot(index)
+	_use_selected_item()
+	slot.accept_event()
 
 
 func _configure_slot_focus() -> void:
@@ -407,8 +443,18 @@ func _get_kind_name(item: Resource) -> String:
 
 
 func _use_selected_item() -> void:
+	if not _is_actor_inventory_active():
+		return
+
 	var stack := _get_stack_at(_selected_index)
 	if stack == null or bool(stack.call("is_empty")):
+		return
+	var item: Resource = stack.get("item")
+	if item == null:
+		return
+
+	if _is_direct_use_item(item):
+		_consume_selected_item()
 		return
 
 	if _equipment != null and _equipment.has_method("equip_stack"):
@@ -416,10 +462,11 @@ func _use_selected_item() -> void:
 			_update_equipment_labels()
 			return
 
-	_consume_selected_item()
-
 
 func _drop_selected_item() -> void:
+	if not _is_actor_inventory_active():
+		return
+
 	var stack := _get_stack_at(_selected_index)
 	if stack == null or bool(stack.call("is_empty")):
 		return
@@ -442,7 +489,32 @@ func _consume_selected_item() -> void:
 
 	var removed := int(_inventory.call("remove_item", item.get("id"), 1))
 	if removed > 0:
+		_apply_consumable_effects(item)
 		call_deferred("_refresh_after_item_change")
+
+
+func _is_direct_use_item(item: Resource) -> bool:
+	if item == null:
+		return false
+
+	var kind := int(item.get("kind"))
+	return kind == KIND_FOOD or kind == KIND_POTION
+
+
+func _is_actor_inventory_active() -> bool:
+	return _inventory != null and _inventory == _actor_inventory
+
+
+func _apply_consumable_effects(item: Resource) -> void:
+	if item == null or _stats == null:
+		return
+
+	var hp_restore := float(item.get("hp_restore"))
+	var hunger_restore := float(item.get("hunger_restore"))
+	if hp_restore > 0.0 and _stats.has_method("heal"):
+		_stats.call("heal", hp_restore)
+	if hunger_restore > 0.0 and _stats.has_method("restore_hunger"):
+		_stats.call("restore_hunger", hunger_restore)
 
 
 func _refresh_after_item_change() -> void:

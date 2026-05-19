@@ -24,12 +24,27 @@ func _ready() -> void:
 func _load_starting_items() -> void:
 	slots.clear()
 	for resource in starting_items:
-		var stack := resource
+		var stack := _create_stack_from_starting_resource(resource)
 		if stack == null or stack.is_empty():
 			continue
-		slots.append(stack.duplicate(true))
+		slots.append(stack)
 	_trim_to_capacity()
 	changed.emit()
+
+
+func _create_stack_from_starting_resource(resource: Resource) -> Resource:
+	if resource == null:
+		return null
+
+	if resource.has_method("is_empty"):
+		return resource.duplicate(true)
+
+	if resource.has_method("create_world_instance") or resource.get("id") != null:
+		var stack: Resource = ItemStackScript.new()
+		stack.call("setup", resource, 1)
+		return stack
+
+	return null
 
 
 func is_accessible(actor_inventory: Node = null) -> bool:

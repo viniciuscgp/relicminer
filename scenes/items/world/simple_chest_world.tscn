@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scenes/containers/chest.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/items/world/simple_chest_world.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chest"]
@@ -21,8 +21,13 @@ size = Vector3(0.18, 0.22, 0.08)
 [sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
 size = Vector3(1.35, 0.75, 0.8)
 
-[node name="Chest" type="StaticBody3D"]
+[node name="Chest" type="RigidBody3D"]
+mass = 18.0
 script = ExtResource("1")
+default_mass_kg = 18.0
+has_inventory = true
+inventory_display_name = "Bau"
+capacity_slots = 12
 
 [node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)

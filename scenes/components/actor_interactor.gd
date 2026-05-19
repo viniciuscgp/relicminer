@@ -15,13 +15,21 @@ func interact() -> bool:
 	if target == null:
 		return false
 
+	if target.has_method("has_container_inventory") and bool(target.call("has_container_inventory")) and target.has_method("open"):
+		if bool(target.call("open", _get_actor_inventory())):
+			_open_target_inventory(target)
+			return true
+		return false
+
 	if target.has_method("try_pickup"):
 		target.call("try_pickup", _get_actor_inventory())
 		return true
 
 	if target.has_method("open"):
-		target.call("open", _get_actor_inventory())
-		return true
+		if bool(target.call("open", _get_actor_inventory())):
+			_open_target_inventory(target)
+			return true
+		return false
 
 	if target.has_method("open_loot"):
 		target.call("open_loot", _get_actor_inventory())
@@ -95,7 +103,7 @@ func _get_nearby_interaction_target(space_state: PhysicsDirectSpaceState3D) -> N
 func _find_interactable(node: Node) -> Node:
 	var current := node
 	while current != null:
-		if current.has_method("try_pickup") or current.has_method("open") or current.has_method("open_loot"):
+		if current.has_method("try_pickup") or current.has_method("has_container_inventory") or current.has_method("open") or current.has_method("open_loot"):
 			return current
 		current = current.get_parent()
 	return null
@@ -105,3 +113,18 @@ func _get_actor_inventory() -> Node:
 	if actor == null or not actor.has_method("get_inventory"):
 		return null
 	return actor.call("get_inventory") as Node
+
+
+func _open_target_inventory(target: Node) -> void:
+	if actor == null or target == null or not target.has_method("get_inventory"):
+		return
+
+	var target_inventory := target.call("get_inventory") as Node
+	if target_inventory == null:
+		return
+
+	var player_menus := actor.get_node_or_null("PlayerMenus")
+	if player_menus == null or not player_menus.has_method("open_inventory"):
+		return
+
+	player_menus.call("open_inventory", target_inventory)

@@ -53,9 +53,10 @@ func process_survival(delta: float, moving: bool, swimming: bool, underwater: bo
 		stats.call("process_survival", delta, moving, swimming, underwater)
 
 
-func interact() -> void:
-	if interactor != null and interactor.has_method("interact"):
-		interactor.call("interact")
+func interact() -> bool:
+	if interactor == null or not interactor.has_method("interact"):
+		return false
+	return bool(interactor.call("interact"))
 
 
 func push_rigid_body_collisions(move_direction: Vector3) -> void:
