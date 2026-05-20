@@ -41,7 +41,6 @@ const ACTION_ALIASES := {
 
 const ANIMATION_MAP_PROPERTY_PREFIX := "animation_map/"
 const LEFT_HAND_SLOT := &"left_hand"
-const TORCH_ID := &"simple_torch"
 
 @export var model_root_path: NodePath = NodePath("../visual/PlayerAnimation"):
 	set(value):
@@ -56,15 +55,9 @@ const TORCH_ID := &"simple_torch"
 @export var default_blend_time := 0.12
 @export var action_lock_seconds := 0.45
 @export var warn_missing_mapped_animations := true
-@export_group("Torch Pose")
+@export_group("Held Pose Override")
 @export var equipment_path: NodePath = NodePath("../Equipment")
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
-@export var torch_pose_enabled := true
-@export var torch_item_ids: Array[StringName] = [TORCH_ID]
-@export var torch_upperarm_bone_name: StringName = &"L_Upperarm"
-@export var torch_upperarm_rotation_degrees := Vector3(-72.0, 0.0, -34.0)
-@export var torch_forearm_bone_name: StringName = &"L_Forearm"
-@export var torch_forearm_rotation_degrees := Vector3(-8.0, 0.0, -8.0)
 
 var animation_map: Dictionary = {
 	WALKING: WALKING,
@@ -86,8 +79,9 @@ var _animation_player: AnimationPlayer
 var _equipment: Node
 var _skeleton: Skeleton3D
 var _current_standard_animation: StringName = &""
+var _current_animation_speed := 1.0
 var _action_locked_until_msec := 0
-var _torch_pose_active := false
+var _active_pose_override: Resource
 
 
 func _enter_tree() -> void:
@@ -100,7 +94,7 @@ func _ready() -> void:
 	process_priority = 1000
 	process_physics_priority = 1000
 	_refresh_animation_player()
-	_refresh_torch_pose_links()
+	_refresh_held_pose_links()
 	if Engine.is_editor_hint():
 		_notify_animation_map_changed()
 
@@ -110,12 +104,12 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if not Engine.is_editor_hint():
-		_apply_torch_pose_override()
+		_apply_held_pose_override()
 
 
 func _physics_process(_delta: float) -> void:
 	if not Engine.is_editor_hint():
-		_apply_torch_pose_override()
+		_apply_held_pose_override()
 
 
 func _get_property_list() -> Array[Dictionary]:
@@ -169,7 +163,7 @@ func _refresh_animation_player() -> void:
 			_animation_player = _find_animation_player(model_root)
 
 
-func _refresh_torch_pose_links() -> void:
+func _refresh_held_pose_links() -> void:
 	_equipment = get_node_or_null(equipment_path)
 	_skeleton = get_node_or_null(skeleton_path) as Skeleton3D
 	if _skeleton == null:
@@ -197,7 +191,7 @@ func has_standard_animation(standard_animation: StringName) -> bool:
 	return _has_animation(resolved)
 
 
-func play_standard_animation(standard_animation: StringName, blend_time := -1.0, custom_speed := 1.0, lock_action := false) -> bool:
+func play_standard_animation(standard_animation: StringName, blend_time := -1.0, custom_speed := 1.0, lock_action := false, force_restart := false) -> bool:
 	if _animation_player == null:
 		return false
 
@@ -208,12 +202,13 @@ func play_standard_animation(standard_animation: StringName, blend_time := -1.0,
 		if resolved == &"":
 			return false
 
-	if _current_standard_animation == normalized and _animation_player.is_playing():
+	if not force_restart and _current_standard_animation == normalized and is_equal_approx(_current_animation_speed, custom_speed) and _animation_player.is_playing():
 		return true
 
 	var blend := default_blend_time if blend_time < 0.0 else blend_time
-	_animation_player.play(resolved, blend, custom_speed)
+	_animation_player.play(resolved, blend, custom_speed, custom_speed < 0.0)
 	_current_standard_animation = normalized
+	_current_animation_speed = custom_speed
 
 	if lock_action:
 		var duration := action_lock_seconds
@@ -225,10 +220,10 @@ func play_standard_animation(standard_animation: StringName, blend_time := -1.0,
 
 
 func play_action_animation(standard_animation: StringName) -> bool:
-	return play_standard_animation(standard_animation, default_blend_time, 1.0, true)
+	return play_standard_animation(standard_animation, default_blend_time, 1.0, true, true)
 
 
-func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool) -> void:
+func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false) -> void:
 	if Time.get_ticks_msec() < _action_locked_until_msec:
 		return
 
@@ -241,6 +236,9 @@ func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: 
 		return
 
 	if moving:
+		if backward:
+			play_standard_animation(WALKING, default_blend_time, -1.0)
+			return
 		play_standard_animation(RUNNING if running else WALKING)
 		return
 
@@ -289,52 +287,58 @@ func _notify_animation_map_changed() -> void:
 		notify_property_list_changed()
 
 
-func _apply_torch_pose_override() -> void:
-	if not torch_pose_enabled:
-		_clear_torch_pose_override()
-		return
+func _apply_held_pose_override() -> void:
+	if _equipment == null or _skeleton == null:
+		_refresh_held_pose_links()
 
 	if _equipment == null or _skeleton == null:
-		_refresh_torch_pose_links()
-
-	if _equipment == null or _skeleton == null:
-		_clear_torch_pose_override()
+		_clear_held_pose_override()
 		return
 
-	if not _is_torch_equipped():
-		_clear_torch_pose_override()
+	var pose_override := _get_equipped_pose_override()
+	if pose_override == null:
+		_clear_held_pose_override()
 		return
 
-	_set_bone_pose_rotation(torch_upperarm_bone_name, torch_upperarm_rotation_degrees)
-	_set_bone_pose_rotation(torch_forearm_bone_name, torch_forearm_rotation_degrees)
-	_torch_pose_active = true
+	if _active_pose_override != pose_override:
+		_clear_held_pose_override()
+		_active_pose_override = pose_override
+
+	_set_bone_pose_rotation(pose_override.upperarm_bone_name, pose_override.upperarm_rotation_degrees)
+	_set_bone_pose_rotation(pose_override.forearm_bone_name, pose_override.forearm_rotation_degrees)
+	_set_bone_pose_rotation(pose_override.hand_bone_name, pose_override.hand_rotation_degrees)
 
 	if _skeleton.has_method("force_update_all_bone_transforms"):
 		_skeleton.call("force_update_all_bone_transforms")
 
 
-func _clear_torch_pose_override() -> void:
-	if not _torch_pose_active or _skeleton == null:
-		_torch_pose_active = false
+func _clear_held_pose_override() -> void:
+	if _active_pose_override == null or _skeleton == null:
+		_active_pose_override = null
 		return
 
-	_reset_bone_pose(torch_upperarm_bone_name)
-	_reset_bone_pose(torch_forearm_bone_name)
-	_torch_pose_active = false
+	if _active_pose_override.get("upperarm_bone_name") != null:
+		_reset_bone_pose(_active_pose_override.get("upperarm_bone_name"))
+	if _active_pose_override.get("forearm_bone_name") != null:
+		_reset_bone_pose(_active_pose_override.get("forearm_bone_name"))
+	if _active_pose_override.get("hand_bone_name") != null:
+		_reset_bone_pose(_active_pose_override.get("hand_bone_name"))
+	_active_pose_override = null
 
 
-func _is_torch_equipped() -> bool:
-	if _equipment == null or not _equipment.has_method("get_equipped_item"):
-		return false
+func _get_equipped_pose_override() -> Resource:
+	if _equipment == null or not _equipment.has_method("get_equipped_item") or not _equipment.has_method("get_held_transform_override"):
+		return null
 
 	var item := _equipment.call("get_equipped_item", LEFT_HAND_SLOT) as Resource
 	if item == null:
-		return false
+		return null
 
 	var item_id := StringName(item.get("id"))
-	if torch_item_ids.has(item_id):
-		return true
-	return String(item_id).to_lower().contains("torch")
+	var override := _equipment.call("get_held_transform_override", item_id) as Resource
+	if override == null or not bool(override.get("pose_enabled")):
+		return null
+	return override
 
 
 func _set_bone_pose_rotation(bone_name: StringName, rotation_degrees: Vector3) -> void:

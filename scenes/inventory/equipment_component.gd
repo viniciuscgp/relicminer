@@ -1,6 +1,8 @@
 extends Node
 class_name EquipmentComponent
 
+const HeldItemTransformOverrideResource := preload("res://scenes/inventory/held_item_transform_override.gd")
+
 const RIGHT_HAND := &"right_hand"
 const LEFT_HAND := &"left_hand"
 const PRIMARY := &"primary"
@@ -12,18 +14,29 @@ signal equipped(slot: StringName, stack: Resource)
 signal unequipped(slot: StringName, stack: Resource)
 signal action_executed(slot: StringName, trigger: StringName, action: Resource)
 
+@export_group("Node References")
 @export var actor_path: NodePath = NodePath("..")
 @export var inventory_path: NodePath = NodePath("../Inventory")
 @export var inventory_dropper_path: NodePath = NodePath("../InventoryDropper")
+@export var aim_source_path: NodePath
+
+@export_group("Socket Paths")
 @export var right_hand_socket_path: NodePath = NodePath("../EquipmentSockets/RightHandSocket")
 @export var left_hand_socket_path: NodePath = NodePath("../EquipmentSockets/LeftHandSocket")
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+
+@export_group("Bone Sockets")
 @export var right_hand_bone_name: StringName = &"R_Hand"
 @export var right_hand_bone_socket_name := "RightHandBoneSocket"
 @export var left_hand_bone_name: StringName = &"L_Hand"
 @export var left_hand_bone_socket_name := "LeftHandBoneSocket"
+
+@export_group("Runtime Behavior")
 @export var compensate_socket_scale := true
-@export var aim_source_path: NodePath
+@export var refresh_held_transforms_in_game := true
+
+@export_group("Held Transform Overrides")
+@export var held_transform_overrides: Array[Resource] = []
 
 @onready var actor: Node = get_node_or_null(actor_path)
 @onready var inventory: Node = get_node_or_null(inventory_path)
@@ -50,6 +63,11 @@ func _ready() -> void:
 	left_hand_socket = _get_or_create_bone_socket(left_hand_socket, left_hand_bone_name, left_hand_bone_socket_name)
 	if inventory != null and inventory.has_signal("changed"):
 		inventory.connect("changed", _validate_equipped_stacks)
+
+
+func _process(_delta: float) -> void:
+	if refresh_held_transforms_in_game:
+		_refresh_held_transforms()
 
 
 func equip_stack(stack: Resource, slot: StringName = &"") -> bool:
@@ -126,6 +144,7 @@ func use_action(slot: StringName, trigger: StringName) -> bool:
 	if action.has_method("can_execute") and not bool(action.call("can_execute", actor, self, stack, slot, held_instance)):
 		return false
 
+	_play_equipment_action_animation(item, trigger)
 	var executed := bool(action.call("execute", actor, self, stack, slot, held_instance))
 	if executed:
 		action_executed.emit(slot, trigger, action)
@@ -203,6 +222,19 @@ func _has_equipped_stack(slot: StringName) -> bool:
 	return stack != null and not bool(stack.call("is_empty"))
 
 
+func _play_equipment_action_animation(item: Resource, trigger: StringName) -> void:
+	if actor == null or item == null or trigger != PRIMARY or not actor.has_method("play_action_animation"):
+		return
+
+	if bool(item.get("is_mining_tool")):
+		actor.call("play_action_animation", &"mining")
+		return
+
+	var item_id := String(item.get("id")).to_lower()
+	if item_id.contains("axe"):
+		actor.call("play_action_animation", &"chopping")
+
+
 func _get_socket(slot: StringName) -> Node3D:
 	if slot == LEFT_HAND:
 		return left_hand_socket
@@ -261,6 +293,23 @@ func _create_held_instance(slot: StringName, stack: Resource) -> void:
 	_held_instances[slot] = held
 
 
+func _refresh_held_transforms() -> void:
+	for slot in _held_instances.keys():
+		var held := _held_instances.get(slot) as Node3D
+		if held == null or not is_instance_valid(held):
+			continue
+
+		var stack: Resource = _equipped_stacks.get(slot)
+		if stack == null or bool(stack.call("is_empty")):
+			continue
+
+		var item: Resource = stack.get("item")
+		if item == null:
+			continue
+
+		_apply_held_transform(held, item, _get_socket(slot))
+
+
 func _prepare_held_node(node: Node) -> void:
 	if node is RigidBody3D:
 		var body := node as RigidBody3D
@@ -287,14 +336,21 @@ func _prepare_held_node(node: Node) -> void:
 
 func _apply_held_transform(held: Node3D, item: Resource, socket: Node3D) -> void:
 	var held_position: Vector3 = item.get("held_position")
+	var held_rotation_degrees: Vector3 = item.get("held_rotation_degrees")
 	var held_scale: Vector3 = item.get("held_scale")
+	var override := _get_held_transform_override(StringName(item.get("id")))
+	if override != null:
+		held_position = override.position
+		held_rotation_degrees = override.rotation_degrees
+		held_scale = override.scale
+
 	if compensate_socket_scale:
 		var socket_scale := _get_safe_socket_scale(socket)
 		held_position = _divide_vector3(held_position, socket_scale)
 		held_scale = _divide_vector3(held_scale, socket_scale)
 
 	held.position = held_position
-	held.rotation_degrees = item.get("held_rotation_degrees")
+	held.rotation_degrees = held_rotation_degrees
 	held.scale = held_scale
 
 
@@ -314,6 +370,18 @@ func _get_safe_socket_scale(socket: Node3D) -> Vector3:
 
 func _divide_vector3(value: Vector3, divisor: Vector3) -> Vector3:
 	return Vector3(value.x / divisor.x, value.y / divisor.y, value.z / divisor.z)
+
+
+func _get_held_transform_override(item_id: StringName) -> HeldItemTransformOverride:
+	for override_resource in held_transform_overrides:
+		var override := override_resource as HeldItemTransformOverride
+		if override != null and override.item_id == item_id:
+			return override
+	return null
+
+
+func get_held_transform_override(item_id: StringName) -> Resource:
+	return _get_held_transform_override(item_id)
 
 
 func _clear_held_instance(slot: StringName) -> void:

@@ -38,14 +38,17 @@ enum Kind {
 
 @export_group("Equipment")
 @export var default_equipment_slot: StringName
-@export var held_position := Vector3.ZERO
-@export var held_rotation_degrees := Vector3.ZERO
-@export var held_scale := Vector3.ONE
-@export var actions: Array[Resource] = []
+@export var is_mining_tool := false
 @export var weapon_damage := 0
 @export var defense_bonus := 0
 @export var durability_max := 0.0
 @export var key_id: StringName
+
+@export_group("Held Transform")
+@export var held_position := Vector3.ZERO
+@export var held_rotation_degrees := Vector3.ZERO
+@export var held_scale := Vector3.ONE
+@export var actions: Array[Resource] = []
 
 @export_group("Use")
 @export var hp_restore := 0.0
@@ -154,9 +157,9 @@ func _create_default_action(trigger: StringName) -> Resource:
 
 func _get_default_primary_animation() -> StringName:
 	if kind == Kind.TOOL:
-		var item_id := String(id).to_lower()
-		if item_id.contains("pickaxe"):
+		if is_mining_tool:
 			return &"mining"
+		var item_id := String(id).to_lower()
 		if item_id.contains("axe"):
 			return &"chopping"
 		return &"picking"

@@ -2,6 +2,12 @@
 
 [ext_resource type="Script" uid="uid://hr1tcr8p82nh" path="res://scripts/systems/items/item_definition.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://byahdcblxgt4a" path="res://scenes/items/world/simple_pickaxe_world.tscn" id="2"]
+[ext_resource type="Script" uid="uid://3w6skc2e82m1" path="res://scripts/systems/items/actions/melee_item_action.gd" id="3_mining_action"]
+
+[sub_resource type="Resource" id="MeleeAction_mining"]
+script = ExtResource("3_mining_action")
+animation_name = &"mining"
+display_name = "Mining"
 
 [resource]
 script = ExtResource("1")
@@ -13,7 +19,8 @@ world_scene = ExtResource("2")
 weight_kg = 3.0
 buy_price = 50
 sell_price = 12
-held_position = Vector3(0, 0, 0.28)
-held_rotation_degrees = Vector3(0, 180, 0)
+is_mining_tool = true
 weapon_damage = 4
 durability_max = 100.0
+held_rotation_degrees = Vector3(0, 180, 0)
+actions = Array[Resource]([SubResource("MeleeAction_mining")])

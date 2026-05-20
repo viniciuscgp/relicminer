@@ -6,11 +6,13 @@ class_name PlayerController
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 
 @export var speed := 15.0
+@export_range(0.1, 1.0, 0.05) var backward_speed_multiplier := 0.55
 @export var jump_velocity := 14.5
 @export var mouse_sensitivity := 0.0025
 @export var gamepad_look_sensitivity := 3.0
 @export_range(10.0, 89.0, 1.0) var max_look_angle_degrees := 65.0
 @export_range(0.0, 60.0, 0.5) var look_smoothing := 18.0
+@export_range(0.0, 30.0, 0.5) var turn_smoothing := 14.0
 @export var acceleration := 18.0
 @export var friction := 22.0
 
@@ -20,6 +22,8 @@ class_name PlayerController
 
 var _camera_pitch := 0.0
 var _target_camera_pitch := 0.0
+var _camera_yaw := 0.0
+var _target_camera_yaw := 0.0
 var _audio_manager: Node
 
 
@@ -30,11 +34,13 @@ func _ready() -> void:
 	if camera_pivot != null:
 		_camera_pitch = camera_pivot.rotation.x
 		_target_camera_pitch = _camera_pitch
+		_camera_yaw = _get_camera_global_yaw()
+		_target_camera_yaw = _camera_yaw
 	_apply_mouse_capture_mode()
 
 
 func _process(delta: float) -> void:
-	_apply_camera_pitch(delta)
+	_apply_camera_rotation(delta)
 
 
 func _input(event: InputEvent) -> void:
@@ -42,7 +48,7 @@ func _input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		actor.rotate_y(-event.relative.x * mouse_sensitivity)
+		_add_camera_yaw(-event.relative.x * mouse_sensitivity)
 		_add_camera_pitch(-event.relative.y * mouse_sensitivity)
 
 
@@ -86,21 +92,24 @@ func _physics_process(delta: float) -> void:
 
 	var look_axis := Input.get_axis("look_left", "look_right")
 	if not is_zero_approx(look_axis):
-		actor.rotate_y(-look_axis * gamepad_look_sensitivity * delta)
+		_add_camera_yaw(-look_axis * gamepad_look_sensitivity * delta)
 
 	var look_vertical_axis := Input.get_axis("look_up", "look_down")
 	if not is_zero_approx(look_vertical_axis):
 		_add_camera_pitch(-look_vertical_axis * gamepad_look_sensitivity * delta)
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction: Vector3 = (actor.global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var direction := _get_camera_relative_direction(input_dir)
 	var moving: bool = direction != Vector3.ZERO
+	var moving_backward := moving and input_dir.y > 0.1
 
 	actor.process_survival(delta, moving, false, _is_underwater())
 	var speed_multiplier: float = actor.get_movement_speed_multiplier()
 
 	if moving and actor.can_move():
-		var target_speed: float = speed * speed_multiplier
+		_turn_actor_for_movement(input_dir, direction, delta)
+		var direction_speed_multiplier := backward_speed_multiplier if moving_backward else 1.0
+		var target_speed: float = speed * speed_multiplier * direction_speed_multiplier
 		actor.velocity.x = move_toward(actor.velocity.x, direction.x * target_speed, acceleration * delta)
 		actor.velocity.z = move_toward(actor.velocity.z, direction.z * target_speed, acceleration * delta)
 	else:
@@ -113,8 +122,12 @@ func _physics_process(delta: float) -> void:
 	if actor.has_method("set_locomotion_animation"):
 		var horizontal_speed := Vector2(actor.velocity.x, actor.velocity.z).length()
 		var is_moving: bool = horizontal_speed > 0.1 and actor.can_move()
-		var is_running: bool = is_moving and horizontal_speed >= speed * 0.75
-		actor.call("set_locomotion_animation", is_moving, is_running, not actor.is_on_floor(), _is_underwater())
+		var is_running: bool = is_moving and not moving_backward and horizontal_speed >= speed * 0.75
+		actor.call("set_locomotion_animation", is_moving, is_running, not actor.is_on_floor(), _is_underwater(), moving_backward)
+
+
+func _add_camera_yaw(amount: float) -> void:
+	_target_camera_yaw = wrapf(_target_camera_yaw + amount, -PI, PI)
 
 
 func _add_camera_pitch(amount: float) -> void:
@@ -129,17 +142,58 @@ func _add_camera_pitch(amount: float) -> void:
 	)
 
 
-func _apply_camera_pitch(delta: float) -> void:
+func _apply_camera_rotation(delta: float) -> void:
 	if camera_pivot == null:
 		return
 
 	if look_smoothing <= 0.0:
 		_camera_pitch = _target_camera_pitch
+		_camera_yaw = _target_camera_yaw
 	else:
 		var weight := 1.0 - exp(-look_smoothing * delta)
 		_camera_pitch = lerpf(_camera_pitch, _target_camera_pitch, weight)
+		_camera_yaw = lerp_angle(_camera_yaw, _target_camera_yaw, weight)
 
 	camera_pivot.rotation.x = _camera_pitch
+	camera_pivot.rotation.y = _camera_yaw - _get_actor_global_yaw()
+
+
+func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:
+	if input_dir == Vector2.ZERO:
+		return Vector3.ZERO
+
+	var yaw_basis := Basis(Vector3.UP, _camera_yaw)
+	var forward: Vector3 = -yaw_basis.z
+	var right: Vector3 = yaw_basis.x
+	forward.y = 0.0
+	right.y = 0.0
+	forward = forward.normalized()
+	right = right.normalized()
+	return (right * input_dir.x - forward * input_dir.y).normalized()
+
+
+func _turn_actor_for_movement(input_dir: Vector2, direction: Vector3, delta: float) -> void:
+	if actor == null or direction == Vector3.ZERO:
+		return
+
+	if input_dir.y > 0.1 and absf(input_dir.x) < 0.1:
+		return
+
+	var target_yaw := atan2(-direction.x, -direction.z)
+	var weight := 1.0 if turn_smoothing <= 0.0 else 1.0 - exp(-turn_smoothing * delta)
+	actor.rotation.y = lerp_angle(actor.rotation.y, target_yaw, weight)
+
+
+func _get_camera_global_yaw() -> float:
+	if camera_pivot == null:
+		return _get_actor_global_yaw()
+	return camera_pivot.global_rotation.y
+
+
+func _get_actor_global_yaw() -> float:
+	if actor == null or not actor is Node3D:
+		return 0.0
+	return (actor as Node3D).global_rotation.y
 
 
 func _is_underwater() -> bool:

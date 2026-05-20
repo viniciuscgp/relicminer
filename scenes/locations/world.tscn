@@ -614,7 +614,7 @@ _shader_parameters = {
 &"auto_slope": 0.5610000266475,
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.4450000211375,
-&"depth_blur": 13.800000205636561,
+&"depth_blur": 13.80000020563656,
 &"enable_macro_variation": true,
 &"enable_projection": true,
 &"flat_terrain_normals": false,
@@ -11375,6 +11375,8 @@ points = PackedVector3Array(-21.300873, -3.1057606, 1758.4055, 548.3058, -3, 113
 
 [node name="Environment" parent="." unique_id=1202088949 instance=ExtResource("6_d6lop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1241.7966, 265.15833, 802.27075)
+current_hour = 8.63
+auto_advance_time = false
 
 [node name="Terrain3D" type="Terrain3D" parent="." unique_id=1223664392]
 data_directory = "res://terrain_data"

@@ -7,8 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player_stats.tscn" id="5_stats"]
 [ext_resource type="PackedScene" uid="uid://bpu4v5el4ayp7" path="res://scenes/ui/player_hud.tscn" id="6_hud"]
 [ext_resource type="Script" uid="uid://cnp603rmhuo8n" path="res://scripts/systems/items/item_stack.gd" id="7_stack"]
-[ext_resource type="Resource" path="res://resources/items/simple_pickaxe.tres" id="8_pickaxe"]
-[ext_resource type="Resource" path="res://resources/items/short_sword.tres" id="9_sword"]
+[ext_resource type="Resource" uid="uid://bd1t04s4hdphg" path="res://resources/items/simple_pickaxe.tres" id="8_pickaxe"]
+[ext_resource type="Resource" uid="uid://cjopcp73r5cma" path="res://resources/items/short_sword.tres" id="9_sword"]
 [ext_resource type="Resource" uid="uid://bnbnviohfioq4" path="res://resources/items/simple_torch.tres" id="10_torch"]
 [ext_resource type="Resource" path="res://resources/items/dry_bread.tres" id="11_bread"]
 [ext_resource type="Resource" path="res://resources/items/weak_healing_potion.tres" id="12_potion"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://6qasyvo7d48y" path="res://scenes/actors/player_controller.gd" id="19_controller"]
 [ext_resource type="Script" uid="uid://dyx23nai8pefm" path="res://scenes/inventory/equipment_component.gd" id="20_equipment"]
 [ext_resource type="Script" uid="uid://118jrmf4wstc" path="res://scenes/actors/character_animation_controller.gd" id="21_animation_controller"]
+[ext_resource type="Script" uid="uid://c1sejmg3reuys" path="res://scenes/inventory/held_item_transform_override.gd" id="22_held_override"]
 
 [sub_resource type="Resource" id="ItemStack_pickaxe"]
 script = ExtResource("7_stack")
@@ -58,9 +59,28 @@ script = ExtResource("7_stack")
 item = ExtResource("14_crown")
 amount = 12
 
+[sub_resource type="Resource" id="HeldOverride_pickaxe"]
+script = ExtResource("22_held_override")
+item_id = &"simple_pickaxe"
+position = Vector3(0.008, 0.2, 0.3)
+rotation_degrees = Vector3(0, 180, 90)
+
+[sub_resource type="Resource" id="HeldOverride_torch"]
+script = ExtResource("22_held_override")
+item_id = &"simple_torch"
+position = Vector3(0.1, 0.32, 0)
+rotation_degrees = Vector3(1, 10, 0)
+pose_enabled = true
+upperarm_bone_name = &"L_Upperarm"
+upperarm_rotation_degrees = Vector3(10, 0, -40)
+forearm_bone_name = &"L_Forearm"
+forearm_rotation_degrees = Vector3(0, 0, 40)
+hand_bone_name = &"L_Hand"
+hand_rotation_degrees = Vector3(90, 0, 90)
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3j4b4"]
 radius = 0.079589844
-height = 0.760664
+height = 0.7416601
 
 [node name="Player" type="CharacterBody3D" unique_id=817496980]
 script = ExtResource("1_3vyb7")
@@ -78,6 +98,7 @@ drop_distance = 1.26
 [node name="Equipment" type="Node" parent="." unique_id=971635141]
 script = ExtResource("20_equipment")
 aim_source_path = NodePath("../CameraPivot/SpringArm3D/Camera3D")
+held_transform_overrides = Array[Resource]([SubResource("HeldOverride_pickaxe"), SubResource("HeldOverride_torch")])
 
 [node name="Interactor" type="Node" parent="." unique_id=1074997997]
 script = ExtResource("17_interactor")
@@ -96,8 +117,6 @@ look_smoothing = 9.0
 process_priority = 1000
 process_physics_priority = 1000
 script = ExtResource("21_animation_controller")
-torch_upperarm_rotation_degrees = Vector3(0, 30, 0)
-torch_forearm_rotation_degrees = Vector3(0, 0, 70)
 animation_map/idle = &"NlaTrack_003"
 animation_map/walking = &"NlaTrack_001"
 animation_map/running = &"NlaTrack_006"
@@ -120,7 +139,7 @@ inventory_path = NodePath("../Inventory")
 [node name="PlayerMenus" parent="." unique_id=397086250 instance=ExtResource("15_menus")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=13544527]
-transform = Transform3D(-1.7484555e-07, 0, 4, 0, 4, 0, -4, 0, -1.7484555e-07, -0.02503395, 1.5075293, -0.1635313)
+transform = Transform3D(-1.7484555e-07, 0, 4, 0, 4, 0, -4, 0, -1.7484555e-07, -0.02503395, 1.4994409, -0.1635313)
 shape = SubResource("CapsuleShape3D_3j4b4")
 
 [node name="visual" type="Node3D" parent="." unique_id=2103274154]
