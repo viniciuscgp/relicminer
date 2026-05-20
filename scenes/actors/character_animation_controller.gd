@@ -228,7 +228,8 @@ func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: 
 		return
 
 	if jumping:
-		play_standard_animation(JUMPING)
+		if has_standard_animation(JUMPING):
+			play_standard_animation(JUMPING)
 		return
 
 	if swimming:

@@ -54,9 +54,9 @@ func get_movement_speed_multiplier() -> float:
 	return 1.0
 
 
-func process_survival(delta: float, moving: bool, swimming: bool, underwater: bool) -> void:
+func process_survival(delta: float, moving: bool, swimming: bool, underwater: bool, running := false) -> void:
 	if stats != null and stats.has_method("process_survival"):
-		stats.call("process_survival", delta, moving, swimming, underwater)
+		stats.call("process_survival", delta, moving, swimming, underwater, running)
 
 
 func play_action_animation(animation_name: StringName) -> bool:

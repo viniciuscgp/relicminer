@@ -6,7 +6,11 @@ class_name PlayerController
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 
 @export var speed := 15.0
+@export_range(0.1, 1.0, 0.05) var walk_speed_multiplier := 0.45
 @export_range(0.1, 1.0, 0.05) var backward_speed_multiplier := 0.55
+@export var minimum_run_energy := 0.0
+@export var run_resume_energy := 12.0
+@export_range(0.0, 1.0, 0.05) var run_animation_min_energy_ratio := 0.2
 @export var jump_velocity := 14.5
 @export var mouse_sensitivity := 0.0025
 @export var gamepad_look_sensitivity := 3.0
@@ -25,6 +29,7 @@ var _target_camera_pitch := 0.0
 var _camera_yaw := 0.0
 var _target_camera_yaw := 0.0
 var _audio_manager: Node
+var _run_exhausted := false
 
 
 func _ready() -> void:
@@ -102,14 +107,19 @@ func _physics_process(delta: float) -> void:
 	var direction := _get_camera_relative_direction(input_dir)
 	var moving: bool = direction != Vector3.ZERO
 	var moving_backward := moving and input_dir.y > 0.1
+	var can_move: bool = actor.can_move()
+	var wants_to_run := _wants_to_run(moving, moving_backward)
+	var running := can_move and _can_run(wants_to_run)
 
-	actor.process_survival(delta, moving, false, _is_underwater())
+	actor.process_survival(delta, moving and can_move, false, _is_underwater(), running)
+	_update_run_exhaustion(wants_to_run)
 	var speed_multiplier: float = actor.get_movement_speed_multiplier()
+	var movement_speed_multiplier := _get_movement_speed_multiplier(running)
 
-	if moving and actor.can_move():
+	if moving and can_move:
 		_turn_actor_for_movement(input_dir, direction, delta)
 		var direction_speed_multiplier := backward_speed_multiplier if moving_backward else 1.0
-		var target_speed: float = speed * speed_multiplier * direction_speed_multiplier
+		var target_speed: float = speed * movement_speed_multiplier * speed_multiplier * direction_speed_multiplier
 		actor.velocity.x = move_toward(actor.velocity.x, direction.x * target_speed, acceleration * delta)
 		actor.velocity.z = move_toward(actor.velocity.z, direction.z * target_speed, acceleration * delta)
 	else:
@@ -121,9 +131,9 @@ func _physics_process(delta: float) -> void:
 
 	if actor.has_method("set_locomotion_animation"):
 		var horizontal_speed := Vector2(actor.velocity.x, actor.velocity.z).length()
-		var is_moving: bool = horizontal_speed > 0.1 and actor.can_move()
-		var is_running: bool = is_moving and not moving_backward and horizontal_speed >= speed * 0.75
-		actor.call("set_locomotion_animation", is_moving, is_running, not actor.is_on_floor(), _is_underwater(), moving_backward)
+		var is_moving: bool = horizontal_speed > 0.1 and can_move
+		var should_play_running := is_moving and running and _get_energy_ratio() > run_animation_min_energy_ratio
+		actor.call("set_locomotion_animation", is_moving, should_play_running, not actor.is_on_floor(), _is_underwater(), moving_backward)
 
 
 func _add_camera_yaw(amount: float) -> void:
@@ -176,12 +186,84 @@ func _turn_actor_for_movement(input_dir: Vector2, direction: Vector3, delta: flo
 	if actor == null or direction == Vector3.ZERO:
 		return
 
-	if input_dir.y > 0.1 and absf(input_dir.x) < 0.1:
-		return
+	var facing_direction := -direction if input_dir.y > 0.1 else direction
 
-	var target_yaw := atan2(-direction.x, -direction.z)
+	var target_yaw := atan2(-facing_direction.x, -facing_direction.z)
 	var weight := 1.0 if turn_smoothing <= 0.0 else 1.0 - exp(-turn_smoothing * delta)
 	actor.rotation.y = lerp_angle(actor.rotation.y, target_yaw, weight)
+
+
+func _wants_to_run(moving: bool, moving_backward: bool) -> bool:
+	return moving and not moving_backward and InputMap.has_action("run") and Input.is_action_pressed("run")
+
+
+func _can_run(wants_to_run: bool) -> bool:
+	if not wants_to_run:
+		_run_exhausted = false
+		return false
+
+	var current_energy := _get_current_energy()
+	if _run_exhausted:
+		if current_energy < run_resume_energy:
+			return false
+		_run_exhausted = false
+
+	return current_energy > minimum_run_energy
+
+
+func _get_movement_speed_multiplier(running: bool) -> float:
+	if not running:
+		return walk_speed_multiplier
+
+	var energy_ratio := _get_energy_ratio()
+	return lerpf(walk_speed_multiplier, 1.0, energy_ratio)
+
+
+func _update_run_exhaustion(wants_to_run: bool) -> void:
+	if not wants_to_run:
+		_run_exhausted = false
+		return
+	if _get_current_energy() <= minimum_run_energy:
+		_run_exhausted = true
+
+
+func _get_current_energy() -> float:
+	var stats: Node = _get_actor_stats()
+	if stats == null:
+		return INF
+
+	var current_energy: Variant = stats.get("current_energy")
+	if current_energy == null:
+		return INF
+	return float(current_energy)
+
+
+func _get_energy_ratio() -> float:
+	var stats: Node = _get_actor_stats()
+	if stats == null:
+		return 1.0
+
+	var current_energy: Variant = stats.get("current_energy")
+	if current_energy == null:
+		return 1.0
+
+	var max_energy := 0.0
+	if stats.has_method("get_max_energy"):
+		max_energy = float(stats.call("get_max_energy"))
+	else:
+		var base_max_energy: Variant = stats.get("base_max_energy")
+		if base_max_energy != null:
+			max_energy = float(base_max_energy)
+
+	if max_energy <= 0.0:
+		return 1.0
+	return clampf(float(current_energy) / max_energy, 0.0, 1.0)
+
+
+func _get_actor_stats() -> Node:
+	if actor == null or not actor.has_method("get_stats"):
+		return null
+	return actor.call("get_stats") as Node
 
 
 func _get_camera_global_yaw() -> float:

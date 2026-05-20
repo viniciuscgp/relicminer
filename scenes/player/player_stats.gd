@@ -32,6 +32,7 @@ signal message_requested(text: String)
 @export var hunger_damage_per_second := 1.0
 @export var energy_recovery_per_second := 18.0
 @export var moving_energy_cost_per_second := 0.0
+@export var running_energy_cost_per_second := 14.0
 @export var swimming_energy_cost_per_second := 8.0
 @export var drowning_damage_first_seconds := 5.0
 @export var drowning_damage_late_seconds := 10.0
@@ -60,9 +61,9 @@ func _ready() -> void:
 	_emit_all()
 
 
-func process_survival(delta: float, moving: bool, swimming: bool, underwater: bool) -> void:
+func process_survival(delta: float, moving: bool, swimming: bool, underwater: bool, running := false) -> void:
 	_update_hunger(delta, moving, swimming)
-	_update_energy(delta, moving, swimming)
+	_update_energy(delta, moving, swimming, running)
 	_update_oxygen(delta, underwater)
 	_emit_all()
 
@@ -120,6 +121,10 @@ func spend_energy(amount: float) -> bool:
 	energy_changed.emit(current_energy, get_max_energy())
 	changed.emit()
 	return true
+
+
+func has_energy(amount: float) -> bool:
+	return amount <= 0.0 or current_energy >= amount
 
 
 func get_max_hp() -> float:
@@ -209,8 +214,10 @@ func _update_hunger(delta: float, moving: bool, swimming: bool) -> void:
 		take_damage(hunger_damage_per_second * delta)
 
 
-func _update_energy(delta: float, moving: bool, swimming: bool) -> void:
+func _update_energy(delta: float, moving: bool, swimming: bool, running := false) -> void:
 	var cost := moving_energy_cost_per_second if moving else 0.0
+	if running:
+		cost += running_energy_cost_per_second
 	if swimming:
 		cost += swimming_energy_cost_per_second
 
