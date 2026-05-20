@@ -135,7 +135,7 @@ func _create_default_action(trigger: StringName) -> Resource:
 		if kind == Kind.WEAPON or kind == Kind.TOOL:
 			var slash := MeleeItemAction.new()
 			slash.display_name = "Slash"
-			slash.animation_name = &"slash"
+			slash.animation_name = _get_default_primary_animation()
 			return slash
 		if kind == Kind.FOOD or kind == Kind.POTION:
 			return ConsumeItemAction.new()
@@ -144,12 +144,41 @@ func _create_default_action(trigger: StringName) -> Resource:
 		var thrust := MeleeItemAction.new()
 		thrust.trigger = ItemAction.TRIGGER_SECONDARY
 		thrust.display_name = "Thrust"
-		thrust.animation_name = &"thrust"
+		thrust.animation_name = _get_default_secondary_animation()
 		thrust.range = 2.2
 		thrust.damage_multiplier = 1.15
 		return thrust
 
 	return null
+
+
+func _get_default_primary_animation() -> StringName:
+	if kind == Kind.TOOL:
+		var item_id := String(id).to_lower()
+		if item_id.contains("pickaxe"):
+			return &"mining"
+		if item_id.contains("axe"):
+			return &"chopping"
+		return &"picking"
+
+	if kind == Kind.WEAPON:
+		var item_id := String(id).to_lower()
+		if item_id.contains("staff"):
+			return &"staff_attack"
+		if item_id.contains("sword"):
+			return &"sword_attack"
+	return &"sword_attack"
+
+
+func _get_default_secondary_animation() -> StringName:
+	if kind == Kind.WEAPON:
+		var item_id := String(id).to_lower()
+		if item_id.contains("staff"):
+			return &"staff_attack"
+		return &"sword_slash_vertical"
+	if kind == Kind.TOOL:
+		return _get_default_primary_animation()
+	return &""
 
 
 func _get_localization_manager() -> Node:

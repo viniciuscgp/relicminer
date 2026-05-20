@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djlsw1k45y2na"
-path="res://.godot/imported/Player_Adventurer_torso_decal.png-2804ee9d6c11a53e2a78e58dda2e8569.ctex"
+uid="uid://c6a6u3r4ybudv"
+path="res://.godot/imported/plugin.png-3bc81f08a34cce385e9570f913edec5f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/player/source/Player_Adventurer_torso_decal.png"
-dest_files=["res://.godot/imported/Player_Adventurer_torso_decal.png-2804ee9d6c11a53e2a78e58dda2e8569.ctex"]
+source_file="res://addons/godot_ai/plugin.png"
+dest_files=["res://.godot/imported/plugin.png-3bc81f08a34cce385e9570f913edec5f.ctex"]
 
 [params]
 

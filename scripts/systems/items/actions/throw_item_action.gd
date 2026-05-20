@@ -25,4 +25,8 @@ func execute(actor: Node, equipment: Node, stack: Resource, slot: StringName, _h
 	if direction.length_squared() < 0.001:
 		return false
 	direction = direction.normalized()
+
+	if actor.has_method("play_action_animation"):
+		actor.call("play_action_animation", &"throwing")
+
 	return bool(equipment.call("throw_equipped_item", slot, throw_speed, upward_speed))

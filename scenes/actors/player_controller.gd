@@ -20,13 +20,17 @@ class_name PlayerController
 
 var _camera_pitch := 0.0
 var _target_camera_pitch := 0.0
+var _audio_manager: Node
 
 
 func _ready() -> void:
+	_audio_manager = get_node_or_null("/root/AudioManager")
+	if _audio_manager != null and _audio_manager.has_signal("settings_changed"):
+		_audio_manager.connect("settings_changed", _on_settings_changed)
 	if camera_pivot != null:
 		_camera_pitch = camera_pivot.rotation.x
 		_target_camera_pitch = _camera_pitch
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	_apply_mouse_capture_mode()
 
 
 func _process(delta: float) -> void:
@@ -66,7 +70,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 
-	if event is InputEventMouseButton and event.pressed:
+	if event is InputEventMouseButton and event.pressed and _should_capture_mouse():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
@@ -106,6 +110,12 @@ func _physics_process(delta: float) -> void:
 	actor.move_and_slide()
 	actor.push_rigid_body_collisions(direction)
 
+	if actor.has_method("set_locomotion_animation"):
+		var horizontal_speed := Vector2(actor.velocity.x, actor.velocity.z).length()
+		var is_moving: bool = horizontal_speed > 0.1 and actor.can_move()
+		var is_running: bool = is_moving and horizontal_speed >= speed * 0.75
+		actor.call("set_locomotion_animation", is_moving, is_running, not actor.is_on_floor(), _is_underwater())
+
 
 func _add_camera_pitch(amount: float) -> void:
 	if camera_pivot == null:
@@ -136,3 +146,23 @@ func _is_underwater() -> bool:
 	if underwater_environment == null or not underwater_environment.has_method("is_underwater"):
 		return false
 	return bool(underwater_environment.call("is_underwater"))
+
+
+func _on_settings_changed() -> void:
+	_apply_mouse_capture_mode()
+
+
+func _apply_mouse_capture_mode() -> void:
+	if _should_capture_mouse():
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _should_capture_mouse() -> bool:
+	if get_tree().paused:
+		return false
+	if _audio_manager != null and _audio_manager.has_method("get_settings"):
+		var settings: Dictionary = _audio_manager.call("get_settings")
+		return str(settings.get("input_mode", "keyboard")) != "joystick"
+	return true

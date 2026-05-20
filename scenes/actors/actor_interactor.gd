@@ -23,6 +23,7 @@ func interact() -> bool:
 
 	if target.has_method("try_pickup"):
 		target.call("try_pickup", _get_actor_inventory())
+		_play_interaction_animation(&"picking")
 		return true
 
 	if target.has_method("open"):
@@ -128,3 +129,8 @@ func _open_target_inventory(target: Node) -> void:
 		return
 
 	player_menus.call("open_inventory", target_inventory)
+
+
+func _play_interaction_animation(animation_name: StringName) -> void:
+	if actor != null and actor.has_method("play_action_animation"):
+		actor.call("play_action_animation", animation_name)

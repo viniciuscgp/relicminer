@@ -26,19 +26,37 @@ sky = SubResource("Sky_srg7c")
 ambient_light_source = 3
 ambient_light_color = Color(0.55, 0.55, 0.55, 1)
 ambient_light_sky_contribution = 0.3
-glow_enabled = true
-glow_intensity = 0.28
-glow_strength = 0.72
 tonemap_mode = 3
+tonemap_exposure = 1.08
+tonemap_white = 5.8
+glow_enabled = true
+glow_intensity = 0.38
+glow_strength = 0.88
+adjustment_enabled = true
+adjustment_contrast = 1.1
+adjustment_saturation = 1.04
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_0gcl0"]
 
 [node name="Environment" type="Node3D" unique_id=1678276354]
 script = ExtResource("1_controller")
-current_hour = 16.28
-water_materials = Array[Material]([ExtResource("9_water")])
+current_hour = 14.7
 weather_profiles = Array[Resource]([ExtResource("5_clear"), ExtResource("6_cloudy"), ExtResource("7_overcast"), ExtResource("8_rain")])
-night_ambient_energy = 0.095
+water_materials = Array[Material]([ExtResource("9_water")])
+night_ambient_energy = 0.15
+day_sun_energy = 1.9
+night_moon_energy = 0.18
+moon_visual_size = 144.0
+celestial_horizon_fade_height = 0.139
+hdr_black_point = 0.174
+hdr_shadow_power = 1.3900000000000001
+hdr_post_exposure = 1.23
+hdr_post_contrast = 0.78
+hdr_post_saturation = 0.73
+hdr_gamma = 0.78
+hdr_tint_strength = 0.29
+hdr_vignette_strength = 0.55
+hdr_vignette_radius = 0.39
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1587626605]
 environment = SubResource("Environment_8jcgm")
@@ -66,6 +84,16 @@ directional_shadow_max_distance = 48.0
 
 [node name="CloudLayer" type="MeshInstance3D" parent="." unique_id=2074919743]
 script = ExtResource("2_clouds")
+size = 2600.0
+height = 255.0
+cloud_cluster_count = 35
+puffs_per_cluster = 13
+min_puff_size = 46.0
+max_puff_size = 99.0
+cluster_spread = 103.0
+drift_speed_multiplier = 0.089
+slow_drift_variation = 0.473
+slow_drift_variation_speed = 0.054
 
 [node name="StarField" type="Node3D" parent="." unique_id=1289911612]
 script = ExtResource("3_stars")

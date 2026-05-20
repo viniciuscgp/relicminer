@@ -19,6 +19,7 @@ func _ready() -> void:
 	pause_menu.resume_requested.connect(close_all)
 	pause_menu.inventory_requested.connect(_open_inventory_from_pause)
 	pause_menu.settings_requested.connect(open_settings)
+	pause_menu.save_requested.connect(save_game)
 	pause_menu.abandon_requested.connect(abandon_game)
 	inventory_menu.close_requested.connect(_on_inventory_close_requested)
 	settings_menu.close_requested.connect(_on_settings_close_requested)
@@ -85,6 +86,12 @@ func abandon_game() -> void:
 	get_tree().change_scene_to_file(main_menu_scene_path)
 
 
+func save_game() -> void:
+	var save_manager := get_node_or_null("/root/SaveManager")
+	if save_manager != null and save_manager.has_method("save_current_game"):
+		save_manager.call("save_current_game")
+
+
 func _toggle_pause_menu() -> void:
 	if settings_menu.visible:
 		open_pause_menu()
@@ -126,9 +133,17 @@ func _on_settings_close_requested() -> void:
 
 
 func _set_ui_mode(enabled: bool) -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if enabled else Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if enabled or not _should_capture_mouse_after_ui() else Input.MOUSE_MODE_CAPTURED
 
 
 func _focus_menu(menu: Node) -> void:
 	if menu.has_method("focus_first"):
 		menu.call_deferred("focus_first")
+
+
+func _should_capture_mouse_after_ui() -> bool:
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager != null and audio_manager.has_method("get_settings"):
+		var settings: Dictionary = audio_manager.call("get_settings")
+		return str(settings.get("input_mode", "keyboard")) != "joystick"
+	return true

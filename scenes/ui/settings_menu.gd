@@ -149,6 +149,8 @@ func _set_input_mode(mode: String) -> void:
 	if not joystick:
 		vibration_button.button_pressed = false
 		_settings["vibration_enabled"] = false
+	if _audio_manager != null and _audio_manager.has_method("set_input_mode"):
+		_audio_manager.call("set_input_mode", mode, false)
 
 
 func _set_vibration_enabled(enabled: bool) -> void:

@@ -59,28 +59,82 @@ signal weather_changed(weather_id: StringName)
 @export var day_ambient_color := Color(0.62, 0.68, 0.76, 1.0)
 
 @export_group("Celestial Visuals")
-## Distancia visual do sol e da lua em relacao a camera. Nao afeta a luz, apenas onde os discos aparecem no ceu.
-@export_range(50.0, 2000.0, 1.0) var celestial_visual_distance := 420.0
+## Distancia visual do sol e da lua em relacao a camera. Deve ficar alem das montanhas para nao parecer um objeto proximo.
+@export_range(50.0, 5000.0, 1.0) var celestial_visual_distance := 3200.0
 ## Tamanho visual do disco do sol no ceu.
-@export_range(1.0, 120.0, 0.5) var sun_visual_size := 18.0
+@export_range(1.0, 300.0, 0.5) var sun_visual_size := 137.0
 ## Tamanho visual do disco da lua no ceu.
-@export_range(1.0, 120.0, 0.5) var moon_visual_size := 13.0
+@export_range(1.0, 300.0, 0.5) var moon_visual_size := 99.0
+## Altura minima acima do horizonte para o sol/lua aparecerem totalmente. Evita o astro atravessar montanhas no nascer/por do sol.
+@export_range(0.0, 0.5, 0.001) var celestial_horizon_fade_height := 0.095
 ## Cor emissiva do disco do sol. Use tons amarelados para evitar um sol branco/frio.
 @export var sun_visual_color := Color(1.0, 0.76, 0.32, 1.0)
 ## Cor emissiva do disco da lua.
-@export var moon_visual_color := Color(0.72, 0.82, 1.0, 1.0)
+@export var moon_visual_color := Color(0.45, 0.56, 0.82, 0.82)
 ## Intensidade emissiva do sol visual. Valores maiores alimentam o glow/bloom do Environment.
 @export_range(0.0, 20.0, 0.1) var sun_emission_energy := 7.0
 ## Intensidade emissiva da lua visual. Deve ser menor que o sol para nao clarear demais a noite.
-@export_range(0.0, 20.0, 0.1) var moon_emission_energy := 1.7
+@export_range(0.0, 20.0, 0.1) var moon_emission_energy := 0.75
+## Tamanho do brilho suave ao redor do sol. Maior cria o halo claro visto em ceus HDR.
+@export_range(1.0, 1200.0, 1.0) var sun_halo_size := 520.0
+## Forca do halo do sol. Afeta o brilho suave mesmo quando a camera nao olha direto para ele.
+@export_range(0.0, 6.0, 0.01) var sun_halo_intensity := 1.25
+## Tamanho do flare frontal do sol quando a camera olha perto dele.
+@export_range(1.0, 1600.0, 1.0) var sun_flare_size := 820.0
+## Forca do flare frontal do sol. Aumente se quiser mais estouro de luz.
+@export_range(0.0, 8.0, 0.01) var sun_flare_intensity := 2.7
+## Quanto a camera precisa apontar para o sol antes do flare aparecer. Maior deixa o flare mais raro.
+@export_range(0.0, 1.0, 0.01) var sun_flare_alignment_start := 0.58
 
 @export_group("Glow")
 ## Ativa bloom/glow no WorldEnvironment para o sol e outros materiais emissivos brilharem.
 @export var glow_enabled := true
 ## Intensidade base do glow. Aumente se o sol ainda parecer sem brilho.
-@export_range(0.0, 2.0, 0.01) var glow_intensity := 0.28
+@export_range(0.0, 2.0, 0.01) var glow_intensity := 0.38
 ## Alcance/forca visual do glow. Aumente para halos maiores.
-@export_range(0.0, 2.0, 0.01) var glow_strength := 0.72
+@export_range(0.0, 2.0, 0.01) var glow_strength := 0.88
+
+@export_group("Color Grading")
+## Exposicao do tonemapper. Valores maiores clareiam altas luzes e alimentam o aspecto HDR.
+@export_range(0.1, 4.0, 0.01) var tonemap_exposure := 1.08
+## Branco maximo do tonemapper. Valores maiores preservam detalhes em areas muito claras.
+@export_range(0.1, 16.0, 0.1) var tonemap_white := 5.8
+## Ativa ajuste final de cor/contraste do WorldEnvironment.
+@export var adjustment_enabled := true
+## Brilho final da imagem. Normalmente fica perto de 1.
+@export_range(0.0, 2.0, 0.01) var adjustment_brightness := 1.0
+## Contraste final. Aumentar cria pretos mais presentes, como o HDR de referencia.
+@export_range(0.0, 2.0, 0.01) var adjustment_contrast := 1.1
+## Saturacao final. Aumente pouco para nao deixar o mundo artificial.
+@export_range(0.0, 2.0, 0.01) var adjustment_saturation := 1.04
+
+@export_group("HDR Look")
+## Ativa uma camada de pos-processamento sobre o 3D, abaixo do HUD, para controlar pretos e cor.
+@export var hdr_post_process_enabled := true
+## Camada do pos-processamento. Deve ficar acima do mundo 3D e abaixo do HUD.
+@export_range(-10, 20, 1) var hdr_post_process_layer := 1
+## Ponto de preto. Aumente para deixar sombras e areas escuras mais pretas sem apagar luzes fortes.
+@export_range(0.0, 0.35, 0.001) var hdr_black_point := 0.08
+## Potencia das sombras. Valores acima de 1 escurecem medios tons e sombras.
+@export_range(0.25, 3.0, 0.01) var hdr_shadow_power := 1.24
+## Exposicao visual depois do render. Aumente para recuperar luz se o preto ficar pesado demais.
+@export_range(0.25, 3.0, 0.01) var hdr_post_exposure := 1.08
+## Contraste do pos-processamento. Trabalha junto com o ponto de preto.
+@export_range(0.0, 3.0, 0.01) var hdr_post_contrast := 1.22
+## Saturacao do pos-processamento. Controla a potencia geral da cor.
+@export_range(0.0, 3.0, 0.01) var hdr_post_saturation := 1.14
+## Gamma final. Acima de 1 clareia medios tons; abaixo de 1 escurece.
+@export_range(0.2, 3.0, 0.01) var hdr_gamma := 1.0
+## Potencia por canal. Valores abaixo de 1 intensificam o canal; acima de 1 seguram o canal.
+@export var hdr_color_power := Color(1.0, 1.0, 1.0, 1.0)
+## Cor multiplicativa opcional para dar direcao artistica ao mundo.
+@export var hdr_tint_color := Color(1.0, 0.96, 0.9, 1.0)
+## Forca da cor multiplicativa. 0 desliga, 1 aplica totalmente.
+@export_range(0.0, 1.0, 0.01) var hdr_tint_strength := 0.08
+## Escurecimento nas bordas da tela. Ajuda a dar leitura de lente/camera.
+@export_range(0.0, 1.0, 0.01) var hdr_vignette_strength := 0.18
+## Raio da vinheta. Maior deixa a vinheta mais perto da borda.
+@export_range(0.1, 1.4, 0.01) var hdr_vignette_radius := 0.78
 
 @export_group("Shadow Quality")
 ## Distancia maxima das sombras do sol. Valores menores deixam a sombra menos serrilhada perto do player.
@@ -102,8 +156,15 @@ var _star_field: Node
 var _rain_controller: Node
 var _sun_visual: MeshInstance3D
 var _moon_visual: MeshInstance3D
+var _sun_halo: MeshInstance3D
+var _sun_flare: MeshInstance3D
 var _sun_visual_material: StandardMaterial3D
 var _moon_visual_material: StandardMaterial3D
+var _sun_halo_material: ShaderMaterial
+var _sun_flare_material: ShaderMaterial
+var _hdr_post_layer: CanvasLayer
+var _hdr_post_rect: ColorRect
+var _hdr_post_material: ShaderMaterial
 var _runtime_environment: Environment
 var _sky_material: ProceduralSkyMaterial
 var _source_weather: Resource
@@ -119,6 +180,7 @@ func _ready() -> void:
 	_resolve_nodes()
 	_refresh_runtime_environment()
 	_ensure_celestial_visuals()
+	_ensure_hdr_post_process()
 	_configure_shadow_quality()
 	_target_weather = _find_weather(initial_weather_id)
 	if _target_weather == null:
@@ -138,6 +200,7 @@ func _process(delta: float) -> void:
 
 	_update_weather(delta_hours)
 	_apply_environment(delta)
+	_resize_hdr_post_rect()
 	_emit_hour_if_needed()
 
 
@@ -165,6 +228,42 @@ func get_current_weather_id() -> StringName:
 	if weather == null:
 		return &""
 	return weather.get("id")
+
+
+func get_environment_save_data() -> Dictionary:
+	return {
+		"current_hour": current_hour,
+		"source_weather_id": str(_source_weather.get("id")) if _source_weather != null else "",
+		"target_weather_id": str(_target_weather.get("id")) if _target_weather != null else "",
+		"weather_blend": _weather_blend,
+		"weather_timer_hours": _weather_timer_hours,
+	}
+
+
+func apply_environment_save_data(data: Dictionary) -> void:
+	if data.has("current_hour"):
+		current_hour = fposmod(float(data.get("current_hour", current_hour)), 24.0)
+
+	var target_weather_id := StringName(str(data.get("target_weather_id", data.get("weather_id", initial_weather_id))))
+	var source_weather_id := StringName(str(data.get("source_weather_id", target_weather_id)))
+	_target_weather = _find_weather(target_weather_id)
+	if _target_weather == null:
+		_target_weather = _get_fallback_weather()
+
+	_source_weather = _find_weather(source_weather_id)
+	if _source_weather == null:
+		_source_weather = _target_weather
+
+	_weather_blend = clampf(float(data.get("weather_blend", 1.0)), 0.0, 1.0)
+	if is_equal_approx(_weather_blend, 1.0):
+		_source_weather = _target_weather
+	_weather_timer_hours = maxf(float(data.get("weather_timer_hours", _weather_timer_hours)), 0.0)
+	if is_zero_approx(_weather_timer_hours):
+		_schedule_next_weather()
+
+	_apply_environment(0.0)
+	_emit_hour_if_needed()
+	weather_changed.emit(get_current_weather_id())
 
 
 func _resolve_nodes() -> void:
@@ -242,6 +341,7 @@ func _apply_environment(delta: float) -> void:
 		return
 
 	_configure_glow()
+	_configure_hdr_post_process()
 	var sun_elevation := sin((current_hour / 24.0) * TAU - PI * 0.5)
 	var day_factor := smoothstep(-0.08, 0.24, sun_elevation)
 	var night_factor := 1.0 - smoothstep(-0.18, 0.05, sun_elevation)
@@ -370,8 +470,14 @@ func _ensure_celestial_visuals() -> void:
 		_sun_visual = _create_celestial_visual("SunVisual", sun_visual_size, sun_visual_color)
 	if _moon_visual == null:
 		_moon_visual = _create_celestial_visual("MoonVisual", moon_visual_size, moon_visual_color)
+	if _sun_halo == null:
+		_sun_halo = _create_sun_effect_visual("SunHalo", sun_halo_size, Color(1.0, 0.76, 0.32, 0.72), 2.8)
+	if _sun_flare == null:
+		_sun_flare = _create_sun_effect_visual("SunFlare", sun_flare_size, Color(1.0, 0.88, 0.54, 0.82), 4.4)
 	_sun_visual_material = _sun_visual.get_active_material(0) as StandardMaterial3D
 	_moon_visual_material = _moon_visual.get_active_material(0) as StandardMaterial3D
+	_sun_halo_material = _sun_halo.get_active_material(0) as ShaderMaterial
+	_sun_flare_material = _sun_flare.get_active_material(0) as ShaderMaterial
 
 
 func _create_celestial_visual(node_name: String, size: float, color: Color) -> MeshInstance3D:
@@ -379,7 +485,10 @@ func _create_celestial_visual(node_name: String, size: float, color: Color) -> M
 	if visual == null:
 		visual = MeshInstance3D.new()
 		visual.name = node_name
+		visual.visible = false
 		add_child(visual)
+	else:
+		visual.visible = false
 
 	var mesh := SphereMesh.new()
 	mesh.radius = size * 0.5
@@ -393,10 +502,57 @@ func _create_celestial_visual(node_name: String, size: float, color: Color) -> M
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.no_depth_test = false
-	material.albedo_color = color
+	var hidden_color := color
+	hidden_color.a = 0.0
+	material.albedo_color = hidden_color
 	material.emission_enabled = true
 	material.emission = color
-	material.emission_energy_multiplier = sun_emission_energy if node_name == "SunVisual" else moon_emission_energy
+	material.emission_energy_multiplier = 0.0
+	visual.material_override = material
+	return visual
+
+
+func _create_sun_effect_visual(node_name: String, size: float, color: Color, falloff_power: float) -> MeshInstance3D:
+	var visual := get_node_or_null(node_name) as MeshInstance3D
+	if visual == null:
+		visual = MeshInstance3D.new()
+		visual.name = node_name
+		visual.visible = false
+		add_child(visual)
+	else:
+		visual.visible = false
+
+	var mesh := QuadMesh.new()
+	mesh.size = Vector2.ONE
+	visual.mesh = mesh
+	visual.scale = Vector3(size, size, 1.0)
+	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode unshaded, cull_disabled, depth_draw_never, depth_test_disabled, blend_add;
+
+uniform vec4 effect_color : source_color = vec4(1.0);
+uniform float intensity = 0.0;
+uniform float falloff_power = 3.0;
+
+void fragment() {
+	vec2 centered = UV * 2.0 - vec2(1.0);
+	float distance_from_center = length(centered);
+	float radial = pow(max(0.0, 1.0 - distance_from_center), falloff_power);
+	float core = pow(max(0.0, 1.0 - distance_from_center * 2.2), 1.4);
+	float alpha = (radial + core * 0.35) * intensity * effect_color.a;
+	ALBEDO = effect_color.rgb;
+	EMISSION = effect_color.rgb * intensity * 2.2;
+	ALPHA = alpha;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("effect_color", color)
+	material.set_shader_parameter("intensity", 0.0)
+	material.set_shader_parameter("falloff_power", falloff_power)
 	visual.material_override = material
 	return visual
 
@@ -407,11 +563,12 @@ func _update_celestial_visuals(day_factor: float, night_factor: float, cloud_cov
 		return
 
 	var weather_visibility := clampf(1.0 - cloud_coverage * 0.65 - rain_intensity * 0.9, 0.0, 1.0)
-	_update_single_celestial_visual(_sun_visual, _sun_visual_material, _sun_light, day_factor * weather_visibility, sun_visual_color, sun_emission_energy)
-	_update_single_celestial_visual(_moon_visual, _moon_visual_material, _moon_light, night_factor * weather_visibility, moon_visual_color, moon_emission_energy)
+	_update_single_celestial_visual(_sun_visual, _sun_visual_material, _sun_light, day_factor * weather_visibility, sun_visual_color, sun_emission_energy, sun_visual_size)
+	_update_single_celestial_visual(_moon_visual, _moon_visual_material, _moon_light, night_factor * weather_visibility, moon_visual_color, moon_emission_energy, moon_visual_size)
+	_update_sun_effects(camera, day_factor * weather_visibility)
 
 
-func _update_single_celestial_visual(visual: MeshInstance3D, material: StandardMaterial3D, light: DirectionalLight3D, visibility: float, color: Color, emission_energy: float) -> void:
+func _update_single_celestial_visual(visual: MeshInstance3D, material: StandardMaterial3D, light: DirectionalLight3D, visibility: float, color: Color, emission_energy: float, visual_size: float) -> void:
 	if visual == null or light == null:
 		return
 
@@ -419,15 +576,141 @@ func _update_single_celestial_visual(visual: MeshInstance3D, material: StandardM
 	if camera == null:
 		return
 
-	var alpha := clampf(visibility, 0.0, 1.0)
-	visual.visible = alpha > 0.01
-	visual.global_position = camera.global_position + _get_light_sky_direction(light) * celestial_visual_distance
+	var sky_direction := _get_light_sky_direction(light)
+	var horizon_visibility := smoothstep(0.0, celestial_horizon_fade_height, sky_direction.y)
+	var alpha := clampf(visibility * horizon_visibility, 0.0, 1.0)
 	if material != null:
 		var visible_color := color
 		visible_color.a = alpha
 		material.albedo_color = visible_color
 		material.emission = color
 		material.emission_energy_multiplier = emission_energy * alpha
+	visual.visible = alpha > 0.01
+	visual.global_position = camera.global_position + sky_direction * celestial_visual_distance
+	visual.scale = Vector3.ONE * (visual_size / maxf(visual.get_aabb().size.y, 0.001))
+
+
+func _update_sun_effects(camera: Camera3D, visibility: float) -> void:
+	if _sun_light == null:
+		return
+
+	var sky_direction := _get_light_sky_direction(_sun_light)
+	var horizon_visibility := smoothstep(0.0, celestial_horizon_fade_height, sky_direction.y)
+	var alpha := clampf(visibility * horizon_visibility, 0.0, 1.0)
+	var camera_forward := -camera.global_transform.basis.z.normalized()
+	var alignment := clampf(camera_forward.dot(sky_direction), 0.0, 1.0)
+	var flare_visibility := alpha * smoothstep(sun_flare_alignment_start, 0.98, alignment)
+	_update_sun_effect_visual(_sun_halo, _sun_halo_material, camera, sky_direction, sun_halo_size, alpha * sun_halo_intensity)
+	_update_sun_effect_visual(_sun_flare, _sun_flare_material, camera, sky_direction, sun_flare_size, flare_visibility * sun_flare_intensity)
+
+
+func _update_sun_effect_visual(visual: MeshInstance3D, material: ShaderMaterial, camera: Camera3D, sky_direction: Vector3, visual_size: float, intensity: float) -> void:
+	if visual == null:
+		return
+
+	var clamped_intensity := clampf(intensity, 0.0, 8.0)
+	if material != null:
+		material.set_shader_parameter("intensity", clamped_intensity)
+	visual.visible = clamped_intensity > 0.01
+	visual.global_position = camera.global_position + sky_direction * (celestial_visual_distance * 0.96)
+	visual.global_transform.basis = camera.global_transform.basis
+	visual.scale = Vector3(visual_size, visual_size, 1.0)
+
+
+func _ensure_hdr_post_process() -> void:
+	_hdr_post_layer = get_node_or_null("HDRPostProcess") as CanvasLayer
+	if _hdr_post_layer == null:
+		_hdr_post_layer = CanvasLayer.new()
+		_hdr_post_layer.name = "HDRPostProcess"
+		add_child(_hdr_post_layer)
+
+	_hdr_post_rect = _hdr_post_layer.get_node_or_null("Grade") as ColorRect
+	if _hdr_post_rect == null:
+		_hdr_post_rect = ColorRect.new()
+		_hdr_post_rect.name = "Grade"
+		_hdr_post_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_hdr_post_layer.add_child(_hdr_post_rect)
+	_hdr_post_rect.color = Color.WHITE
+	_resize_hdr_post_rect()
+
+	if _hdr_post_material == null:
+		var shader := Shader.new()
+		shader.code = """
+shader_type canvas_item;
+
+uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
+uniform float black_point = 0.08;
+uniform float shadow_power = 1.24;
+uniform float post_exposure = 1.08;
+uniform float post_contrast = 1.22;
+uniform float post_saturation = 1.14;
+uniform float grade_gamma = 1.0;
+uniform vec3 color_power = vec3(1.0);
+uniform vec4 tint_color : source_color = vec4(1.0, 0.96, 0.9, 1.0);
+uniform float tint_strength = 0.08;
+uniform float vignette_strength = 0.18;
+uniform float vignette_radius = 0.78;
+
+void fragment() {
+	vec3 color = texture(screen_texture, SCREEN_UV).rgb;
+	color *= post_exposure;
+
+	float black_range = max(0.001, 1.0 - black_point);
+	color = max((color - vec3(black_point)) / black_range, vec3(0.0));
+	color = pow(color, vec3(shadow_power));
+
+	color = (color - vec3(0.5)) * post_contrast + vec3(0.5);
+	float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	color = mix(vec3(luma), color, post_saturation);
+
+	color = pow(max(color, vec3(0.0)), max(color_power, vec3(0.001)));
+	color = mix(color, color * tint_color.rgb, tint_strength);
+	color = pow(max(color, vec3(0.0)), vec3(1.0 / max(grade_gamma, 0.001)));
+
+	float edge = smoothstep(vignette_radius, 0.98, distance(UV, vec2(0.5)));
+	color *= 1.0 - edge * vignette_strength;
+	COLOR = vec4(max(color, vec3(0.0)), 1.0);
+}
+"""
+		_hdr_post_material = ShaderMaterial.new()
+		_hdr_post_material.shader = shader
+		_hdr_post_rect.material = _hdr_post_material
+	else:
+		_hdr_post_rect.material = _hdr_post_material
+
+	_configure_hdr_post_process()
+
+
+func _configure_hdr_post_process() -> void:
+	if _hdr_post_layer == null or _hdr_post_rect == null:
+		return
+
+	_hdr_post_layer.layer = hdr_post_process_layer
+	_hdr_post_rect.visible = hdr_post_process_enabled
+	_resize_hdr_post_rect()
+	if _hdr_post_material == null:
+		return
+
+	_hdr_post_material.set_shader_parameter("black_point", hdr_black_point)
+	_hdr_post_material.set_shader_parameter("shadow_power", hdr_shadow_power)
+	_hdr_post_material.set_shader_parameter("post_exposure", hdr_post_exposure)
+	_hdr_post_material.set_shader_parameter("post_contrast", hdr_post_contrast)
+	_hdr_post_material.set_shader_parameter("post_saturation", hdr_post_saturation)
+	_hdr_post_material.set_shader_parameter("grade_gamma", hdr_gamma)
+	_hdr_post_material.set_shader_parameter("color_power", Vector3(hdr_color_power.r, hdr_color_power.g, hdr_color_power.b))
+	_hdr_post_material.set_shader_parameter("tint_color", hdr_tint_color)
+	_hdr_post_material.set_shader_parameter("tint_strength", hdr_tint_strength)
+	_hdr_post_material.set_shader_parameter("vignette_strength", hdr_vignette_strength)
+	_hdr_post_material.set_shader_parameter("vignette_radius", hdr_vignette_radius)
+
+
+func _resize_hdr_post_rect() -> void:
+	if _hdr_post_rect == null:
+		return
+
+	_hdr_post_rect.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_hdr_post_rect.position = Vector2.ZERO
+	_hdr_post_rect.size = get_viewport().get_visible_rect().size
 
 
 func _get_light_sky_direction(light: DirectionalLight3D) -> Vector3:
@@ -446,6 +729,12 @@ func _configure_glow() -> void:
 	_runtime_environment.glow_enabled = glow_enabled
 	_runtime_environment.glow_intensity = glow_intensity
 	_runtime_environment.glow_strength = glow_strength
+	_runtime_environment.tonemap_exposure = tonemap_exposure
+	_runtime_environment.tonemap_white = tonemap_white
+	_runtime_environment.adjustment_enabled = adjustment_enabled
+	_runtime_environment.adjustment_brightness = adjustment_brightness
+	_runtime_environment.adjustment_contrast = adjustment_contrast
+	_runtime_environment.adjustment_saturation = adjustment_saturation
 
 
 func _configure_directional_shadow(light: DirectionalLight3D, distance: float) -> void:

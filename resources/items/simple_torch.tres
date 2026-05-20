@@ -1,6 +1,6 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://bnbnviohfioq4"]
 
-[ext_resource type="Script" path="res://scripts/systems/items/item_definition.gd" id="1"]
+[ext_resource type="Script" uid="uid://hr1tcr8p82nh" path="res://scripts/systems/items/item_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/items/world/simple_torch_world.tscn" id="2"]
 
 [resource]
@@ -14,4 +14,6 @@ weight_kg = 0.5
 stack_limit = 4
 buy_price = 5
 sell_price = 1
+held_position = Vector3(0, 0.32, -0.16)
+held_rotation_degrees = Vector3(0, 0, -8)
 durability_max = 180.0

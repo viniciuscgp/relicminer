@@ -109,6 +109,13 @@ func apply_settings(settings: Dictionary, save := true) -> void:
 		save_settings()
 
 
+func set_input_mode(mode: String, save := false) -> void:
+	input_mode = mode
+	_apply_to_audio_server()
+	if save:
+		save_settings()
+
+
 func get_settings() -> Dictionary:
 	return {
 		"master_volume": master_volume,

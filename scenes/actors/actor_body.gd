@@ -8,6 +8,7 @@ class_name ActorBody
 @export var interactor_path: NodePath = NodePath("Interactor")
 @export var rigid_body_pusher_path: NodePath = NodePath("RigidBodyPusher")
 @export var equipment_path: NodePath = NodePath("Equipment")
+@export var animation_controller_path: NodePath = NodePath("AnimationController")
 
 @onready var inventory: Node = get_node_or_null(inventory_path)
 @onready var stats: Node = get_node_or_null(stats_path)
@@ -16,6 +17,7 @@ class_name ActorBody
 @onready var interactor: Node = get_node_or_null(interactor_path)
 @onready var rigid_body_pusher: Node = get_node_or_null(rigid_body_pusher_path)
 @onready var equipment: Node = get_node_or_null(equipment_path)
+@onready var animation_controller: Node = get_node_or_null(animation_controller_path)
 
 
 func get_inventory() -> Node:
@@ -38,6 +40,10 @@ func get_equipment() -> Node:
 	return equipment
 
 
+func get_animation_controller() -> Node:
+	return animation_controller
+
+
 func can_move() -> bool:
 	return stats == null or not stats.has_method("is_over_absolute_weight") or not bool(stats.call("is_over_absolute_weight"))
 
@@ -51,6 +57,18 @@ func get_movement_speed_multiplier() -> float:
 func process_survival(delta: float, moving: bool, swimming: bool, underwater: bool) -> void:
 	if stats != null and stats.has_method("process_survival"):
 		stats.call("process_survival", delta, moving, swimming, underwater)
+
+
+func play_action_animation(animation_name: StringName) -> bool:
+	if animation_controller == null or not animation_controller.has_method("play_action_animation"):
+		return false
+	return bool(animation_controller.call("play_action_animation", animation_name))
+
+
+func set_locomotion_animation(moving: bool, running: bool, jumping: bool, swimming: bool) -> void:
+	if animation_controller == null or not animation_controller.has_method("set_locomotion_state"):
+		return
+	animation_controller.call("set_locomotion_state", moving, running, jumping, swimming)
 
 
 func interact() -> bool:

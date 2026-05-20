@@ -17,6 +17,12 @@ signal action_executed(slot: StringName, trigger: StringName, action: Resource)
 @export var inventory_dropper_path: NodePath = NodePath("../InventoryDropper")
 @export var right_hand_socket_path: NodePath = NodePath("../EquipmentSockets/RightHandSocket")
 @export var left_hand_socket_path: NodePath = NodePath("../EquipmentSockets/LeftHandSocket")
+@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+@export var right_hand_bone_name: StringName = &"R_Hand"
+@export var right_hand_bone_socket_name := "RightHandBoneSocket"
+@export var left_hand_bone_name: StringName = &"L_Hand"
+@export var left_hand_bone_socket_name := "LeftHandBoneSocket"
+@export var compensate_socket_scale := true
 @export var aim_source_path: NodePath
 
 @onready var actor: Node = get_node_or_null(actor_path)
@@ -24,6 +30,7 @@ signal action_executed(slot: StringName, trigger: StringName, action: Resource)
 @onready var inventory_dropper: Node = get_node_or_null(inventory_dropper_path)
 @onready var right_hand_socket: Node3D = get_node_or_null(right_hand_socket_path) as Node3D
 @onready var left_hand_socket: Node3D = get_node_or_null(left_hand_socket_path) as Node3D
+@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D
 @onready var aim_source: Node3D = get_node_or_null(aim_source_path) as Node3D
 
 var _equipped_stacks := {
@@ -37,6 +44,10 @@ var _held_instances := {
 
 
 func _ready() -> void:
+	if skeleton == null and actor != null:
+		skeleton = _find_skeleton(actor)
+	right_hand_socket = _get_or_create_bone_socket(right_hand_socket, right_hand_bone_name, right_hand_bone_socket_name)
+	left_hand_socket = _get_or_create_bone_socket(left_hand_socket, left_hand_bone_name, left_hand_bone_socket_name)
 	if inventory != null and inventory.has_signal("changed"):
 		inventory.connect("changed", _validate_equipped_stacks)
 
@@ -198,6 +209,38 @@ func _get_socket(slot: StringName) -> Node3D:
 	return right_hand_socket
 
 
+func _get_or_create_bone_socket(fallback_socket: Node3D, bone_name: StringName, socket_name: String) -> Node3D:
+	if skeleton == null or bone_name == &"":
+		return fallback_socket
+
+	var bone_index := skeleton.find_bone(String(bone_name))
+	if bone_index == -1:
+		push_warning("Could not attach equipment to missing bone '%s'." % bone_name)
+		return fallback_socket
+
+	for child in skeleton.get_children():
+		var attachment := child as BoneAttachment3D
+		if attachment != null and StringName(attachment.bone_name) == bone_name:
+			return attachment
+
+	var socket := BoneAttachment3D.new()
+	socket.name = socket_name
+	socket.bone_name = String(bone_name)
+	skeleton.add_child(socket)
+	return socket
+
+
+func _find_skeleton(node: Node) -> Skeleton3D:
+	if node is Skeleton3D:
+		return node as Skeleton3D
+
+	for child in node.get_children():
+		var found := _find_skeleton(child)
+		if found != null:
+			return found
+	return null
+
+
 func _create_held_instance(slot: StringName, stack: Resource) -> void:
 	var socket := _get_socket(slot)
 	if socket == null:
@@ -213,7 +256,7 @@ func _create_held_instance(slot: StringName, stack: Resource) -> void:
 
 	socket.add_child(held)
 	_prepare_held_node(held)
-	_apply_held_transform(held, item)
+	_apply_held_transform(held, item, socket)
 	_set_held_light_enabled(held, true)
 	_held_instances[slot] = held
 
@@ -242,10 +285,35 @@ func _prepare_held_node(node: Node) -> void:
 		_prepare_held_node(child)
 
 
-func _apply_held_transform(held: Node3D, item: Resource) -> void:
-	held.position = item.get("held_position")
+func _apply_held_transform(held: Node3D, item: Resource, socket: Node3D) -> void:
+	var held_position: Vector3 = item.get("held_position")
+	var held_scale: Vector3 = item.get("held_scale")
+	if compensate_socket_scale:
+		var socket_scale := _get_safe_socket_scale(socket)
+		held_position = _divide_vector3(held_position, socket_scale)
+		held_scale = _divide_vector3(held_scale, socket_scale)
+
+	held.position = held_position
 	held.rotation_degrees = item.get("held_rotation_degrees")
-	held.scale = item.get("held_scale")
+	held.scale = held_scale
+
+
+func _get_safe_socket_scale(socket: Node3D) -> Vector3:
+	if socket == null:
+		return Vector3.ONE
+
+	var socket_scale := socket.global_transform.basis.get_scale().abs()
+	if is_zero_approx(socket_scale.x):
+		socket_scale.x = 1.0
+	if is_zero_approx(socket_scale.y):
+		socket_scale.y = 1.0
+	if is_zero_approx(socket_scale.z):
+		socket_scale.z = 1.0
+	return socket_scale
+
+
+func _divide_vector3(value: Vector3, divisor: Vector3) -> Vector3:
+	return Vector3(value.x / divisor.x, value.y / divisor.y, value.z / divisor.z)
 
 
 func _clear_held_instance(slot: StringName) -> void:

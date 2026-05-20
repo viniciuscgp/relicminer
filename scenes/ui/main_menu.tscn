@@ -1,9 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://b3gbqm123q72e"]
 
-[ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/background_5.jpg" id="2"]
-[ext_resource type="Texture2D" path="res://assets/logo.png" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="4"]
+[ext_resource type="Script" uid="uid://dro7fq32tp8kq" path="res://scenes/ui/main_menu.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cuirhw6v7d40d" path="res://assets/background_5.jpg" id="2"]
+[ext_resource type="Texture2D" uid="uid://cd7nyws528uag" path="res://assets/logo.png" id="3"]
+[ext_resource type="PackedScene" uid="uid://bkgrgihwnmvl8" path="res://scenes/ui/settings_menu.tscn" id="4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1kxf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.025, 0.023, 0.018, 0.86)
@@ -29,7 +31,7 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1889753528]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,7 +40,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=806602377]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -50,7 +52,7 @@ texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Shade" type="ColorRect" parent="."]
+[node name="Shade" type="ColorRect" parent="." unique_id=337709995]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -60,7 +62,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.34)
 
-[node name="Content" type="MarginContainer" parent="."]
+[node name="Content" type="MarginContainer" parent="." unique_id=1427311042]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -72,87 +74,97 @@ theme_override_constants/margin_top = 54
 theme_override_constants/margin_right = 72
 theme_override_constants/margin_bottom = 54
 
-[node name="Layout" type="VBoxContainer" parent="Content"]
+[node name="Layout" type="VBoxContainer" parent="Content" unique_id=1501111807]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 16
 
-[node name="TitleRow" type="HBoxContainer" parent="Content/Layout"]
+[node name="TitleRow" type="HBoxContainer" parent="Content/Layout" unique_id=1693529529]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Logo" type="TextureRect" parent="Content/Layout/TitleRow"]
-custom_minimum_size = Vector2(520, 150)
+[node name="Logo" type="TextureRect" parent="Content/Layout/TitleRow" unique_id=2112701895]
+custom_minimum_size = Vector2(500, 300)
 layout_mode = 2
+size_flags_horizontal = 2
 mouse_filter = 2
 texture = ExtResource("3")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MenuPanel" type="PanelContainer" parent="Content/Layout"]
+[node name="MenuRow" type="HBoxContainer" parent="Content/Layout" unique_id=1237611031]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="VSeparator" type="VSeparator" parent="Content/Layout/MenuRow" unique_id=261168046]
+layout_mode = 2
+theme_override_constants/separation = 69
+theme_override_styles/separator = SubResource("StyleBoxEmpty_m1kxf")
+
+[node name="MenuPanel" type="PanelContainer" parent="Content/Layout/MenuRow" unique_id=980844820]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="PanelMargin" type="MarginContainer" parent="Content/Layout/MenuPanel"]
+[node name="PanelMargin" type="MarginContainer" parent="Content/Layout/MenuRow/MenuPanel" unique_id=412359574]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 22
 
-[node name="Buttons" type="VBoxContainer" parent="Content/Layout/MenuPanel/PanelMargin"]
+[node name="Buttons" type="VBoxContainer" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin" unique_id=1779235682]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ContinueButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="ContinueButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=1170327062]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Continue"
 
-[node name="NewGameButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="NewGameButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=270964684]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "New Game"
 
-[node name="LoadButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="LoadButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=945013906]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Load Game"
 
-[node name="OptionsButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="OptionsButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=573786672]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Options"
 
-[node name="CreditsButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="CreditsButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=451157440]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Credits"
 
-[node name="QuitButton" type="Button" parent="Content/Layout/MenuPanel/PanelMargin/Buttons"]
+[node name="QuitButton" type="Button" parent="Content/Layout/MenuRow/MenuPanel/PanelMargin/Buttons" unique_id=2014792410]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Quit"
 
-[node name="Footer" type="Label" parent="Content/Layout"]
+[node name="Footer" type="Label" parent="Content/Layout" unique_id=414767901]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 text = "Relic Miner  Version 1.0.0"
 
-[node name="SettingsMenu" parent="." instance=ExtResource("4")]
+[node name="SettingsMenu" parent="." unique_id=968535290 instance=ExtResource("4")]
 unique_name_in_owner = true
 visible = false

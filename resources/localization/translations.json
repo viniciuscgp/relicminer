@@ -29,6 +29,7 @@
 	"ui.pause.resume": {"en": "Resume", "pt": "Continuar"},
 	"ui.pause.inventory": {"en": "Inventory", "pt": "Inventario"},
 	"ui.pause.settings": {"en": "Settings", "pt": "Configuracoes"},
+	"ui.pause.save": {"en": "Save Game", "pt": "Salvar jogo"},
 	"ui.pause.abandon": {"en": "Abandon Game", "pt": "Abandonar jogo"},
 	"ui.inventory.backpack": {"en": "Backpack", "pt": "Mochila"},
 	"ui.inventory.chest": {"en": "Chest", "pt": "Bau"},

@@ -58,7 +58,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Root/Center"]
-custom_minimum_size = Vector2(360, 368)
+custom_minimum_size = Vector2(360, 426)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
@@ -101,6 +101,13 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
 text = "Settings"
+
+[node name="SaveButton" type="Button" parent="Root/Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Save Game"
 
 [node name="AbandonButton" type="Button" parent="Root/Center/Panel/Margin/Content"]
 unique_name_in_owner = true

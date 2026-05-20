@@ -1,0 +1,116 @@
+RELIC MINER - PROMPTS PARA NPCs
+Estilo visual base: RPG medieval semi-realista, semelhante a Oblivion/Gothic/Skyrim antigo.
+Uso recomendado: gerar personagens 3D game-ready, riggable/rigged, sem armas nas mãos, para equipar ferramentas e armas depois no Godot.
+
+============================================================
+BASE DE ESTILO PARA TODOS OS NPCs
+============================================================
+
+Use esta base em todos os prompts para manter consistência visual:
+
+semi-realistic medieval fantasy RPG character, game-ready 3D model, humanoid proportions, detailed but optimized for game engine, PBR textures, riggable character, neutral standing pose, full body, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+1. MINERADOR
+============================================================
+
+male medieval miner NPC, semi-realistic medieval fantasy RPG character, rugged face, short beard, dirty work clothes, leather boots, worn gloves, mining belt with small pouches, simple metal shoulder protection, dusty fabric, practical worker outfit, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+2. FERREIRO
+============================================================
+
+male medieval blacksmith NPC, semi-realistic medieval fantasy RPG character, strong body, muscular arms, short dark hair, thick beard, leather apron over dark tunic, heavy boots, metal bracers, soot stains, work belt with tools, rugged craftsman appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no hammer in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+3. MERCADOR
+============================================================
+
+male medieval merchant NPC, semi-realistic medieval fantasy RPG character, friendly face, well-kept beard, layered cloth outfit, leather vest, belt with coin pouch, small satchel, travel boots, slightly colorful but realistic medieval clothing, experienced trader appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+4. GUARDA DA VILA
+============================================================
+
+male medieval village guard NPC, semi-realistic medieval fantasy RPG character, disciplined expression, short hair, trimmed beard, leather armor with simple metal plates, dark tunic, boots, belt, shoulder guards, practical town guard uniform, not too heroic, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no weapon in hands, no shield in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+5. HERBALISTA
+============================================================
+
+female medieval herbalist NPC, semi-realistic medieval fantasy RPG character, mature woman, calm wise expression, long gray or white hair, layered green and brown robes, leather belt with herb pouches, small vials, simple necklace, rustic healer appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no staff in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+6. ESTALAJADEIRO / DONO DA TAVERNA
+============================================================
+
+male medieval tavern keeper NPC, semi-realistic medieval fantasy RPG character, middle-aged man, friendly but tired face, short beard, simple linen shirt, leather vest, apron, rolled sleeves, work boots, belt with small pouch, rustic innkeeper appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no mug in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+7. CARPINTEIRO
+============================================================
+
+male medieval carpenter NPC, semi-realistic medieval fantasy RPG character, practical worker appearance, short hair, light beard, simple tunic, leather apron, work gloves, boots, belt with small tools, sawdust stains, rustic craftsman style, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no tool in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+8. CAÇADOR
+============================================================
+
+male medieval hunter NPC, semi-realistic medieval fantasy RPG character, lean body, serious expression, medium dark hair, short beard, leather and fur clothing, hooded cloak, boots, belt with small pouches, wilderness survival style, earthy colors, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no bow in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+9. LENHADOR
+============================================================
+
+male medieval lumberjack NPC, semi-realistic medieval fantasy RPG character, strong worker body, rugged face, thick beard, simple shirt, leather suspenders, work pants, heavy boots, gloves, belt, rough outdoor worker appearance, earthy colors, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no axe in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+10. VELHO SÁBIO DA VILA
+============================================================
+
+elderly male village elder NPC, semi-realistic medieval fantasy RPG character, old wise face, long gray beard, long gray hair, simple dark robe, worn cloak, leather belt, small amulet, calm mysterious expression, rustic fantasy village leader appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no staff in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+11. COZINHEIRA / NPC DA TAVERNA
+============================================================
+
+female medieval tavern cook NPC, semi-realistic medieval fantasy RPG character, middle-aged woman, warm expression, tied hair, simple dress, apron, rolled sleeves, leather shoes, rustic kitchen worker appearance, natural fabric textures, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no tool in hands, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+12. APRENDIZ JOVEM
+============================================================
+
+young male medieval apprentice NPC, semi-realistic medieval fantasy RPG character, young adult, curious expression, simple tunic, leather vest, boots, small belt pouch, modest village clothing, slightly inexperienced adventurer appearance, game-ready 3D model, humanoid proportions, PBR textures, riggable character, neutral standing pose, full body, no weapon in hands, no background, suitable for third-person RPG, style similar to classic Oblivion/Gothic fantasy RPG
+
+============================================================
+OBSERVAÇÕES IMPORTANTES
+============================================================
+
+1. Evite pedir personagens segurando objetos nas mãos.
+   Melhor gerar todos sem armas, ferramentas ou tochas nas mãos.
+
+2. Tocha, espada, picareta, machado e outros itens devem ser objetos separados.
+   No Godot, eles podem ser presos nas mãos usando BoneAttachment3D.
+
+3. Para manter consistência visual, use sempre termos como:
+   - semi-realistic medieval fantasy RPG
+   - game-ready 3D model
+   - PBR textures
+   - riggable character
+   - style similar to classic Oblivion/Gothic fantasy RPG
+
+4. Para NPCs simples, eles não precisam de muitas animações.
+   O básico seria:
+   - idle
+   - walk
+   - talk / gesture
+
+5. Para o personagem principal, o ideal seria ter:
+   - idle
+   - walk
+   - run
+   - jump
+   - attack
+   - mining / pickaxe action
+   - interact / pick up
+   - hold torch / carry pose

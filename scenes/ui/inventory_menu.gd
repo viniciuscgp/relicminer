@@ -58,6 +58,7 @@ var _localization_manager: Node
 var _equipment_icon_rects := {}
 var _equipment_empty_icons := {}
 var _equipment_slot_labels := {}
+var _refresh_queued := false
 
 
 func _ready() -> void:
@@ -157,7 +158,7 @@ func _resolve_actor_links() -> void:
 
 
 func _set_active_inventory(inventory: Node) -> void:
-	var refresh_callable := Callable(self, "refresh")
+	var refresh_callable := Callable(self, "_on_inventory_changed")
 	if _inventory != null and _inventory.has_signal("changed"):
 		if _inventory.is_connected("changed", refresh_callable):
 			_inventory.disconnect("changed", refresh_callable)
@@ -190,7 +191,8 @@ func _update_weight() -> void:
 func _clear_slots() -> void:
 	_slot_buttons.clear()
 	for child in slot_grid.get_children():
-		child.free()
+		slot_grid.remove_child(child)
+		child.queue_free()
 
 
 func _make_slot(stack: Resource, index: int) -> Button:
@@ -525,6 +527,22 @@ func _apply_consumable_effects(item: Resource) -> void:
 func _refresh_after_item_change() -> void:
 	refresh()
 	focus_first()
+
+
+func _on_inventory_changed() -> void:
+	if _refresh_queued:
+		return
+
+	_refresh_queued = true
+	call_deferred("_refresh_from_inventory_changed")
+
+
+func _refresh_from_inventory_changed() -> void:
+	_refresh_queued = false
+	if not is_node_ready():
+		return
+
+	refresh()
 
 
 func _on_close_pressed() -> void:
