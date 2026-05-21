@@ -56,6 +56,17 @@ const LEFT_HAND_SLOT := &"left_hand"
 @export var action_lock_seconds := 0.45
 @export var warn_missing_mapped_animations := true
 @export_range(0.05, 1.0, 0.05) var underwater_drift_animation_speed := 0.25
+@export_group("Locomotion Speed Matching")
+## When enabled, walk/run animation speed is scaled from the character's real horizontal movement speed.
+@export var match_locomotion_animation_to_ground_speed := true
+## Real-world ground speed, in meters per second, that matches the imported walk cycle at 1.0x playback.
+@export_range(0.1, 20.0, 0.1, "or_greater") var walk_animation_reference_speed := 3.0
+## Real-world ground speed, in meters per second, that matches the imported run cycle at 1.0x playback.
+@export_range(0.1, 20.0, 0.1, "or_greater") var run_animation_reference_speed := 8.0
+## Lowest playback speed scale allowed after matching locomotion to ground speed.
+@export_range(0.05, 10.0, 0.05, "or_greater") var min_locomotion_animation_speed_scale := 0.25
+## Highest playback speed scale allowed after matching locomotion to ground speed.
+@export_range(0.05, 10.0, 0.05, "or_greater") var max_locomotion_animation_speed_scale := 3.0
 @export_group("Held Pose Override")
 @export var equipment_path: NodePath = NodePath("../Equipment")
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
@@ -203,13 +214,15 @@ func play_standard_animation(standard_animation: StringName, blend_time := -1.0,
 		if resolved == &"":
 			return false
 
-	if not force_restart and _current_standard_animation == normalized and is_equal_approx(_current_animation_speed, custom_speed) and _animation_player.is_playing():
-		return true
+	if not force_restart and _current_standard_animation == normalized and _animation_player.is_playing():
+		if signf(_current_animation_speed) == signf(custom_speed):
+			_set_animation_speed(custom_speed)
+			return true
 
 	var blend := default_blend_time if blend_time < 0.0 else blend_time
-	_animation_player.play(resolved, blend, custom_speed, custom_speed < 0.0)
+	_set_animation_speed(custom_speed)
+	_animation_player.play(resolved, blend, -1.0 if custom_speed < 0.0 else 1.0, custom_speed < 0.0)
 	_current_standard_animation = normalized
-	_current_animation_speed = custom_speed
 
 	if lock_action:
 		var duration := action_lock_seconds
@@ -220,17 +233,30 @@ func play_standard_animation(standard_animation: StringName, blend_time := -1.0,
 	return true
 
 
+func _set_animation_speed(custom_speed: float) -> void:
+	if _animation_player == null:
+		return
+	if is_equal_approx(custom_speed, 0.0):
+		custom_speed = 1.0
+	if is_equal_approx(_current_animation_speed, custom_speed) and is_equal_approx(_animation_player.speed_scale, absf(custom_speed)):
+		return
+	_animation_player.speed_scale = absf(custom_speed)
+	_current_animation_speed = custom_speed
+
+
 func play_action_animation(standard_animation: StringName) -> bool:
 	return play_standard_animation(standard_animation, default_blend_time, 1.0, true, true)
 
 
-func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false) -> void:
+func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false, ground_speed := -1.0) -> void:
 	if Time.get_ticks_msec() < _action_locked_until_msec:
 		return
 
 	if jumping:
 		if has_standard_animation(JUMPING):
 			play_standard_animation(JUMPING)
+		else:
+			play_standard_animation(IDLE)
 		return
 
 	if swimming:
@@ -241,13 +267,28 @@ func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: 
 		return
 
 	if moving:
+		var locomotion_animation := RUNNING if running else WALKING
+		var locomotion_speed := _get_locomotion_animation_speed(locomotion_animation, ground_speed)
 		if backward:
-			play_standard_animation(WALKING, default_blend_time, -1.0)
+			play_standard_animation(WALKING, default_blend_time, -locomotion_speed)
 			return
-		play_standard_animation(RUNNING if running else WALKING)
+		play_standard_animation(locomotion_animation, default_blend_time, locomotion_speed)
 		return
 
 	play_standard_animation(IDLE)
+
+
+func _get_locomotion_animation_speed(standard_animation: StringName, ground_speed: float) -> float:
+	if not match_locomotion_animation_to_ground_speed or ground_speed < 0.0:
+		return 1.0
+
+	var reference_speed := run_animation_reference_speed if standard_animation == RUNNING else walk_animation_reference_speed
+	if reference_speed <= 0.0:
+		return 1.0
+
+	var min_scale := minf(min_locomotion_animation_speed_scale, max_locomotion_animation_speed_scale)
+	var max_scale := maxf(min_locomotion_animation_speed_scale, max_locomotion_animation_speed_scale)
+	return clampf(maxf(ground_speed, 0.0) / reference_speed, min_scale, max_scale)
 
 
 func _normalize_standard_name(animation_name: StringName) -> StringName:

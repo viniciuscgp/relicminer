@@ -78,10 +78,10 @@ func play_action_animation(animation_name: StringName) -> bool:
 	return bool(animation_controller.call("play_action_animation", animation_name))
 
 
-func set_locomotion_animation(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false) -> void:
+func set_locomotion_animation(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false, ground_speed := -1.0) -> void:
 	if animation_controller == null or not animation_controller.has_method("set_locomotion_state"):
 		return
-	animation_controller.call("set_locomotion_state", moving, running, jumping, swimming, backward, swim_drift)
+	animation_controller.call("set_locomotion_state", moving, running, jumping, swimming, backward, swim_drift, ground_speed)
 
 
 func interact() -> bool:

@@ -5,6 +5,8 @@ class_name PlayerController
 @export var camera_pivot_path: NodePath = NodePath("../CameraPivot")
 @export var camera_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D")
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
+@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+@export var breath_probe_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D/BreathProbeAttachment/BreathProbe")
 
 @export var speed := 15.0
 @export_range(0.1, 1.0, 0.05) var walk_speed_multiplier := 0.45
@@ -25,14 +27,21 @@ class_name PlayerController
 @export var swim_vertical_friction := 10.0
 @export_range(0.0, 20.0, 0.1, "or_greater") var swim_up_speed := 8.0
 @export_range(0.0, 80.0, 0.5, "or_greater") var swim_up_acceleration := 32.0
-@export var swim_probe_height := 0.75
+@export_range(0.0, 10.0, 0.1, "or_greater") var swim_exit_animation_min_up_speed := 1.0
+@export var swim_probe_height := 1.0
 @export var swim_probe_radius := 0.25
-@export var breath_probe_height := 1.15
+@export var swim_floor_probe_start_height := 0.2
+@export var swim_floor_probe_distance := 0.6
+@export var breath_probe_height := 2.55
+@export var surface_swim_bone_names: Array[StringName] = [&"L_Clavicle", &"R_Clavicle"]
+@export_range(1, 8, 1) var surface_swim_required_bone_hits := 1
 
 @onready var actor = get_node_or_null(actor_path)
 @onready var camera_pivot: Node3D = get_node_or_null(camera_pivot_path) as Node3D
 @onready var camera: Node3D = get_node_or_null(camera_path) as Node3D
 @onready var underwater_environment: Node = get_node_or_null(underwater_environment_path)
+@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D
+@onready var breath_probe: Node3D = get_node_or_null(breath_probe_path) as Node3D
 
 var _camera_pitch := 0.0
 var _target_camera_pitch := 0.0
@@ -101,13 +110,14 @@ func _physics_process(delta: float) -> void:
 
 	var head_underwater := _is_head_underwater()
 	var swimming := _is_swimming()
+	var has_water_footing := _has_water_footing()
 
 	if swimming:
 		actor.velocity.y = move_toward(actor.velocity.y, 0.0, swim_vertical_friction * delta)
 	elif not actor.is_on_floor():
 		actor.velocity += actor.get_gravity() * delta
 
-	if not swimming and Input.is_action_just_pressed("jump") and actor.is_on_floor() and actor.can_move():
+	if (not swimming or has_water_footing) and Input.is_action_just_pressed("jump") and actor.is_on_floor() and actor.can_move():
 		actor.velocity.y = jump_velocity
 
 	var look_axis := Input.get_axis("look_left", "look_right")
@@ -149,19 +159,25 @@ func _physics_process(delta: float) -> void:
 			actor.velocity.y = move_toward(actor.velocity.y, 0, swim_vertical_friction * delta)
 		actor.velocity.z = move_toward(actor.velocity.z, 0, friction * delta)
 
-	if swimming and Input.is_action_pressed("jump") and can_move:
+	if swimming and head_underwater and Input.is_action_pressed("jump") and can_move:
 		actor.velocity.y = move_toward(actor.velocity.y, swim_up_speed, swim_up_acceleration * delta)
+	elif swimming and not head_underwater and not has_water_footing and Input.is_action_pressed("jump") and can_move:
+		actor.velocity.y = minf(actor.velocity.y, 0.0)
 
 	actor.move_and_slide()
 	actor.push_rigid_body_collisions(direction)
 
 	if actor.has_method("set_locomotion_animation"):
+		var animation_head_underwater := _is_head_underwater()
+		var animation_swimming := _is_swimming()
+		if _is_exiting_water_for_animation(animation_head_underwater):
+			animation_swimming = false
 		var horizontal_speed := Vector2(actor.velocity.x, actor.velocity.z).length()
-		var is_swim_ascending := swimming and Input.is_action_pressed("jump") and can_move
-		var is_moving: bool = (moving or is_swim_ascending if swimming else horizontal_speed > 0.1) and can_move
-		var swim_drift := swimming and head_underwater and not moving and not is_swim_ascending and can_move
+		var is_swim_ascending := animation_swimming and animation_head_underwater and Input.is_action_pressed("jump") and can_move
+		var is_moving: bool = (moving or is_swim_ascending if animation_swimming else horizontal_speed > 0.1) and can_move
+		var swim_drift := animation_swimming and animation_head_underwater and not moving and not is_swim_ascending and can_move
 		var should_play_running := is_moving and running and _get_energy_ratio() > run_animation_min_energy_ratio
-		actor.call("set_locomotion_animation", is_moving, should_play_running, not actor.is_on_floor() and not swimming, swimming, moving_backward, swim_drift)
+		actor.call("set_locomotion_animation", is_moving, should_play_running, not actor.is_on_floor() and not animation_swimming, animation_swimming, moving_backward, swim_drift, horizontal_speed)
 
 
 func _add_camera_yaw(amount: float) -> void:
@@ -335,8 +351,7 @@ func _is_head_underwater() -> bool:
 	if not underwater_environment.has_method("is_water_at_point"):
 		return _is_underwater()
 
-	var actor_node := actor as Node3D
-	return bool(underwater_environment.call("is_water_at_point", actor_node.global_position + Vector3.UP * breath_probe_height))
+	return bool(underwater_environment.call("is_water_at_point", _get_breath_probe_position()))
 
 
 func _is_swimming() -> bool:
@@ -344,13 +359,80 @@ func _is_swimming() -> bool:
 		return false
 	if not underwater_environment.has_method("is_water_at_point"):
 		return _is_underwater()
+	if _is_head_underwater():
+		return true
+	return _is_surface_swim_depth()
 
+
+func _is_body_in_water() -> bool:
 	var actor_node := actor as Node3D
 	var probe_origin: Vector3 = actor_node.global_position + Vector3.UP * swim_probe_height
 	for probe_position in _get_swim_probe_positions(probe_origin):
 		if bool(underwater_environment.call("is_water_at_point", probe_position)):
 			return true
 	return false
+
+
+func _is_surface_swim_depth() -> bool:
+	if skeleton == null or surface_swim_bone_names.is_empty():
+		return _is_body_in_water() and not _has_water_footing()
+
+	var required_hits: int = clampi(surface_swim_required_bone_hits, 1, surface_swim_bone_names.size())
+	var hits := 0
+	for bone_name in surface_swim_bone_names:
+		if _is_bone_in_water(bone_name):
+			hits += 1
+			if hits >= required_hits:
+				return true
+	return false
+
+
+func _is_bone_in_water(bone_name: StringName) -> bool:
+	var bone_position: Variant = _get_bone_global_position(bone_name)
+	if not bone_position is Vector3:
+		return false
+	return bool(underwater_environment.call("is_water_at_point", bone_position))
+
+
+func _get_bone_global_position(bone_name: StringName) -> Variant:
+	if skeleton == null or bone_name == &"":
+		return null
+	var bone_index := skeleton.find_bone(String(bone_name))
+	if bone_index < 0:
+		return null
+	return skeleton.global_transform * skeleton.get_bone_global_pose(bone_index).origin
+
+
+func _get_breath_probe_position() -> Vector3:
+	if breath_probe != null:
+		return breath_probe.global_position
+	if actor != null and actor is Node3D:
+		return (actor as Node3D).global_position + Vector3.UP * breath_probe_height
+	return Vector3.ZERO
+
+
+func _is_exiting_water_for_animation(head_underwater: bool) -> bool:
+	return not head_underwater and Input.is_action_pressed("jump") and actor != null and actor.velocity.y > swim_exit_animation_min_up_speed
+
+
+func _has_water_footing() -> bool:
+	if actor == null or not actor is Node3D:
+		return false
+	if actor.has_method("is_on_floor") and bool(actor.call("is_on_floor")):
+		return true
+	if swim_floor_probe_distance <= 0.0:
+		return false
+
+	var actor_node := actor as Node3D
+	var start := actor_node.global_position + Vector3.UP * maxf(swim_floor_probe_start_height, 0.0)
+	var end := actor_node.global_position + Vector3.DOWN * swim_floor_probe_distance
+	var query := PhysicsRayQueryParameters3D.create(start, end)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	if actor_node is CollisionObject3D:
+		query.exclude = [(actor_node as CollisionObject3D).get_rid()]
+
+	return not actor_node.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _get_swim_probe_positions(origin: Vector3) -> Array[Vector3]:
