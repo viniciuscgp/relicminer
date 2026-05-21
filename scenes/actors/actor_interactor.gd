@@ -5,6 +5,8 @@ class_name ActorInteractor
 @export var aim_source_path: NodePath
 @export var interaction_distance := 3.0
 @export var interaction_radius := 1.45
+@export var ground_pickup_radius := 2.0
+@export var ground_pickup_height := 0.45
 
 @onready var actor: Node = get_node_or_null(actor_path)
 @onready var aim_source: Node3D = get_node_or_null(aim_source_path) as Node3D
@@ -70,26 +72,50 @@ func get_interaction_target() -> Node:
 
 
 func _get_nearby_interaction_target(space_state: PhysicsDirectSpaceState3D) -> Node:
-	var shape := SphereShape3D.new()
-	shape.radius = interaction_radius
-
 	var actor_3d := actor as Node3D
 	if actor_3d == null:
 		return null
 
+	var pickup_target := _get_closest_target_in_sphere(
+		space_state,
+		actor_3d.global_position + Vector3.UP * ground_pickup_height,
+		ground_pickup_radius,
+		true
+	)
+	if pickup_target != null:
+		return pickup_target
+
+	return _get_closest_target_in_sphere(
+		space_state,
+		actor_3d.global_position + Vector3.UP * 0.75,
+		interaction_radius,
+		false
+	)
+
+
+func _get_closest_target_in_sphere(space_state: PhysicsDirectSpaceState3D, origin: Vector3, radius: float, pickup_only: bool) -> Node:
+	var actor_3d := actor as Node3D
+	if actor_3d == null:
+		return null
+
+	var shape := SphereShape3D.new()
+	shape.radius = maxf(radius, 0.01)
+
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = shape
-	query.transform = Transform3D(Basis(), actor_3d.global_position + Vector3.UP * 0.75)
+	query.transform = Transform3D(Basis(), origin)
 	query.exclude = [actor_3d.get_rid()]
 	query.collide_with_areas = true
 	query.collide_with_bodies = true
 
-	var hits := space_state.intersect_shape(query, 16)
+	var hits := space_state.intersect_shape(query, 32)
 	var closest: Node = null
 	var closest_distance := INF
 	for hit in hits:
 		var target := _find_interactable(hit.get("collider") as Node)
 		if target == null:
+			continue
+		if pickup_only and not target.has_method("try_pickup"):
 			continue
 		var target_3d := target as Node3D
 		if target_3d == null:
