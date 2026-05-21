@@ -19,7 +19,7 @@
 [ext_resource type="Script" uid="uid://denivmfdkdn22" path="res://scenes/actors/actor_interactor.gd" id="17_interactor"]
 [ext_resource type="Script" uid="uid://dhcq8ljht1tfn" path="res://scenes/actors/rigid_body_pusher.gd" id="18_pusher"]
 [ext_resource type="PackedScene" uid="uid://o5g0q85tns0y" path="res://scenes/player/player_animation.tscn" id="19_3j4b4"]
-[ext_resource type="Script" uid="uid://6qasyvo7d48y" path="res://scenes/actors/player_controller.gd" id="19_controller"]
+[ext_resource type="Script" path="res://scenes/player/player_controller.gd" id="19_controller"]
 [ext_resource type="Script" uid="uid://dyx23nai8pefm" path="res://scenes/inventory/equipment_component.gd" id="20_equipment"]
 [ext_resource type="Script" uid="uid://118jrmf4wstc" path="res://scenes/actors/character_animation_controller.gd" id="21_animation_controller"]
 [ext_resource type="Script" uid="uid://c1sejmg3reuys" path="res://scenes/inventory/held_item_transform_override.gd" id="22_held_override"]
@@ -110,7 +110,6 @@ script = ExtResource("18_pusher")
 [node name="PlayerController" type="Node" parent="." unique_id=1156572493]
 script = ExtResource("19_controller")
 speed = 10.0
-jump_velocity = 8.0
 look_smoothing = 9.0
 
 [node name="AnimationController" type="Node" parent="." unique_id=272995029]

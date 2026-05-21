@@ -12,7 +12,7 @@ class_name PlayerController
 @export var minimum_run_energy := 0.0
 @export var run_resume_energy := 12.0
 @export_range(0.0, 1.0, 0.05) var run_animation_min_energy_ratio := 0.2
-@export var jump_velocity := 14.5
+@export var jump_velocity := 7.0
 @export var mouse_sensitivity := 0.0025
 @export var gamepad_look_sensitivity := 3.0
 @export_range(10.0, 89.0, 1.0) var max_look_angle_degrees := 65.0
@@ -23,7 +23,8 @@ class_name PlayerController
 @export_group("Swimming")
 @export var swim_speed_multiplier := 0.55
 @export var swim_vertical_friction := 10.0
-@export var swim_up_speed := 4.5
+@export_range(0.0, 20.0, 0.1, "or_greater") var swim_up_speed := 8.0
+@export_range(0.0, 80.0, 0.5, "or_greater") var swim_up_acceleration := 32.0
 @export var swim_probe_height := 0.75
 @export var swim_probe_radius := 0.25
 @export var breath_probe_height := 1.15
@@ -149,7 +150,7 @@ func _physics_process(delta: float) -> void:
 		actor.velocity.z = move_toward(actor.velocity.z, 0, friction * delta)
 
 	if swimming and Input.is_action_pressed("jump") and can_move:
-		actor.velocity.y = move_toward(actor.velocity.y, swim_up_speed, acceleration * delta)
+		actor.velocity.y = move_toward(actor.velocity.y, swim_up_speed, swim_up_acceleration * delta)
 
 	actor.move_and_slide()
 	actor.push_rigid_body_collisions(direction)
