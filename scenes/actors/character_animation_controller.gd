@@ -55,6 +55,7 @@ const LEFT_HAND_SLOT := &"left_hand"
 @export var default_blend_time := 0.12
 @export var action_lock_seconds := 0.45
 @export var warn_missing_mapped_animations := true
+@export_range(0.05, 1.0, 0.05) var underwater_drift_animation_speed := 0.25
 @export_group("Held Pose Override")
 @export var equipment_path: NodePath = NodePath("../Equipment")
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
@@ -223,7 +224,7 @@ func play_action_animation(standard_animation: StringName) -> bool:
 	return play_standard_animation(standard_animation, default_blend_time, 1.0, true, true)
 
 
-func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false) -> void:
+func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false) -> void:
 	if Time.get_ticks_msec() < _action_locked_until_msec:
 		return
 
@@ -233,6 +234,9 @@ func set_locomotion_state(moving: bool, running: bool, jumping: bool, swimming: 
 		return
 
 	if swimming:
+		if swim_drift:
+			play_standard_animation(SWIMING, default_blend_time, underwater_drift_animation_speed)
+			return
 		play_standard_animation(SWIMING if moving else SWIMMING_IDLW)
 		return
 

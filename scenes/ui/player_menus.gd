@@ -8,6 +8,7 @@ extends Node
 @onready var settings_menu: CanvasLayer = %SettingsMenu
 
 var _return_to_pause_after_inventory := false
+var _open_container: Node
 
 
 func _ready() -> void:
@@ -35,6 +36,7 @@ func _input(event: InputEvent) -> void:
 
 
 func open_pause_menu() -> void:
+	_close_open_container()
 	inventory_menu.hide()
 	settings_menu.hide()
 	pause_menu.show()
@@ -43,8 +45,10 @@ func open_pause_menu() -> void:
 	_focus_menu(pause_menu)
 
 
-func open_inventory(inventory_override: Node = null) -> void:
+func open_inventory(inventory_override: Node = null, opened_container: Node = null) -> void:
+	_close_open_container()
 	_return_to_pause_after_inventory = false
+	_open_container = opened_container
 	pause_menu.hide()
 	settings_menu.hide()
 	if inventory_menu.has_method("set_inventory_override"):
@@ -59,6 +63,7 @@ func open_inventory(inventory_override: Node = null) -> void:
 
 
 func open_settings() -> void:
+	_close_open_container()
 	_return_to_pause_after_inventory = false
 	pause_menu.hide()
 	inventory_menu.hide()
@@ -69,6 +74,7 @@ func open_settings() -> void:
 
 
 func close_all() -> void:
+	_close_open_container()
 	_return_to_pause_after_inventory = false
 	pause_menu.hide()
 	inventory_menu.hide()
@@ -125,6 +131,7 @@ func _on_inventory_close_requested() -> void:
 		inventory_menu.hide()
 		if inventory_menu.has_method("set_inventory_override"):
 			inventory_menu.call("set_inventory_override", null)
+		_close_open_container()
 		_set_ui_mode(false)
 
 
@@ -139,6 +146,12 @@ func _set_ui_mode(enabled: bool) -> void:
 func _focus_menu(menu: Node) -> void:
 	if menu.has_method("focus_first"):
 		menu.call_deferred("focus_first")
+
+
+func _close_open_container() -> void:
+	if _open_container != null and is_instance_valid(_open_container) and _open_container.has_method("close"):
+		_open_container.call("close")
+	_open_container = null
 
 
 func _should_capture_mouse_after_ui() -> bool:

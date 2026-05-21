@@ -115,6 +115,34 @@ func get_equipped_item(slot: StringName) -> Resource:
 	return stack.get("item") as Resource
 
 
+func get_save_data() -> Dictionary:
+	var equipped_slots := {}
+	for slot in _equipped_stacks.keys():
+		var stack: Resource = _equipped_stacks.get(slot)
+		equipped_slots[String(slot)] = _stack_to_save_data(stack)
+	return {"equipped_slots": equipped_slots}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	for slot in _equipped_stacks.keys():
+		_clear_held_instance(slot)
+		_equipped_stacks[slot] = null
+
+	var equipped_slots: Dictionary = data.get("equipped_slots", {})
+	for slot_text in equipped_slots.keys():
+		var slot := StringName(str(slot_text))
+		if not _equipped_stacks.has(slot):
+			continue
+		var stack_data: Variant = equipped_slots.get(slot_text)
+		if not stack_data is Dictionary:
+			continue
+		var stack := _find_inventory_stack_for_save_data(stack_data)
+		if stack != null:
+			_equipped_stacks[slot] = stack
+			_create_held_instance(slot, stack)
+	changed.emit()
+
+
 func use_primary(slot: StringName = &"") -> bool:
 	return use_action(_resolve_action_slot(slot), PRIMARY)
 
@@ -426,3 +454,39 @@ func _inventory_contains_stack(stack: Resource) -> bool:
 
 	var slots: Array = inventory.get("slots")
 	return slots.has(stack)
+
+
+func _stack_to_save_data(stack: Resource) -> Dictionary:
+	if stack == null or bool(stack.call("is_empty")):
+		return {}
+	var item: Resource = stack.get("item")
+	if item == null:
+		return {}
+	return {
+		"item_path": item.resource_path,
+		"item_id": String(item.get("id")),
+		"durability": float(stack.get("durability")),
+	}
+
+
+func _find_inventory_stack_for_save_data(data: Dictionary) -> Resource:
+	if inventory == null:
+		return null
+	var item_path := str(data.get("item_path", ""))
+	var item_id := str(data.get("item_id", ""))
+	var saved_durability := float(data.get("durability", -1.0))
+	var slots: Array = inventory.get("slots")
+	for stack in slots:
+		if stack == null or bool(stack.call("is_empty")):
+			continue
+		var item: Resource = stack.get("item")
+		if item == null:
+			continue
+		if not item_path.is_empty() and item.resource_path != item_path:
+			continue
+		if item_path.is_empty() and item_id != "" and str(item.get("id")) != item_id:
+			continue
+		if not is_equal_approx(float(stack.get("durability")), saved_durability):
+			continue
+		return stack
+	return null

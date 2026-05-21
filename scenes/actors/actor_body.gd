@@ -44,6 +44,19 @@ func get_animation_controller() -> Node:
 	return animation_controller
 
 
+func get_save_data() -> Dictionary:
+	return {
+		"transform": _transform_to_save_data(global_transform),
+		"velocity": _vector3_to_save_data(velocity),
+	}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	if data.has("transform"):
+		global_transform = _transform_from_save_data(data["transform"], global_transform)
+	velocity = _vector3_from_save_data(data.get("velocity", []), velocity)
+
+
 func can_move() -> bool:
 	return stats == null or not stats.has_method("is_over_absolute_weight") or not bool(stats.call("is_over_absolute_weight"))
 
@@ -65,10 +78,10 @@ func play_action_animation(animation_name: StringName) -> bool:
 	return bool(animation_controller.call("play_action_animation", animation_name))
 
 
-func set_locomotion_animation(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false) -> void:
+func set_locomotion_animation(moving: bool, running: bool, jumping: bool, swimming: bool, backward := false, swim_drift := false) -> void:
 	if animation_controller == null or not animation_controller.has_method("set_locomotion_state"):
 		return
-	animation_controller.call("set_locomotion_state", moving, running, jumping, swimming, backward)
+	animation_controller.call("set_locomotion_state", moving, running, jumping, swimming, backward, swim_drift)
 
 
 func interact() -> bool:
@@ -117,3 +130,39 @@ func take_damage(raw_damage: float) -> float:
 	if damage_target == null or not damage_target.has_method("take_damage"):
 		return 0.0
 	return float(damage_target.call("take_damage", raw_damage))
+
+
+func _transform_to_save_data(value: Transform3D) -> Dictionary:
+	return {
+		"origin": _vector3_to_save_data(value.origin),
+		"basis_x": _vector3_to_save_data(value.basis.x),
+		"basis_y": _vector3_to_save_data(value.basis.y),
+		"basis_z": _vector3_to_save_data(value.basis.z),
+	}
+
+
+func _transform_from_save_data(data: Variant, fallback: Transform3D) -> Transform3D:
+	if not data is Dictionary:
+		return fallback
+	var dict := data as Dictionary
+	return Transform3D(
+		Basis(
+			_vector3_from_save_data(dict.get("basis_x", []), fallback.basis.x),
+			_vector3_from_save_data(dict.get("basis_y", []), fallback.basis.y),
+			_vector3_from_save_data(dict.get("basis_z", []), fallback.basis.z)
+		),
+		_vector3_from_save_data(dict.get("origin", []), fallback.origin)
+	)
+
+
+func _vector3_to_save_data(value: Vector3) -> Array:
+	return [value.x, value.y, value.z]
+
+
+func _vector3_from_save_data(data: Variant, fallback: Vector3) -> Vector3:
+	if not data is Array:
+		return fallback
+	var values := data as Array
+	if values.size() < 3:
+		return fallback
+	return Vector3(float(values[0]), float(values[1]), float(values[2]))

@@ -16,33 +16,33 @@ signal message_requested(text: String)
 @export var xp := 0
 
 @export_group("Base Stats")
-@export var base_max_hp := 100.0
-@export var base_attack := 5
-@export var base_defense := 1
+@export var base_max_hp     := 100.0
+@export var base_attack     := 5
+@export var base_defense    := 1
 @export var base_max_energy := 100.0
-@export var max_hunger := 100.0
-@export var base_oxygen_seconds := 10.0
-@export var base_comfort_weight_kg := 22.0
+@export var max_hunger      := 100.0
+@export var base_oxygen_seconds     := 10.0
+@export var base_comfort_weight_kg  := 22.0
 @export var base_absolute_weight_kg := 32.0
 
 @export_group("Survival Rates")
-@export var hunger_drain_per_second := 0.015
-@export var moving_hunger_multiplier := 2.0
-@export var swimming_hunger_multiplier := 3.0
-@export var hunger_damage_per_second := 1.0
-@export var energy_recovery_per_second := 18.0
-@export var moving_energy_cost_per_second := 0.0
-@export var running_energy_cost_per_second := 14.0
+@export var hunger_drain_per_second         := 0.015
+@export var moving_hunger_multiplier        := 3.0
+@export var swimming_hunger_multiplier      := 4.0
+@export var hunger_damage_per_second        := 1.0
+@export var energy_recovery_per_second      := 18.0
+@export var moving_energy_cost_per_second   := 0.0
+@export var running_energy_cost_per_second  := 14.0
 @export var swimming_energy_cost_per_second := 8.0
-@export var drowning_damage_first_seconds := 5.0
-@export var drowning_damage_late_seconds := 10.0
+@export var drowning_damage_first_seconds   := 5.0
+@export var drowning_damage_late_seconds    := 10.0
 
-var current_hp := 0.0
+var current_hp     := 0.0
 var current_energy := 0.0
 var current_hunger := 0.0
 var current_oxygen := 0.0
 var extra_oxygen_seconds := 0.0
-var attack_bonus := 0
+var attack_bonus  := 0
 var defense_bonus := 0
 
 var _inventory: Node
@@ -58,6 +58,35 @@ func _ready() -> void:
 	current_energy = get_max_energy()
 	current_hunger = max_hunger
 	current_oxygen = get_max_oxygen()
+	_emit_all()
+
+
+func get_save_data() -> Dictionary:
+	return {
+		"level": level,
+		"xp": xp,
+		"current_hp": current_hp,
+		"current_energy": current_energy,
+		"current_hunger": current_hunger,
+		"current_oxygen": current_oxygen,
+		"extra_oxygen_seconds": extra_oxygen_seconds,
+		"attack_bonus": attack_bonus,
+		"defense_bonus": defense_bonus,
+		"drowning_time": _drowning_time,
+	}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	level = max(1, int(data.get("level", level)))
+	xp = max(0, int(data.get("xp", xp)))
+	extra_oxygen_seconds = maxf(0.0, float(data.get("extra_oxygen_seconds", extra_oxygen_seconds)))
+	attack_bonus = int(data.get("attack_bonus", attack_bonus))
+	defense_bonus = int(data.get("defense_bonus", defense_bonus))
+	current_hp = clampf(float(data.get("current_hp", current_hp)), 0.0, get_max_hp())
+	current_energy = clampf(float(data.get("current_energy", current_energy)), 0.0, get_max_energy())
+	current_hunger = clampf(float(data.get("current_hunger", current_hunger)), 0.0, max_hunger)
+	current_oxygen = clampf(float(data.get("current_oxygen", current_oxygen)), 0.0, get_max_oxygen())
+	_drowning_time = maxf(0.0, float(data.get("drowning_time", _drowning_time)))
 	_emit_all()
 
 

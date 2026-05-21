@@ -32,6 +32,38 @@ func _load_starting_items() -> void:
 	changed.emit()
 
 
+func get_save_data() -> Dictionary:
+	return {
+		"display_name": display_name,
+		"capacity_slots": capacity_slots,
+		"max_weight_kg": max_weight_kg,
+		"locked": locked,
+		"required_key_id": String(required_key_id),
+		"slots": _get_slots_save_data(),
+	}
+
+
+func apply_save_data(data: Dictionary) -> void:
+	display_name = str(data.get("display_name", display_name))
+	capacity_slots = max(1, int(data.get("capacity_slots", capacity_slots)))
+	max_weight_kg = maxf(0.0, float(data.get("max_weight_kg", max_weight_kg)))
+	locked = bool(data.get("locked", locked))
+	required_key_id = StringName(str(data.get("required_key_id", String(required_key_id))))
+
+	slots.clear()
+	var saved_slots: Array = data.get("slots", [])
+	for stack_data in saved_slots:
+		if not stack_data is Dictionary:
+			continue
+		var stack := _create_stack_from_save_data(stack_data)
+		if stack == null or stack.is_empty():
+			continue
+		slots.append(stack)
+	_trim_to_capacity()
+	locked_changed.emit(locked)
+	changed.emit()
+
+
 func _create_stack_from_starting_resource(resource: Resource) -> Resource:
 	if resource == null:
 		return null
@@ -45,6 +77,38 @@ func _create_stack_from_starting_resource(resource: Resource) -> Resource:
 		return stack
 
 	return null
+
+
+func _get_slots_save_data() -> Array:
+	var saved_slots: Array = []
+	for stack in slots:
+		if stack == null or stack.is_empty():
+			continue
+		var item: Resource = stack.get("item")
+		if item == null:
+			continue
+		saved_slots.append({
+			"item_path": item.resource_path,
+			"item_id": String(item.get("id")),
+			"amount": int(stack.get("amount")),
+			"durability": float(stack.get("durability")),
+		})
+	return saved_slots
+
+
+func _create_stack_from_save_data(data: Dictionary) -> Resource:
+	var item_path := str(data.get("item_path", ""))
+	if item_path.is_empty():
+		return null
+
+	var item := load(item_path) as Resource
+	if item == null:
+		push_warning("InventoryComponent: could not load saved item '%s'." % item_path)
+		return null
+
+	var stack: Resource = ItemStackScript.new()
+	stack.call("setup", item, max(1, int(data.get("amount", 1))), float(data.get("durability", -1.0)))
+	return stack
 
 
 func is_accessible(actor_inventory: Node = null) -> bool:

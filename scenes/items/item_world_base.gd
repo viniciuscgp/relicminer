@@ -38,6 +38,8 @@ signal open_failed(reason: String)
 
 @onready var inventory: Node = get_node_or_null(inventory_path)
 
+var is_open := false
+
 
 func _ready() -> void:
 	continuous_cd = true
@@ -89,7 +91,7 @@ func try_pickup(actor_inventory: Node) -> int:
 	picked_up.emit(actor_inventory, added)
 
 	if amount <= 0 and remove_when_empty:
-		queue_free()
+		_queue_free_persistently()
 
 	return added
 
@@ -137,8 +139,77 @@ func open(actor_inventory: Node = null) -> bool:
 		open_failed.emit(_text("message.locked"))
 		return false
 
+	set_open(true)
 	opened.emit(actor_inventory, inventory)
 	return true
+
+
+func close() -> void:
+	set_open(false)
+
+
+func set_open(opened: bool) -> void:
+	is_open = opened
+
+
+func get_save_data() -> Dictionary:
+	var data := {
+		"item_path": item.resource_path if item != null else "",
+		"item_id": String(item.get("id")) if item != null else "",
+		"amount": amount,
+		"durability": durability,
+		"remove_when_empty": remove_when_empty,
+		"has_inventory": has_inventory,
+		"is_open": is_open,
+		"transform": _transform_to_save_data(global_transform),
+		"linear_velocity": _vector3_to_save_data(linear_velocity),
+		"angular_velocity": _vector3_to_save_data(angular_velocity),
+		"sleeping": sleeping,
+		"freeze": freeze,
+	}
+	if has_container_inventory() and inventory.has_method("get_save_data"):
+		data["inventory"] = inventory.call("get_save_data")
+	return data
+
+
+func apply_save_data(data: Dictionary) -> void:
+	var item_path := str(data.get("item_path", ""))
+	if not item_path.is_empty():
+		var saved_item := load(item_path) as Resource
+		if saved_item != null:
+			item = saved_item
+		else:
+			push_warning("ItemWorldBase: could not load saved item '%s'." % item_path)
+
+	amount = max(1, int(data.get("amount", amount)))
+	durability = float(data.get("durability", durability))
+	remove_when_empty = bool(data.get("remove_when_empty", remove_when_empty))
+	has_inventory = bool(data.get("has_inventory", has_inventory))
+	is_open = bool(data.get("is_open", is_open))
+
+	_ensure_inventory()
+	_apply_inventory_exports()
+	var inventory_data: Dictionary = data.get("inventory", {})
+	if has_container_inventory() and inventory.has_method("apply_save_data"):
+		inventory.call("apply_save_data", inventory_data)
+
+	if data.has("transform"):
+		global_transform = _transform_from_save_data(data["transform"], global_transform)
+	linear_velocity = _vector3_from_save_data(data.get("linear_velocity", []), linear_velocity)
+	angular_velocity = _vector3_from_save_data(data.get("angular_velocity", []), angular_velocity)
+	sleeping = bool(data.get("sleeping", sleeping))
+	freeze = bool(data.get("freeze", freeze))
+	_apply_physics_from_item()
+
+
+func get_spawn_scene_path() -> String:
+	if not scene_file_path.is_empty():
+		return scene_file_path
+	if item != null:
+		var world_scene: PackedScene = item.get("world_scene")
+		if world_scene != null:
+			return world_scene.resource_path
+	return ""
 
 
 func _ensure_inventory() -> void:
@@ -204,3 +275,46 @@ func _text(key: String) -> String:
 	if localization != null and localization.has_method("text"):
 		return str(localization.call("text", key))
 	return key
+
+
+func _queue_free_persistently() -> void:
+	var save_manager := get_node_or_null("/root/SaveManager")
+	if save_manager != null and save_manager.has_method("mark_scene_node_removed"):
+		save_manager.call("mark_scene_node_removed", self)
+	queue_free()
+
+
+func _transform_to_save_data(value: Transform3D) -> Dictionary:
+	return {
+		"origin": _vector3_to_save_data(value.origin),
+		"basis_x": _vector3_to_save_data(value.basis.x),
+		"basis_y": _vector3_to_save_data(value.basis.y),
+		"basis_z": _vector3_to_save_data(value.basis.z),
+	}
+
+
+func _transform_from_save_data(data: Variant, fallback: Transform3D) -> Transform3D:
+	if not data is Dictionary:
+		return fallback
+	var dict := data as Dictionary
+	return Transform3D(
+		Basis(
+			_vector3_from_save_data(dict.get("basis_x", []), fallback.basis.x),
+			_vector3_from_save_data(dict.get("basis_y", []), fallback.basis.y),
+			_vector3_from_save_data(dict.get("basis_z", []), fallback.basis.z)
+		),
+		_vector3_from_save_data(dict.get("origin", []), fallback.origin)
+	)
+
+
+func _vector3_to_save_data(value: Vector3) -> Array:
+	return [value.x, value.y, value.z]
+
+
+func _vector3_from_save_data(data: Variant, fallback: Vector3) -> Vector3:
+	if not data is Array:
+		return fallback
+	var values := data as Array
+	if values.size() < 3:
+		return fallback
+	return Vector3(float(values[0]), float(values[1]), float(values[2]))

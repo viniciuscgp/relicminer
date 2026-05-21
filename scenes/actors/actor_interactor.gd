@@ -128,7 +128,7 @@ func _open_target_inventory(target: Node) -> void:
 	if player_menus == null or not player_menus.has_method("open_inventory"):
 		return
 
-	player_menus.call("open_inventory", target_inventory)
+	player_menus.call("open_inventory", target_inventory, target)
 
 
 func _play_interaction_animation(animation_name: StringName) -> void:

@@ -3,6 +3,7 @@ class_name PlayerController
 
 @export var actor_path: NodePath = NodePath("..")
 @export var camera_pivot_path: NodePath = NodePath("../CameraPivot")
+@export var camera_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D")
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 
 @export var speed := 15.0
@@ -19,9 +20,17 @@ class_name PlayerController
 @export_range(0.0, 30.0, 0.5) var turn_smoothing := 14.0
 @export var acceleration := 18.0
 @export var friction := 22.0
+@export_group("Swimming")
+@export var swim_speed_multiplier := 0.55
+@export var swim_vertical_friction := 10.0
+@export var swim_up_speed := 4.5
+@export var swim_probe_height := 0.75
+@export var swim_probe_radius := 0.25
+@export var breath_probe_height := 1.15
 
 @onready var actor = get_node_or_null(actor_path)
 @onready var camera_pivot: Node3D = get_node_or_null(camera_pivot_path) as Node3D
+@onready var camera: Node3D = get_node_or_null(camera_path) as Node3D
 @onready var underwater_environment: Node = get_node_or_null(underwater_environment_path)
 
 var _camera_pitch := 0.0
@@ -89,10 +98,15 @@ func _physics_process(delta: float) -> void:
 	if actor == null:
 		return
 
-	if not actor.is_on_floor():
+	var head_underwater := _is_head_underwater()
+	var swimming := _is_swimming()
+
+	if swimming:
+		actor.velocity.y = move_toward(actor.velocity.y, 0.0, swim_vertical_friction * delta)
+	elif not actor.is_on_floor():
 		actor.velocity += actor.get_gravity() * delta
 
-	if Input.is_action_just_pressed("jump") and actor.is_on_floor() and actor.can_move():
+	if not swimming and Input.is_action_just_pressed("jump") and actor.is_on_floor() and actor.can_move():
 		actor.velocity.y = jump_velocity
 
 	var look_axis := Input.get_axis("look_left", "look_right")
@@ -104,36 +118,49 @@ func _physics_process(delta: float) -> void:
 		_add_camera_pitch(-look_vertical_axis * gamepad_look_sensitivity * delta)
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction := _get_camera_relative_direction(input_dir)
+	var direction := _get_camera_relative_direction(input_dir, swimming)
 	var moving: bool = direction != Vector3.ZERO
 	var moving_backward := moving and input_dir.y > 0.1
 	var can_move: bool = actor.can_move()
 	var wants_to_run := _wants_to_run(moving, moving_backward)
-	var running := can_move and _can_run(wants_to_run)
+	var running := can_move and not swimming and _can_run(wants_to_run)
 
-	actor.process_survival(delta, moving and can_move, false, _is_underwater(), running)
+	actor.process_survival(delta, moving and can_move, swimming, head_underwater, running)
 	_update_run_exhaustion(wants_to_run)
 	var speed_multiplier: float = actor.get_movement_speed_multiplier()
-	var movement_speed_multiplier := _get_movement_speed_multiplier(running)
+	var movement_speed_multiplier := swim_speed_multiplier if swimming else _get_movement_speed_multiplier(running)
+
+	if swimming and can_move:
+		_turn_actor_toward_camera(delta)
 
 	if moving and can_move:
-		_turn_actor_for_movement(input_dir, direction, delta)
+		if not swimming:
+			_turn_actor_for_movement(input_dir, direction, delta)
 		var direction_speed_multiplier := backward_speed_multiplier if moving_backward else 1.0
 		var target_speed: float = speed * movement_speed_multiplier * speed_multiplier * direction_speed_multiplier
 		actor.velocity.x = move_toward(actor.velocity.x, direction.x * target_speed, acceleration * delta)
+		if swimming:
+			actor.velocity.y = move_toward(actor.velocity.y, direction.y * target_speed, acceleration * delta)
 		actor.velocity.z = move_toward(actor.velocity.z, direction.z * target_speed, acceleration * delta)
 	else:
 		actor.velocity.x = move_toward(actor.velocity.x, 0, friction * delta)
+		if swimming:
+			actor.velocity.y = move_toward(actor.velocity.y, 0, swim_vertical_friction * delta)
 		actor.velocity.z = move_toward(actor.velocity.z, 0, friction * delta)
+
+	if swimming and Input.is_action_pressed("jump") and can_move:
+		actor.velocity.y = move_toward(actor.velocity.y, swim_up_speed, acceleration * delta)
 
 	actor.move_and_slide()
 	actor.push_rigid_body_collisions(direction)
 
 	if actor.has_method("set_locomotion_animation"):
 		var horizontal_speed := Vector2(actor.velocity.x, actor.velocity.z).length()
-		var is_moving: bool = horizontal_speed > 0.1 and can_move
+		var is_swim_ascending := swimming and Input.is_action_pressed("jump") and can_move
+		var is_moving: bool = (moving or is_swim_ascending if swimming else horizontal_speed > 0.1) and can_move
+		var swim_drift := swimming and head_underwater and not moving and not is_swim_ascending and can_move
 		var should_play_running := is_moving and running and _get_energy_ratio() > run_animation_min_energy_ratio
-		actor.call("set_locomotion_animation", is_moving, should_play_running, not actor.is_on_floor(), _is_underwater(), moving_backward)
+		actor.call("set_locomotion_animation", is_moving, should_play_running, not actor.is_on_floor() and not swimming, swimming, moving_backward, swim_drift)
 
 
 func _add_camera_yaw(amount: float) -> void:
@@ -168,9 +195,11 @@ func _apply_camera_rotation(delta: float) -> void:
 	camera_pivot.rotation.y = _camera_yaw - _get_actor_global_yaw()
 
 
-func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:
+func _get_camera_relative_direction(input_dir: Vector2, include_pitch := false) -> Vector3:
 	if input_dir == Vector2.ZERO:
 		return Vector3.ZERO
+	if include_pitch:
+		return _get_camera_swim_direction(input_dir)
 
 	var yaw_basis := Basis(Vector3.UP, _camera_yaw)
 	var forward: Vector3 = -yaw_basis.z
@@ -182,6 +211,13 @@ func _get_camera_relative_direction(input_dir: Vector2) -> Vector3:
 	return (right * input_dir.x - forward * input_dir.y).normalized()
 
 
+func _get_camera_swim_direction(input_dir: Vector2) -> Vector3:
+	var basis := camera.global_transform.basis if camera != null else Basis(Vector3.UP, _camera_yaw)
+	var forward: Vector3 = -basis.z
+	var right: Vector3 = basis.x
+	return (right * input_dir.x - forward * input_dir.y).normalized()
+
+
 func _turn_actor_for_movement(input_dir: Vector2, direction: Vector3, delta: float) -> void:
 	if actor == null or direction == Vector3.ZERO:
 		return
@@ -189,6 +225,14 @@ func _turn_actor_for_movement(input_dir: Vector2, direction: Vector3, delta: flo
 	var facing_direction := -direction if input_dir.y > 0.1 else direction
 
 	var target_yaw := atan2(-facing_direction.x, -facing_direction.z)
+	var weight := 1.0 if turn_smoothing <= 0.0 else 1.0 - exp(-turn_smoothing * delta)
+	actor.rotation.y = lerp_angle(actor.rotation.y, target_yaw, weight)
+
+
+func _turn_actor_toward_camera(delta: float) -> void:
+	if actor == null:
+		return
+	var target_yaw := _get_camera_global_yaw()
 	var weight := 1.0 if turn_smoothing <= 0.0 else 1.0 - exp(-turn_smoothing * delta)
 	actor.rotation.y = lerp_angle(actor.rotation.y, target_yaw, weight)
 
@@ -282,6 +326,43 @@ func _is_underwater() -> bool:
 	if underwater_environment == null or not underwater_environment.has_method("is_underwater"):
 		return false
 	return bool(underwater_environment.call("is_underwater"))
+
+
+func _is_head_underwater() -> bool:
+	if actor == null or not actor is Node3D or underwater_environment == null:
+		return _is_underwater()
+	if not underwater_environment.has_method("is_water_at_point"):
+		return _is_underwater()
+
+	var actor_node := actor as Node3D
+	return bool(underwater_environment.call("is_water_at_point", actor_node.global_position + Vector3.UP * breath_probe_height))
+
+
+func _is_swimming() -> bool:
+	if actor == null or not actor is Node3D or underwater_environment == null:
+		return false
+	if not underwater_environment.has_method("is_water_at_point"):
+		return _is_underwater()
+
+	var actor_node := actor as Node3D
+	var probe_origin: Vector3 = actor_node.global_position + Vector3.UP * swim_probe_height
+	for probe_position in _get_swim_probe_positions(probe_origin):
+		if bool(underwater_environment.call("is_water_at_point", probe_position)):
+			return true
+	return false
+
+
+func _get_swim_probe_positions(origin: Vector3) -> Array[Vector3]:
+	var radius := maxf(swim_probe_radius, 0.0)
+	var positions: Array[Vector3] = [origin]
+	if radius <= 0.0:
+		return positions
+
+	positions.append(origin + Vector3(radius, 0.0, 0.0))
+	positions.append(origin - Vector3(radius, 0.0, 0.0))
+	positions.append(origin + Vector3(0.0, 0.0, radius))
+	positions.append(origin - Vector3(0.0, 0.0, radius))
+	return positions
 
 
 func _on_settings_changed() -> void:

@@ -74,6 +74,14 @@ func is_underwater() -> bool:
 	return _underwater
 
 
+func is_position_inside_water(position: Vector3) -> bool:
+	return _is_position_inside_water(position)
+
+
+func is_water_at_point(position: Vector3) -> bool:
+	return _is_probe_inside_water(position)
+
+
 func _resolve_target() -> Node3D:
 	if not target_path.is_empty():
 		var node := get_node_or_null(target_path) as Node3D
