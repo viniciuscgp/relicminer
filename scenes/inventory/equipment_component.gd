@@ -57,12 +57,23 @@ var _held_instances := {
 
 
 func _ready() -> void:
+	refresh_skeleton()
+	if inventory != null and inventory.has_signal("changed"):
+		inventory.connect("changed", _validate_equipped_stacks)
+
+
+func refresh_skeleton() -> void:
+	skeleton = null
+	if actor != null:
+		var player_animation := actor.get_node_or_null("visual/PlayerAnimation")
+		if player_animation != null and player_animation.has_method("get_active_skeleton"):
+			skeleton = player_animation.call("get_active_skeleton") as Skeleton3D
+	if skeleton == null:
+		skeleton = get_node_or_null(skeleton_path) as Skeleton3D
 	if skeleton == null and actor != null:
 		skeleton = _find_skeleton(actor)
 	right_hand_socket = _get_or_create_bone_socket(right_hand_socket, right_hand_bone_name, right_hand_bone_socket_name)
 	left_hand_socket = _get_or_create_bone_socket(left_hand_socket, left_hand_bone_name, left_hand_bone_socket_name)
-	if inventory != null and inventory.has_signal("changed"):
-		inventory.connect("changed", _validate_equipped_stacks)
 
 
 func _process(_delta: float) -> void:

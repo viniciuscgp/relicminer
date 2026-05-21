@@ -1,6 +1,7 @@
 extends Control
 
 @export_file("*.tscn") var game_scene_path := "res://scenes/locations/world.tscn"
+@export_file("*.tscn") var character_select_scene_path := "res://scenes/ui/character_select.tscn"
 
 @onready var continue_button: Button = %ContinueButton
 @onready var new_game_button: Button = %NewGameButton
@@ -25,7 +26,7 @@ func _ready() -> void:
 		_localization_manager.connect("language_changed", _on_language_changed)
 
 	continue_button.pressed.connect(_load_game)
-	new_game_button.pressed.connect(_start_game)
+	new_game_button.pressed.connect(_open_character_select)
 	load_button.pressed.connect(_load_game)
 	options_button.pressed.connect(_open_settings)
 	credits_button.pressed.connect(_focus_credits)
@@ -44,11 +45,17 @@ func _start_game() -> void:
 	get_tree().change_scene_to_file(game_scene_path)
 
 
+func _open_character_select() -> void:
+	var error := get_tree().change_scene_to_file(character_select_scene_path)
+	if error != OK:
+		_start_game()
+
+
 func _load_game() -> void:
 	if _save_manager != null and _save_manager.has_method("load_game_scene"):
 		if bool(_save_manager.call("load_game_scene", game_scene_path)):
 			return
-	_start_game()
+	_open_character_select()
 
 
 func _open_settings() -> void:

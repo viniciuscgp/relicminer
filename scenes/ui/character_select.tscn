@@ -1,0 +1,207 @@
+[gd_scene format=3 uid="uid://doyioc64p1ukc"]
+
+[ext_resource type="Script" path="res://scenes/ui/character_select.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cuirhw6v7d40d" path="res://assets/background_5.jpg" id="2"]
+[ext_resource type="PackedScene" path="res://models/player/relic_miner_hero_new_male.glb" id="3"]
+[ext_resource type="PackedScene" path="res://models/player/relic_miner_hero_new_female.glb" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.025, 0.023, 0.018, 0.86)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.63, 0.42, 0.16, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.08, 0.065, 0.045, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.45, 0.17, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="Environment" id="Environment_preview"]
+background_mode = 1
+background_color = Color(0.035, 0.032, 0.026, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.86, 0.78, 0.65, 1)
+ambient_light_energy = 0.7
+
+[sub_resource type="World3D" id="World3D_male"]
+environment = SubResource("Environment_preview")
+
+[sub_resource type="World3D" id="World3D_female"]
+environment = SubResource("Environment_preview")
+
+[node name="CharacterSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.42)
+
+[node name="Content" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 72
+theme_override_constants/margin_top = 54
+theme_override_constants/margin_right = 72
+theme_override_constants/margin_bottom = 54
+
+[node name="Layout" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 18
+
+[node name="TitleLabel" type="Label" parent="Content/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.86, 0.65, 1)
+theme_override_font_sizes/font_size = 34
+text = "Choose Your Character"
+horizontal_alignment = 1
+
+[node name="ChoiceRow" type="HBoxContainer" parent="Content/Layout"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 22
+
+[node name="MalePanel" type="PanelContainer" parent="Content/Layout/ChoiceRow"]
+custom_minimum_size = Vector2(330, 470)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MaleMargin" type="MarginContainer" parent="Content/Layout/ChoiceRow/MalePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="MaleLayout" type="VBoxContainer" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="MaleViewportContainer" type="SubViewportContainer" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout"]
+custom_minimum_size = Vector2(290, 370)
+layout_mode = 2
+stretch = true
+
+[node name="MaleViewport" type="SubViewport" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout/MaleViewportContainer"]
+own_world_3d = true
+world_3d = SubResource("World3D_male")
+size = Vector2i(290, 370)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout/MaleViewportContainer/MaleViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.35, 5.2)
+current = true
+fov = 42.0
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout/MaleViewportContainer/MaleViewport"]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 0, 0)
+light_energy = 2.6
+
+[node name="Male" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout/MaleViewportContainer/MaleViewport" instance=ExtResource("3")]
+transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, 0, -1.35, 0)
+
+[node name="MaleButton" type="Button" parent="Content/Layout/ChoiceRow/MalePanel/MaleMargin/MaleLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(290, 44)
+layout_mode = 2
+focus_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Male"
+
+[node name="FemalePanel" type="PanelContainer" parent="Content/Layout/ChoiceRow"]
+custom_minimum_size = Vector2(330, 470)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="FemaleMargin" type="MarginContainer" parent="Content/Layout/ChoiceRow/FemalePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="FemaleLayout" type="VBoxContainer" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="FemaleViewportContainer" type="SubViewportContainer" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout"]
+custom_minimum_size = Vector2(290, 370)
+layout_mode = 2
+stretch = true
+
+[node name="FemaleViewport" type="SubViewport" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout/FemaleViewportContainer"]
+own_world_3d = true
+world_3d = SubResource("World3D_female")
+size = Vector2i(290, 370)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout/FemaleViewportContainer/FemaleViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.35, 5.2)
+current = true
+fov = 42.0
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout/FemaleViewportContainer/FemaleViewport"]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 0, 0)
+light_energy = 2.6
+
+[node name="Female" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout/FemaleViewportContainer/FemaleViewport" instance=ExtResource("4")]
+transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, 0, -1.35, 0)
+
+[node name="FemaleButton" type="Button" parent="Content/Layout/ChoiceRow/FemalePanel/FemaleMargin/FemaleLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(290, 44)
+layout_mode = 2
+focus_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Female"
+
+[node name="BackButton" type="Button" parent="Content/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 42)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Back"

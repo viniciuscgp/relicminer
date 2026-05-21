@@ -1,7 +1,0 @@
-Hero:
------------------------------------
-male medieval fantasy explorer, game-ready 3D character, semi-realistic stylized, 
-leather armor, boots, belt, neutral expression, humanoid proportions, 
-suitable for third-person RPG, PBR textures, 
-riggable, no weapon, no background
-

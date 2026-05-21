@@ -1,39 +1,80 @@
 extends Node
 class_name PlayerController
 
+@export_group("Node References")
+## Node do personagem controlado. Normalmente aponta para o CharacterBody3D pai.
 @export var actor_path: NodePath = NodePath("..")
+## Pivot vertical/horizontal da camera usado para mirar e suavizar a rotacao.
 @export var camera_pivot_path: NodePath = NodePath("../CameraPivot")
+## Camera principal usada para calcular direcao relativa de movimento e mira.
 @export var camera_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D")
+## Ambiente subaquatico ligado/desligado quando a camera entra na agua.
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
+## Caminho fallback do esqueleto do personagem. Quando ha Male/Female, o esqueleto ativo e resolvido via PlayerAnimation.
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+## Probe usado como fallback para detectar se a cabeca esta submersa.
 @export var breath_probe_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D/BreathProbeAttachment/BreathProbe")
 
+@export_group("Ground Movement")
+## Velocidade base do personagem em metros por segundo antes de multiplicadores.
 @export var speed := 15.0
+## Multiplicador aplicado quando o jogador caminha em vez de correr.
 @export_range(0.1, 1.0, 0.05) var walk_speed_multiplier := 0.45
+## Multiplicador aplicado quando o jogador se move para tras.
 @export_range(0.1, 1.0, 0.05) var backward_speed_multiplier := 0.55
-@export var minimum_run_energy := 0.0
-@export var run_resume_energy := 12.0
-@export_range(0.0, 1.0, 0.05) var run_animation_min_energy_ratio := 0.2
+## Forca inicial do pulo aplicada no eixo Y.
 @export var jump_velocity := 7.0
-@export var mouse_sensitivity := 0.0025
-@export var gamepad_look_sensitivity := 3.0
-@export_range(10.0, 89.0, 1.0) var max_look_angle_degrees := 65.0
-@export_range(0.0, 60.0, 0.5) var look_smoothing := 18.0
-@export_range(0.0, 30.0, 0.5) var turn_smoothing := 14.0
+## Taxa de aceleracao ao entrar em movimento.
 @export var acceleration := 18.0
+## Taxa de desaceleracao quando nao ha input de movimento.
 @export var friction := 22.0
+
+@export_group("Running")
+## Energia minima necessaria para iniciar ou manter corrida.
+@export var minimum_run_energy := 0.0
+## Energia necessaria para voltar a correr depois de exaustao.
+@export var run_resume_energy := 12.0
+## Razao minima de energia para permitir animacao de corrida; abaixo disso a locomocao usa walk.
+@export_range(0.0, 1.0, 0.05) var run_animation_min_energy_ratio := 0.2
+
+@export_group("Camera Look")
+## Sensibilidade do mouse para girar a camera.
+@export var mouse_sensitivity := 0.0025
+## Sensibilidade do analogico/gamepad para girar a camera.
+@export var gamepad_look_sensitivity := 3.0
+## Angulo vertical maximo da camera em graus, para cima e para baixo.
+@export_range(10.0, 89.0, 1.0) var max_look_angle_degrees := 65.0
+## Suavizacao da rotacao da camera. Maior valor responde mais rapido.
+@export_range(0.0, 60.0, 0.5) var look_smoothing := 18.0
+
+@export_group("Body Rotation")
+## Suavizacao da rotacao do personagem em direcao ao movimento/camera. Maior valor responde mais rapido.
+@export_range(0.0, 30.0, 0.5) var turn_smoothing := 14.0
+
 @export_group("Swimming")
+## Multiplicador da velocidade base enquanto o personagem esta nadando.
 @export var swim_speed_multiplier := 0.55
+## Atrito vertical aplicado na agua para reduzir subida/descida involuntaria.
 @export var swim_vertical_friction := 10.0
+## Velocidade vertical alvo ao segurar pulo enquanto submerso.
 @export_range(0.0, 20.0, 0.1, "or_greater") var swim_up_speed := 8.0
+## Aceleracao usada para atingir a velocidade vertical de subida.
 @export_range(0.0, 80.0, 0.5, "or_greater") var swim_up_acceleration := 32.0
+## Velocidade vertical minima para manter animacao de saida da agua.
 @export_range(0.0, 10.0, 0.1, "or_greater") var swim_exit_animation_min_up_speed := 1.0
+## Altura do probe usado para detectar superficie/volume de agua ao redor do corpo.
 @export var swim_probe_height := 1.0
+## Raio do probe de natacao usado em consultas fisicas.
 @export var swim_probe_radius := 0.25
+## Altura inicial do probe que verifica apoio no fundo enquanto em agua rasa.
 @export var swim_floor_probe_start_height := 0.2
+## Distancia vertical do probe que verifica se ha chao sob o personagem na agua.
 @export var swim_floor_probe_distance := 0.6
+## Altura fallback do ponto de respiracao quando breath_probe_path nao resolve um node.
 @export var breath_probe_height := 2.55
+## Ossos que podem ser testados contra a superficie para detectar natacao de superficie.
 @export var surface_swim_bone_names: Array[StringName] = [&"L_Clavicle", &"R_Clavicle"]
+## Quantidade minima de ossos acima/fora da agua para considerar natacao de superficie.
 @export_range(1, 8, 1) var surface_swim_required_bone_hits := 1
 
 @onready var actor = get_node_or_null(actor_path)
@@ -52,6 +93,7 @@ var _run_exhausted := false
 
 
 func _ready() -> void:
+	refresh_character_nodes()
 	_audio_manager = get_node_or_null("/root/AudioManager")
 	if _audio_manager != null and _audio_manager.has_signal("settings_changed"):
 		_audio_manager.connect("settings_changed", _on_settings_changed)
@@ -61,6 +103,24 @@ func _ready() -> void:
 		_camera_yaw = _get_camera_global_yaw()
 		_target_camera_yaw = _camera_yaw
 	_apply_mouse_capture_mode()
+
+
+func refresh_character_nodes() -> void:
+	skeleton = null
+	breath_probe = null
+
+	var actor := get_node_or_null(actor_path)
+	if actor != null:
+		var player_animation := actor.get_node_or_null("visual/PlayerAnimation")
+		if player_animation != null and player_animation.has_method("get_active_skeleton"):
+			skeleton = player_animation.call("get_active_skeleton") as Skeleton3D
+
+	if skeleton == null:
+		skeleton = get_node_or_null(skeleton_path) as Skeleton3D
+	if breath_probe == null:
+		breath_probe = get_node_or_null(breath_probe_path) as Node3D
+	if breath_probe == null and skeleton != null:
+		breath_probe = skeleton.get_node_or_null("BreathProbeAttachment/BreathProbe") as Node3D
 
 
 func _process(delta: float) -> void:

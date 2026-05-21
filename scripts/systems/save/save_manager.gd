@@ -1,7 +1,11 @@
 extends Node
 
 const SAVE_PATH := "user://savegame.json"
+const PLAYER_PROFILE_PATH := "user://player_profile.json"
 const SAVE_VERSION := 2
+const PLAYER_CHARACTER_MODEL_META := &"selected_player_character_model"
+const DEFAULT_PLAYER_CHARACTER_MODEL := &"Male"
+const VALID_PLAYER_CHARACTER_MODELS := ["Male", "Female"]
 
 var _pending_scene_save_data: Dictionary = {}
 var _removed_scene_node_paths: Array[String] = []
@@ -20,6 +24,7 @@ func save_current_game() -> bool:
 		"version": SAVE_VERSION,
 		"saved_at_unix_time": Time.get_unix_time_from_system(),
 		"scene_path": scene.scene_file_path,
+		"player_character_model": _get_player_character_model(scene),
 		"environment": _get_environment_save_data(scene),
 		"nodes": _get_nodes_save_data(scene),
 		"removed_scene_nodes": _removed_scene_node_paths.duplicate(),
@@ -29,6 +34,7 @@ func save_current_game() -> bool:
 
 
 func save_payload(payload: Dictionary) -> bool:
+	_store_player_character_model(str(payload.get("player_character_model", "")))
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("SaveManager: failed to open save file '%s' for writing." % SAVE_PATH)
@@ -62,6 +68,7 @@ func load_game_scene(fallback_scene_path := "") -> bool:
 	if scene_path.is_empty():
 		return false
 
+	_apply_global_save_metadata(payload)
 	var error := get_tree().change_scene_to_file(scene_path)
 	if error != OK:
 		push_error("SaveManager: failed to change scene to '%s'. Error: %s" % [scene_path, error])
@@ -111,6 +118,7 @@ func _apply_pending_scene_save_data() -> void:
 
 
 func _apply_payload_to_scene(payload: Dictionary, scene: Node) -> void:
+	_apply_global_save_metadata(payload)
 	_removed_scene_node_paths = _get_string_array(payload.get("removed_scene_nodes", []))
 	_apply_removed_scene_nodes(scene, _removed_scene_node_paths)
 	_spawn_saved_nodes(scene, payload.get("spawned_nodes", []))
@@ -126,6 +134,79 @@ func _get_environment_save_data(root: Node) -> Dictionary:
 	if environment == null:
 		return {}
 	return environment.call("get_environment_save_data")
+
+
+func _get_player_character_model(root: Node) -> String:
+	var player_animation := _find_node_with_method(root, &"get_selected_character_model")
+	if player_animation != null:
+		return _normalize_player_character_model(str(player_animation.call("get_selected_character_model")))
+	if get_tree().has_meta(PLAYER_CHARACTER_MODEL_META):
+		return _normalize_player_character_model(str(get_tree().get_meta(PLAYER_CHARACTER_MODEL_META)))
+	return _load_stored_player_character_model()
+
+
+func _apply_global_save_metadata(payload: Dictionary) -> void:
+	var character_model := _normalize_player_character_model(str(payload.get("player_character_model", "")))
+	if character_model.is_empty():
+		var nodes: Variant = payload.get("nodes", {})
+		if nodes is Dictionary:
+			for node_data in (nodes as Dictionary).values():
+				if node_data is Dictionary and (node_data as Dictionary).has("character_model"):
+					character_model = _normalize_player_character_model(str((node_data as Dictionary).get("character_model", "")))
+					break
+	if character_model.is_empty():
+		character_model = _load_stored_player_character_model()
+	if character_model.is_empty():
+		character_model = DEFAULT_PLAYER_CHARACTER_MODEL
+	if not character_model.is_empty():
+		get_tree().set_meta(PLAYER_CHARACTER_MODEL_META, StringName(character_model))
+		_store_player_character_model(character_model)
+
+
+func set_player_character_model(character_model: StringName) -> void:
+	var normalized := _normalize_player_character_model(str(character_model))
+	if normalized.is_empty():
+		normalized = DEFAULT_PLAYER_CHARACTER_MODEL
+	get_tree().set_meta(PLAYER_CHARACTER_MODEL_META, StringName(normalized))
+	_store_player_character_model(normalized)
+
+
+func get_player_character_model() -> StringName:
+	if get_tree().has_meta(PLAYER_CHARACTER_MODEL_META):
+		var normalized := _normalize_player_character_model(str(get_tree().get_meta(PLAYER_CHARACTER_MODEL_META)))
+		if not normalized.is_empty():
+			return StringName(normalized)
+	return StringName(_load_stored_player_character_model())
+
+
+func _store_player_character_model(character_model: String) -> void:
+	var normalized := _normalize_player_character_model(character_model)
+	if normalized.is_empty():
+		return
+
+	var file := FileAccess.open(PLAYER_PROFILE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_error("SaveManager: failed to open player profile '%s' for writing." % PLAYER_PROFILE_PATH)
+		return
+	file.store_string(JSON.stringify({"player_character_model": normalized}, "\t"))
+
+
+func _load_stored_player_character_model() -> String:
+	if not FileAccess.file_exists(PLAYER_PROFILE_PATH):
+		return ""
+	var file := FileAccess.open(PLAYER_PROFILE_PATH, FileAccess.READ)
+	if file == null:
+		return ""
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if not parsed is Dictionary:
+		return ""
+	return _normalize_player_character_model(str((parsed as Dictionary).get("player_character_model", "")))
+
+
+func _normalize_player_character_model(character_model: String) -> String:
+	if VALID_PLAYER_CHARACTER_MODELS.has(character_model):
+		return character_model
+	return ""
 
 
 func _apply_environment_save_data(root: Node, data: Dictionary) -> void:
