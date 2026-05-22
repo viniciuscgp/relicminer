@@ -7,6 +7,8 @@ const LEFT_HAND := &"left_hand"
 const PRIMARY := &"primary"
 const SECONDARY := &"secondary"
 const THROW := &"throw"
+const LIVE_PREVIEW_PATH := "user://held_transform_override_preview.json"
+const LIVE_PREVIEW_POLL_INTERVAL := 0.1
 
 signal changed
 signal equipped(slot: StringName, stack: Resource)
@@ -14,6 +16,10 @@ signal unequipped(slot: StringName, stack: Resource)
 signal action_executed(slot: StringName, trigger: StringName, action: Resource)
 
 var _watched_held_transform_overrides := {}
+var _pending_equipped_slots_save_data: Dictionary = {}
+var _live_preview_overrides := {}
+var _live_preview_payload_text := ""
+var _live_preview_poll_time := 0.0
 
 @export_group("Node References")
 @export var actor_path: NodePath = NodePath("..")
@@ -35,6 +41,7 @@ var _watched_held_transform_overrides := {}
 @export_group("Runtime Behavior")
 @export var compensate_socket_scale := true
 @export var refresh_held_transforms_in_game := true
+@export var use_editor_live_preview_overrides := true
 
 @export_group("Held Transform Overrides")
 @export var held_transform_overrides: Array[HeldItemTransformOverride] = []:
@@ -90,6 +97,7 @@ func refresh_skeleton() -> void:
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
+	_refresh_editor_live_preview_overrides(_delta)
 	if refresh_held_transforms_in_game:
 		_refresh_held_transforms()
 
@@ -148,11 +156,18 @@ func get_save_data() -> Dictionary:
 
 
 func apply_save_data(data: Dictionary) -> void:
-	for slot in _equipped_stacks.keys():
-		_clear_held_instance(slot)
-		_equipped_stacks[slot] = null
+	_clear_equipped_slots()
+	_pending_equipped_slots_save_data = data.get("equipped_slots", {})
+	if is_inside_tree():
+		_apply_pending_equipped_slots_save_data.call_deferred()
+	else:
+		_apply_pending_equipped_slots_save_data()
 
-	var equipped_slots: Dictionary = data.get("equipped_slots", {})
+
+func _apply_pending_equipped_slots_save_data() -> void:
+	var equipped_slots := _pending_equipped_slots_save_data.duplicate(true)
+	_pending_equipped_slots_save_data.clear()
+	_clear_equipped_slots()
 	for slot_text in equipped_slots.keys():
 		var slot := StringName(str(slot_text))
 		if not _equipped_stacks.has(slot):
@@ -160,11 +175,19 @@ func apply_save_data(data: Dictionary) -> void:
 		var stack_data: Variant = equipped_slots.get(slot_text)
 		if not stack_data is Dictionary:
 			continue
+		if (stack_data as Dictionary).is_empty():
+			continue
 		var stack := _find_inventory_stack_for_save_data(stack_data)
 		if stack != null:
 			_equipped_stacks[slot] = stack
 			_create_held_instance(slot, stack)
 	changed.emit()
+
+
+func _clear_equipped_slots() -> void:
+	for slot in _equipped_stacks.keys():
+		_clear_held_instance(slot)
+		_equipped_stacks[slot] = null
 
 
 func use_primary(slot: StringName = &"") -> bool:
@@ -346,6 +369,7 @@ func _watch_held_transform_overrides() -> void:
 func _on_held_transform_override_changed() -> void:
 	if is_node_ready():
 		_refresh_held_transforms()
+	changed.emit()
 
 
 func _play_equipment_action_animation(item: Resource, trigger: StringName) -> void:
@@ -499,6 +523,10 @@ func _divide_vector3(value: Vector3, divisor: Vector3) -> Vector3:
 
 
 func _get_held_transform_override(item_id: StringName) -> HeldItemTransformOverride:
+	var live_preview_override := _live_preview_overrides.get(item_id) as HeldItemTransformOverride
+	if live_preview_override != null:
+		return live_preview_override
+
 	for index in range(held_transform_overrides.size() - 1, -1, -1):
 		var override := held_transform_overrides[index]
 		if override != null and override.matches_item(item_id):
@@ -508,6 +536,84 @@ func _get_held_transform_override(item_id: StringName) -> HeldItemTransformOverr
 
 func get_held_transform_override(item_id: StringName) -> Resource:
 	return _get_held_transform_override(item_id)
+
+
+func _refresh_editor_live_preview_overrides(delta: float) -> void:
+	if not use_editor_live_preview_overrides or not OS.is_debug_build():
+		return
+
+	_live_preview_poll_time -= delta
+	if _live_preview_poll_time > 0.0:
+		return
+	_live_preview_poll_time = LIVE_PREVIEW_POLL_INTERVAL
+
+	if not FileAccess.file_exists(LIVE_PREVIEW_PATH):
+		if not _live_preview_overrides.is_empty():
+			_live_preview_overrides.clear()
+			changed.emit()
+		_live_preview_payload_text = ""
+		return
+
+	var file := FileAccess.open(LIVE_PREVIEW_PATH, FileAccess.READ)
+	if file == null:
+		return
+
+	var payload_text := file.get_as_text()
+	if payload_text == _live_preview_payload_text:
+		return
+	_live_preview_payload_text = payload_text
+
+	var parsed: Variant = JSON.parse_string(payload_text)
+	if not parsed is Dictionary:
+		return
+
+	var loaded_overrides := {}
+	for key in (parsed as Dictionary).keys():
+		var data: Variant = (parsed as Dictionary).get(key)
+		if not data is Dictionary:
+			continue
+		var override := _live_preview_override_from_data(data as Dictionary)
+		if override != null:
+			loaded_overrides[StringName(str(key))] = override
+
+	_live_preview_overrides = loaded_overrides
+	_refresh_held_transforms()
+	changed.emit()
+
+
+func _live_preview_override_from_data(data: Dictionary) -> HeldItemTransformOverride:
+	var preview := HeldItemTransformOverride.new()
+	preview.item_id = StringName(str(data.get("item_id", "")))
+	preview.additional_item_ids = _string_name_array_from_variant(data.get("additional_item_ids", []))
+	preview.position = _vector3_from_variant(data.get("position", []), Vector3.ZERO)
+	preview.rotation_degrees = _vector3_from_variant(data.get("rotation_degrees", []), Vector3.ZERO)
+	preview.scale = _vector3_from_variant(data.get("scale", []), Vector3.ONE)
+	preview.pose_enabled = bool(data.get("pose_enabled", false))
+	preview.upperarm_bone_name = StringName(str(data.get("upperarm_bone_name", "")))
+	preview.upperarm_rotation_degrees = _vector3_from_variant(data.get("upperarm_rotation_degrees", []), Vector3.ZERO)
+	preview.forearm_bone_name = StringName(str(data.get("forearm_bone_name", "")))
+	preview.forearm_rotation_degrees = _vector3_from_variant(data.get("forearm_rotation_degrees", []), Vector3.ZERO)
+	preview.hand_bone_name = StringName(str(data.get("hand_bone_name", "")))
+	preview.hand_rotation_degrees = _vector3_from_variant(data.get("hand_rotation_degrees", []), Vector3.ZERO)
+	return preview
+
+
+func _vector3_from_variant(value: Variant, fallback: Vector3) -> Vector3:
+	if not value is Array:
+		return fallback
+	var values := value as Array
+	if values.size() < 3:
+		return fallback
+	return Vector3(float(values[0]), float(values[1]), float(values[2]))
+
+
+func _string_name_array_from_variant(value: Variant) -> Array[StringName]:
+	var result: Array[StringName] = []
+	if not value is Array:
+		return result
+	for item in value:
+		result.append(StringName(str(item)))
+	return result
 
 
 func _clear_held_instance(slot: StringName) -> void:
@@ -560,31 +666,60 @@ func _stack_to_save_data(stack: Resource) -> Dictionary:
 	var item: Resource = stack.get("item")
 	if item == null:
 		return {}
-	return {
+	var data := {
 		"item_path": item.resource_path,
 		"item_id": String(item.get("id")),
+		"amount": int(stack.get("amount")),
 		"durability": float(stack.get("durability")),
 	}
+	var inventory_slot_index := _get_inventory_stack_index(stack)
+	if inventory_slot_index >= 0:
+		data["inventory_slot_index"] = inventory_slot_index
+	return data
 
 
 func _find_inventory_stack_for_save_data(data: Dictionary) -> Resource:
 	if inventory == null:
 		return null
+	var slots: Array = inventory.get("slots")
+	var inventory_slot_index := int(data.get("inventory_slot_index", -1))
+	if inventory_slot_index >= 0 and inventory_slot_index < slots.size():
+		var indexed_stack: Resource = slots[inventory_slot_index]
+		if _stack_matches_save_data(indexed_stack, data):
+			return indexed_stack
+
+	for stack in slots:
+		if _stack_matches_save_data(stack, data):
+			return stack
+	return null
+
+
+func _get_inventory_stack_index(stack: Resource) -> int:
+	if inventory == null:
+		return -1
+	var slots: Array = inventory.get("slots")
+	return slots.find(stack)
+
+
+func _stack_matches_save_data(stack: Resource, data: Dictionary) -> bool:
+	if stack == null or bool(stack.call("is_empty")):
+		return false
+
+	var item: Resource = stack.get("item")
+	if item == null:
+		return false
+
 	var item_path := str(data.get("item_path", ""))
 	var item_id := str(data.get("item_id", ""))
+	if item_path.is_empty() and item_id.is_empty():
+		return false
+	if not item_path.is_empty() and item.resource_path != item_path:
+		return false
+	if item_path.is_empty() and not item_id.is_empty() and str(item.get("id")) != item_id:
+		return false
+
+	if data.has("amount") and int(stack.get("amount")) != int(data.get("amount")):
+		return false
+
 	var saved_durability := float(data.get("durability", -1.0))
-	var slots: Array = inventory.get("slots")
-	for stack in slots:
-		if stack == null or bool(stack.call("is_empty")):
-			continue
-		var item: Resource = stack.get("item")
-		if item == null:
-			continue
-		if not item_path.is_empty() and item.resource_path != item_path:
-			continue
-		if item_path.is_empty() and item_id != "" and str(item.get("id")) != item_id:
-			continue
-		if not is_equal_approx(float(stack.get("durability")), saved_durability):
-			continue
-		return stack
-	return null
+	return is_equal_approx(float(stack.get("durability")), saved_durability)

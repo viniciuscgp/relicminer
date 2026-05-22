@@ -139,6 +139,7 @@ var character_animation_maps: Dictionary = {
 
 var _animation_player: AnimationPlayer
 var _equipment: Node
+var _connected_equipment: Node
 var _skeleton: Skeleton3D
 var _current_standard_animation: StringName = &""
 var _current_animation_speed := 1.0
@@ -336,7 +337,7 @@ func _refresh_animation_player() -> void:
 
 
 func _refresh_held_pose_links() -> void:
-	_equipment = get_node_or_null(equipment_path)
+	_set_held_pose_equipment(get_node_or_null(equipment_path))
 	_skeleton = null
 	var model_root := get_node_or_null(model_root_path)
 	if model_root == null:
@@ -347,6 +348,26 @@ func _refresh_held_pose_links() -> void:
 		_skeleton = get_node_or_null(skeleton_path) as Skeleton3D
 	if _skeleton == null and model_root != null:
 		_skeleton = _find_skeleton(model_root)
+
+
+func _set_held_pose_equipment(equipment: Node) -> void:
+	if _connected_equipment == equipment:
+		_equipment = equipment
+		return
+
+	if _connected_equipment != null and is_instance_valid(_connected_equipment) and _connected_equipment.has_signal("changed"):
+		if _connected_equipment.changed.is_connected(_on_equipment_changed):
+			_connected_equipment.changed.disconnect(_on_equipment_changed)
+
+	_equipment = equipment
+	_connected_equipment = equipment
+	if _connected_equipment != null and _connected_equipment.has_signal("changed"):
+		if not _connected_equipment.changed.is_connected(_on_equipment_changed):
+			_connected_equipment.changed.connect(_on_equipment_changed)
+
+
+func _on_equipment_changed() -> void:
+	_apply_held_pose_override()
 
 
 func get_required_animations() -> Array[StringName]:
@@ -687,7 +708,8 @@ func _notify_animation_map_changed() -> void:
 
 
 func _apply_held_pose_override() -> void:
-	if _equipment == null or _skeleton == null:
+	_refresh_active_held_pose_skeleton()
+	if _equipment == null:
 		_refresh_held_pose_links()
 
 	if _equipment == null or _skeleton == null:
@@ -709,6 +731,17 @@ func _apply_held_pose_override() -> void:
 
 	if _skeleton.has_method("force_update_all_bone_transforms"):
 		_skeleton.call("force_update_all_bone_transforms")
+
+
+func _refresh_active_held_pose_skeleton() -> void:
+	var model_root := get_node_or_null(model_root_path)
+	if model_root == null:
+		model_root = get_parent()
+	if not Engine.is_editor_hint() and model_root != null and model_root.has_method("get_active_skeleton"):
+		var active_skeleton := model_root.call("get_active_skeleton") as Skeleton3D
+		if active_skeleton != null and active_skeleton != _skeleton:
+			_clear_held_pose_override()
+			_skeleton = active_skeleton
 
 
 func _clear_held_pose_override() -> void:

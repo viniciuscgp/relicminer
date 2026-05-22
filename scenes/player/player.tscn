@@ -71,15 +71,15 @@ rotation_degrees = Vector3(0, 0, 90)
 resource_local_to_scene = true
 script = ExtResource("22_held_override")
 item_id = &"simple_torch"
-additional_item_ids = Array[StringName]([&"small_stone"])
-position = Vector3(0.1, 0.31, 0)
+position = Vector3(-0.01, 0.2, -0.2)
+rotation_degrees = Vector3(-90, 0, 0)
 pose_enabled = true
 upperarm_bone_name = &"L_Upperarm"
-upperarm_rotation_degrees = Vector3(10, 0, -40)
+upperarm_rotation_degrees = Vector3(10, -40, -90)
 forearm_bone_name = &"L_Forearm"
-forearm_rotation_degrees = Vector3(0, 0, 40)
+forearm_rotation_degrees = Vector3(30, 40, 120)
 hand_bone_name = &"L_Hand"
-hand_rotation_degrees = Vector3(90, 0, 90)
+hand_rotation_degrees = Vector3(40, 130, 40)
 
 [sub_resource type="Resource" id="Resource_ioxgp"]
 resource_local_to_scene = true
@@ -96,7 +96,6 @@ hand_bone_name = &"L_Hand"
 hand_rotation_degrees = Vector3(90, 0, 90)
 
 [sub_resource type="Resource" id="Resource_cnsyf"]
-resource_local_to_scene = true
 script = ExtResource("22_held_override")
 item_id = &"small_stone"
 position = Vector3(0, 0.31, 0)
