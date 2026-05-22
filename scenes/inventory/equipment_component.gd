@@ -1,7 +1,6 @@
+@tool
 extends Node
 class_name EquipmentComponent
-
-const HeldItemTransformOverrideResource := preload("res://scenes/inventory/held_item_transform_override.gd")
 
 const RIGHT_HAND := &"right_hand"
 const LEFT_HAND := &"left_hand"
@@ -13,6 +12,8 @@ signal changed
 signal equipped(slot: StringName, stack: Resource)
 signal unequipped(slot: StringName, stack: Resource)
 signal action_executed(slot: StringName, trigger: StringName, action: Resource)
+
+var _watched_held_transform_overrides := {}
 
 @export_group("Node References")
 @export var actor_path: NodePath = NodePath("..")
@@ -36,7 +37,12 @@ signal action_executed(slot: StringName, trigger: StringName, action: Resource)
 @export var refresh_held_transforms_in_game := true
 
 @export_group("Held Transform Overrides")
-@export var held_transform_overrides: Array[Resource] = []
+@export var held_transform_overrides: Array[HeldItemTransformOverride] = []:
+	set(value):
+		held_transform_overrides = _make_unique_held_transform_overrides(value, held_transform_overrides.size())
+		_watch_held_transform_overrides()
+		if is_node_ready():
+			_refresh_held_transforms()
 
 @onready var actor: Node = get_node_or_null(actor_path)
 @onready var inventory: Node = get_node_or_null(inventory_path)
@@ -57,6 +63,11 @@ var _held_instances := {
 
 
 func _ready() -> void:
+	held_transform_overrides = _make_unique_held_transform_overrides(held_transform_overrides, held_transform_overrides.size())
+	_watch_held_transform_overrides()
+	if Engine.is_editor_hint():
+		return
+
 	refresh_skeleton()
 	if inventory != null and inventory.has_signal("changed"):
 		inventory.connect("changed", _validate_equipped_stacks)
@@ -77,6 +88,8 @@ func refresh_skeleton() -> void:
 
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if refresh_held_transforms_in_game:
 		_refresh_held_transforms()
 
@@ -196,13 +209,20 @@ func throw_equipped_item(slot: StringName, throw_speed := 9.0, upward_speed := 1
 	if stack == null or bool(stack.call("is_empty")):
 		return false
 
-	var item: Resource = stack.get("item")
-	if item == null or inventory_dropper == null or not inventory_dropper.has_method("throw_item"):
+	if inventory_dropper == null:
 		return false
 
-	var durability := float(stack.get("durability"))
-	var thrown := bool(inventory_dropper.call("throw_item", item, 1, durability, get_aim_direction(), throw_speed, upward_speed))
+	var thrown := false
+	if inventory_dropper.has_method("throw_stack"):
+		thrown = bool(inventory_dropper.call("throw_stack", stack, 1, get_aim_direction(), throw_speed, upward_speed))
+	else:
+		var item: Resource = stack.get("item")
+		if item == null or not inventory_dropper.has_method("throw_item"):
+			return false
+		var durability := float(stack.get("durability"))
+		thrown = bool(inventory_dropper.call("throw_item", item, 1, durability, get_aim_direction(), throw_speed, upward_speed))
 	if thrown:
+		unequip(slot)
 		_validate_equipped_stacks()
 	return thrown
 
@@ -259,6 +279,73 @@ func _resolve_action_slot(requested_slot: StringName) -> StringName:
 func _has_equipped_stack(slot: StringName) -> bool:
 	var stack := get_equipped_stack(slot)
 	return stack != null and not bool(stack.call("is_empty"))
+
+
+func _make_unique_held_transform_overrides(overrides: Array[HeldItemTransformOverride], previous_size := -1) -> Array[HeldItemTransformOverride]:
+	var prepared: Array[HeldItemTransformOverride] = []
+	var seen := {}
+	for index in range(overrides.size()):
+		var override := overrides[index]
+		if override == null and previous_size >= 0 and index >= previous_size:
+			var previous_override := _find_previous_held_transform_override(prepared)
+			if previous_override != null:
+				override = _duplicate_held_transform_override(previous_override)
+
+		if override == null:
+			prepared.append(null)
+			continue
+
+		var prepared_override := override
+		var instance_id := override.get_instance_id()
+		if seen.has(instance_id):
+			prepared_override = _duplicate_held_transform_override(override)
+
+		seen[prepared_override.get_instance_id()] = true
+		prepared.append(prepared_override)
+	return prepared
+
+
+func _find_previous_held_transform_override(overrides: Array[HeldItemTransformOverride]) -> HeldItemTransformOverride:
+	for index in range(overrides.size() - 1, -1, -1):
+		var override := overrides[index]
+		if override != null:
+			return override
+	return null
+
+
+func _duplicate_held_transform_override(override: HeldItemTransformOverride) -> HeldItemTransformOverride:
+	var duplicate := override.duplicate(true) as HeldItemTransformOverride
+	if duplicate == null:
+		return null
+	duplicate.resource_path = ""
+	return duplicate
+
+
+func _watch_held_transform_overrides() -> void:
+	var active_overrides := {}
+	for override in held_transform_overrides:
+		if override == null:
+			continue
+
+		var instance_id := override.get_instance_id()
+		active_overrides[instance_id] = override
+		if not override.changed.is_connected(_on_held_transform_override_changed):
+			override.changed.connect(_on_held_transform_override_changed)
+
+	for instance_id in _watched_held_transform_overrides.keys():
+		if active_overrides.has(instance_id):
+			continue
+
+		var watched_override: HeldItemTransformOverride = _watched_held_transform_overrides[instance_id]
+		if watched_override != null and watched_override.changed.is_connected(_on_held_transform_override_changed):
+			watched_override.changed.disconnect(_on_held_transform_override_changed)
+
+	_watched_held_transform_overrides = active_overrides
+
+
+func _on_held_transform_override_changed() -> void:
+	if is_node_ready():
+		_refresh_held_transforms()
 
 
 func _play_equipment_action_animation(item: Resource, trigger: StringName) -> void:
@@ -412,9 +499,9 @@ func _divide_vector3(value: Vector3, divisor: Vector3) -> Vector3:
 
 
 func _get_held_transform_override(item_id: StringName) -> HeldItemTransformOverride:
-	for override_resource in held_transform_overrides:
-		var override := override_resource as HeldItemTransformOverride
-		if override != null and override.item_id == item_id:
+	for index in range(held_transform_overrides.size() - 1, -1, -1):
+		var override := held_transform_overrides[index]
+		if override != null and override.matches_item(item_id):
 			return override
 	return null
 

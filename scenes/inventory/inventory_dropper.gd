@@ -27,7 +27,7 @@ func drop_stack(stack: Resource, amount := 1) -> bool:
 		return false
 
 	var durability := float(stack.get("durability"))
-	return drop_item(item, amount, durability)
+	return _drop_item_internal(item, amount, durability, Vector3.ZERO, false, stack)
 
 
 func drop_item(item: Resource, amount := 1, durability := -1.0) -> bool:
@@ -39,7 +39,20 @@ func throw_item(item: Resource, amount := 1, durability := -1.0, direction := Ve
 	return _drop_item_internal(item, amount, durability, throw_velocity, true)
 
 
-func _drop_item_internal(item: Resource, amount := 1, durability := -1.0, velocity_override := Vector3.ZERO, has_velocity_override := false) -> bool:
+func throw_stack(stack: Resource, amount := 1, direction := Vector3.FORWARD, speed := 9.0, upward_speed := 1.5) -> bool:
+	if stack == null or bool(stack.call("is_empty")):
+		return false
+
+	var item: Resource = stack.get("item")
+	if item == null:
+		return false
+
+	var durability := float(stack.get("durability"))
+	var throw_velocity := direction.normalized() * speed + Vector3.UP * upward_speed
+	return _drop_item_internal(item, amount, durability, throw_velocity, true, stack)
+
+
+func _drop_item_internal(item: Resource, amount := 1, durability := -1.0, velocity_override := Vector3.ZERO, has_velocity_override := false, source_stack: Resource = null) -> bool:
 	if item == null or inventory == null or not inventory.has_method("remove_item"):
 		return false
 	if not item.has_method("create_world_instance"):
@@ -49,7 +62,7 @@ func _drop_item_internal(item: Resource, amount := 1, durability := -1.0, veloci
 	if world_item == null:
 		return false
 
-	var removed := int(inventory.call("remove_item", item.get("id"), amount))
+	var removed := _remove_item(item.get("id"), amount, source_stack)
 	if removed <= 0:
 		world_item.queue_free()
 		return false
@@ -59,6 +72,38 @@ func _drop_item_internal(item: Resource, amount := 1, durability := -1.0, veloci
 
 	_add_dropped_item_to_world(world_item, velocity_override, has_velocity_override)
 	return true
+
+
+func _remove_item(item_id: StringName, amount: int, source_stack: Resource = null) -> int:
+	if source_stack == null:
+		return int(inventory.call("remove_item", item_id, amount))
+	return _remove_from_stack(source_stack, item_id, amount)
+
+
+func _remove_from_stack(stack: Resource, item_id: StringName, amount: int) -> int:
+	if amount <= 0 or stack == null or bool(stack.call("is_empty")):
+		return 0
+
+	var item: Resource = stack.get("item")
+	if item == null or item.get("id") != item_id:
+		return 0
+
+	var slots: Array = inventory.get("slots")
+	var slot_index := slots.find(stack)
+	if slot_index == -1:
+		return 0
+
+	var removed: int = min(int(stack.get("amount")), amount)
+	stack.set("amount", int(stack.get("amount")) - removed)
+	if int(stack.get("amount")) <= 0:
+		slots.remove_at(slot_index)
+
+	if removed > 0:
+		if inventory.has_signal("item_removed"):
+			inventory.emit_signal("item_removed", item_id, removed)
+		if inventory.has_signal("changed"):
+			inventory.emit_signal("changed")
+	return removed
 
 
 func _add_dropped_item_to_world(world_item: Node, velocity_override := Vector3.ZERO, has_velocity_override := false) -> void:

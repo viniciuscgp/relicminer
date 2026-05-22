@@ -60,16 +60,47 @@ item = ExtResource("14_crown")
 amount = 12
 
 [sub_resource type="Resource" id="HeldOverride_pickaxe"]
+resource_local_to_scene = true
 script = ExtResource("22_held_override")
 item_id = &"simple_pickaxe"
-position = Vector3(0.008, 0.2, 0.3)
-rotation_degrees = Vector3(0, 180, 90)
+additional_item_ids = Array[StringName]([&"short_sword"])
+position = Vector3(0.01, 0.1, -0.38)
+rotation_degrees = Vector3(0, 0, 90)
 
 [sub_resource type="Resource" id="HeldOverride_torch"]
+resource_local_to_scene = true
 script = ExtResource("22_held_override")
 item_id = &"simple_torch"
-position = Vector3(0.1, 0.32, 0)
-rotation_degrees = Vector3(1, 10, 0)
+additional_item_ids = Array[StringName]([&"small_stone"])
+position = Vector3(0.1, 0.31, 0)
+pose_enabled = true
+upperarm_bone_name = &"L_Upperarm"
+upperarm_rotation_degrees = Vector3(10, 0, -40)
+forearm_bone_name = &"L_Forearm"
+forearm_rotation_degrees = Vector3(0, 0, 40)
+hand_bone_name = &"L_Hand"
+hand_rotation_degrees = Vector3(90, 0, 90)
+
+[sub_resource type="Resource" id="Resource_ioxgp"]
+resource_local_to_scene = true
+script = ExtResource("22_held_override")
+item_id = &"copper_crown"
+position = Vector3(0, 0.31, 0)
+rotation_degrees = Vector3(0, 0, 90)
+pose_enabled = true
+upperarm_bone_name = &"L_Upperarm"
+upperarm_rotation_degrees = Vector3(10, 0, -40)
+forearm_bone_name = &"L_Forearm"
+forearm_rotation_degrees = Vector3(0, 0, 40)
+hand_bone_name = &"L_Hand"
+hand_rotation_degrees = Vector3(90, 0, 90)
+
+[sub_resource type="Resource" id="Resource_cnsyf"]
+resource_local_to_scene = true
+script = ExtResource("22_held_override")
+item_id = &"small_stone"
+position = Vector3(0, 0.31, 0)
+rotation_degrees = Vector3(0, 0, 90)
 pose_enabled = true
 upperarm_bone_name = &"L_Upperarm"
 upperarm_rotation_degrees = Vector3(10, 0, -40)
@@ -98,7 +129,7 @@ drop_distance = 1.26
 [node name="Equipment" type="Node" parent="." unique_id=971635141]
 script = ExtResource("20_equipment")
 aim_source_path = NodePath("../CameraPivot/SpringArm3D/Camera3D")
-held_transform_overrides = Array[Resource]([SubResource("HeldOverride_pickaxe"), SubResource("HeldOverride_torch")])
+held_transform_overrides = Array[ExtResource("22_held_override")]([SubResource("HeldOverride_pickaxe"), SubResource("HeldOverride_torch"), SubResource("Resource_ioxgp"), SubResource("Resource_cnsyf")])
 
 [node name="Interactor" type="Node" parent="." unique_id=1074997997]
 script = ExtResource("17_interactor")
