@@ -1,13 +1,13 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeatherProfile" format=3 uid="uid://4bcgl63lbduf"]
 
-[ext_resource type="Script" path="res://scenes/environment/weather_profile.gd" id="1"]
+[ext_resource type="Script" uid="uid://bor8cyr47qmno" path="res://scenes/environment/weather_profile.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 id = &"overcast"
 display_name = "Overcast"
+auto_weather_weight = 1.5
 cloud_coverage = 0.92
-rain_intensity = 0.0
 fog_density = 0.008
 sky_tint = Color(0.72, 0.76, 0.8, 1)
 sun_energy_multiplier = 0.45

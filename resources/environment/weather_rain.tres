@@ -1,18 +1,18 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeatherProfile" format=3 uid="uid://chxxcym314o83"]
 
-[ext_resource type="Script" path="res://scenes/environment/weather_profile.gd" id="1"]
+[ext_resource type="Script" uid="uid://bor8cyr47qmno" path="res://scenes/environment/weather_profile.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 id = &"rain"
 display_name = "Rain"
-cloud_coverage = 0.98
+cloud_coverage = 0.63
 rain_intensity = 0.68
-fog_density = 0.014
-sky_tint = Color(0.58, 0.64, 0.72, 1)
+fog_density = 0.03
+sky_tint = Color(0.58320004, 0.64248, 0.72, 0.74509805)
 sun_energy_multiplier = 0.28
 moon_energy_multiplier = 0.12
-ambient_energy_multiplier = 0.56
 star_visibility_multiplier = 0.0
+lightning_activity = 0.85
 wind_direction = Vector2(0.6, -0.7)
 wind_speed = 2.4

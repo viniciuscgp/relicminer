@@ -25,6 +25,7 @@ signal close_requested
 @onready var keyboard_button: CheckButton = %KeyboardButton
 @onready var joystick_button: CheckButton = %JoystickButton
 @onready var vibration_button: CheckBox = %VibrationButton
+@onready var world_time_button: CheckBox = %WorldTimeButton
 @onready var apply_button: Button = %ApplyButton
 @onready var restore_button: Button = %RestoreButton
 @onready var back_button: Button = %BackButton
@@ -65,6 +66,7 @@ func _connect_controls() -> void:
 	keyboard_button.pressed.connect(_set_input_mode.bind("keyboard"))
 	joystick_button.pressed.connect(_set_input_mode.bind("joystick"))
 	vibration_button.toggled.connect(_set_vibration_enabled)
+	world_time_button.toggled.connect(_set_world_time_visible)
 	language_option.item_selected.connect(_set_language_by_index)
 	apply_button.pressed.connect(_on_apply_pressed)
 	restore_button.pressed.connect(_on_restore_pressed)
@@ -83,6 +85,7 @@ func _get_audio_settings() -> Dictionary:
 		"sfx_enabled": true,
 		"input_mode": "keyboard",
 		"vibration_enabled": false,
+		"hud_show_world_time": true,
 		"language": "en",
 	}
 
@@ -96,6 +99,7 @@ func _apply_settings_to_controls() -> void:
 	var input_mode := str(_settings.get("input_mode", "keyboard"))
 	var joystick := input_mode == "joystick"
 	var vibration_enabled := bool(_settings.get("vibration_enabled", false))
+	var hud_show_world_time := bool(_settings.get("hud_show_world_time", true))
 	var language := str(_settings.get("language", _get_current_language()))
 
 	music_on_button.button_pressed = music_enabled
@@ -109,6 +113,7 @@ func _apply_settings_to_controls() -> void:
 	joystick_button.button_pressed = joystick
 	vibration_button.disabled = not joystick
 	vibration_button.button_pressed = joystick and vibration_enabled
+	world_time_button.button_pressed = hud_show_world_time
 	_select_language(language)
 	_refresh_volume_labels()
 
@@ -155,6 +160,10 @@ func _set_input_mode(mode: String) -> void:
 
 func _set_vibration_enabled(enabled: bool) -> void:
 	_settings["vibration_enabled"] = enabled and not vibration_button.disabled
+
+
+func _set_world_time_visible(enabled: bool) -> void:
+	_settings["hud_show_world_time"] = enabled
 
 
 func _set_language_by_index(index: int) -> void:
@@ -207,6 +216,7 @@ func _configure_focus() -> void:
 		keyboard_button,
 		joystick_button,
 		vibration_button,
+		world_time_button,
 		apply_button,
 		restore_button,
 		back_button,
@@ -231,6 +241,7 @@ func _apply_localization() -> void:
 	keyboard_button.text = _text("ui.settings.keyboard_mouse")
 	joystick_button.text = _text("ui.settings.joystick")
 	vibration_button.text = _text("ui.settings.vibration")
+	world_time_button.text = _text("ui.settings.show_world_time")
 	apply_button.text = _text("ui.settings.apply")
 	restore_button.text = _text("ui.settings.restore")
 	back_button.text = _text("ui.settings.back")

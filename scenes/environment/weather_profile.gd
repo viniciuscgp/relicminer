@@ -6,6 +6,10 @@ class_name WeatherProfile
 ## Nome legivel do clima para editor, debug ou UI futura.
 @export var display_name := "Clear"
 
+@export_group("Selection")
+## Peso usado no sorteio automatico de clima. 0 impede este clima de ser escolhido automaticamente.
+@export_range(0.0, 100.0, 0.1, "or_greater") var auto_weather_weight := 1.0
+
 @export_group("Sky")
 ## Cobertura de nuvens de 0 a 1. Valores altos escurecem o dia, escondem estrelas e reduzem sol/lua.
 @export_range(0.0, 1.0, 0.01) var cloud_coverage := 0.0
@@ -25,6 +29,10 @@ class_name WeatherProfile
 @export_range(0.0, 2.0, 0.01) var ambient_energy_multiplier := 1.0
 ## Multiplica a visibilidade das estrelas. Ainda e afetado por noite, nuvens e chuva.
 @export_range(0.0, 1.0, 0.01) var star_visibility_multiplier := 1.0
+
+@export_group("Storm")
+## Frequencia/forca dos relampagos neste clima. 0 desliga; valores altos deixam os flashes mais frequentes e visiveis.
+@export_range(0.0, 1.0, 0.01) var lightning_activity := 0.0
 
 @export_group("Motion")
 ## Direcao do vento usada para mover nuvens e futuramente chuva/folhagem.

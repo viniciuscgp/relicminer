@@ -1,18 +1,10 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeatherProfile" format=3 uid="uid://de14aixuvh0yk"]
 
-[ext_resource type="Script" path="res://scenes/environment/weather_profile.gd" id="1"]
+[ext_resource type="Script" uid="uid://bor8cyr47qmno" path="res://scenes/environment/weather_profile.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-id = &"clear"
-display_name = "Clear"
+auto_weather_weight = 8.0
 cloud_coverage = 0.08
-rain_intensity = 0.0
-fog_density = 0.0
-sky_tint = Color(1, 1, 1, 1)
-sun_energy_multiplier = 1.0
-moon_energy_multiplier = 1.0
-ambient_energy_multiplier = 1.0
-star_visibility_multiplier = 1.0
 wind_direction = Vector2(1, 0.18)
 wind_speed = 0.55

@@ -2,12 +2,21 @@ extends CanvasLayer
 
 @export var player_path: NodePath = NodePath("..")
 @export var update_interval := 0.15
+@export_group("World Time")
+@export var show_world_time := true
+@export var environment_path: NodePath
+@export var show_weather_id := true
 
 var _stats: Node
 var _inventory: Node
+var _environment: Node
 var _localization_manager: Node
+var _audio_manager: Node
 var _elapsed := 0.0
 
+var _time_panel: PanelContainer
+var _time_label: Label
+var _weather_label: Label
 var _level_label: Label
 var _hp_label: Label
 var _energy_label: Label
@@ -21,11 +30,16 @@ var _oxygen_bar: ProgressBar
 
 
 func _ready() -> void:
+	_audio_manager = get_node_or_null("/root/AudioManager")
+	if _audio_manager != null and _audio_manager.has_signal("settings_changed"):
+		_audio_manager.connect("settings_changed", _on_settings_changed)
 	_localization_manager = get_node_or_null("/root/LocalizationManager")
 	if _localization_manager != null and _localization_manager.has_signal("language_changed"):
 		_localization_manager.connect("language_changed", _on_language_changed)
+	_apply_saved_settings()
 	_build_ui()
 	_resolve_player_links()
+	_resolve_environment()
 	_refresh()
 
 
@@ -55,12 +69,69 @@ func _resolve_player_links() -> void:
 		_inventory.connect("changed", _refresh)
 
 
+func _resolve_environment() -> void:
+	if not environment_path.is_empty():
+		_environment = get_node_or_null(environment_path)
+	if _environment == null:
+		_environment = _find_environment(get_tree().current_scene)
+	if _environment != null and _environment.has_signal("hour_changed"):
+		_environment.connect("hour_changed", _on_environment_hour_changed)
+	if _environment != null and _environment.has_signal("weather_changed"):
+		_environment.connect("weather_changed", _on_environment_weather_changed)
+
+
+func _find_environment(node: Node) -> Node:
+	if node == null:
+		return null
+	if node.get("current_hour") != null and node.has_method("get_current_weather_id"):
+		return node
+	for child in node.get_children():
+		var result := _find_environment(child)
+		if result != null:
+			return result
+	return null
+
+
 func _build_ui() -> void:
 	var root := Control.new()
 	root.name = "Root"
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(root)
+
+	_time_panel = PanelContainer.new()
+	_time_panel.name = "WorldTimePanel"
+	_time_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_time_panel.custom_minimum_size = Vector2(164.0, 48.0)
+	_time_panel.offset_left = 16.0
+	_time_panel.offset_top = 184.0
+	_time_panel.offset_right = 180.0
+	_time_panel.offset_bottom = 232.0
+	_time_panel.add_theme_stylebox_override("panel", _make_panel_style())
+	root.add_child(_time_panel)
+
+	var time_margin := MarginContainer.new()
+	time_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	time_margin.add_theme_constant_override("margin_left", 10)
+	time_margin.add_theme_constant_override("margin_top", 8)
+	time_margin.add_theme_constant_override("margin_right", 10)
+	time_margin.add_theme_constant_override("margin_bottom", 8)
+	_time_panel.add_child(time_margin)
+
+	var time_rows := VBoxContainer.new()
+	time_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	time_rows.add_theme_constant_override("separation", 2)
+	time_margin.add_child(time_rows)
+
+	_time_label = Label.new()
+	_time_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_time_label.add_theme_font_size_override("font_size", 14)
+	time_rows.add_child(_time_label)
+
+	_weather_label = Label.new()
+	_weather_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_weather_label.add_theme_font_size_override("font_size", 11)
+	time_rows.add_child(_weather_label)
 
 	var panel := PanelContainer.new()
 	panel.name = "Panel"
@@ -156,6 +227,7 @@ func _make_bar_style(color: Color) -> StyleBoxFlat:
 
 
 func _refresh() -> void:
+	_update_world_time()
 	if _stats == null:
 		_level_label.text = "%s --" % _text("ui.hud.level")
 		return
@@ -168,6 +240,32 @@ func _refresh() -> void:
 
 	var carried: float = float(_stats.call("get_carried_weight_kg"))
 	_weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.hud.weight"), carried, float(_stats.call("get_absolute_weight_kg"))]
+
+
+func _update_world_time() -> void:
+	if _time_panel == null:
+		return
+
+	_time_panel.visible = show_world_time and _environment != null
+	if not _time_panel.visible:
+		return
+
+	var hour := float(_environment.get("current_hour"))
+	_time_label.text = "%s %s" % [_text("ui.hud.time"), _format_world_time(hour)]
+	_weather_label.visible = show_weather_id
+	if show_weather_id:
+		var weather_id := ""
+		if _environment.has_method("get_current_weather_id"):
+			weather_id = str(_environment.call("get_current_weather_id"))
+		_weather_label.text = "%s %s" % [_text("ui.hud.weather"), weather_id.capitalize()]
+
+
+func _format_world_time(hour: float) -> String:
+	var wrapped := fposmod(hour, 24.0)
+	var total_minutes := int(round(wrapped * 60.0)) % (24 * 60)
+	var hours := int(total_minutes / 60)
+	var minutes := total_minutes % 60
+	return "%02d:%02d" % [hours, minutes]
 
 
 func _set_meter(bar: ProgressBar, label: Label, title: String, value: float, maximum: float) -> void:
@@ -184,6 +282,25 @@ func _meter_title(title: String) -> String:
 
 func _on_language_changed(_language: String) -> void:
 	_refresh()
+
+
+func _on_environment_hour_changed(_hour: float) -> void:
+	_update_world_time()
+
+
+func _on_environment_weather_changed(_weather_id: StringName) -> void:
+	_update_world_time()
+
+
+func _on_settings_changed() -> void:
+	_apply_saved_settings()
+	_update_world_time()
+
+
+func _apply_saved_settings() -> void:
+	if _audio_manager != null and _audio_manager.has_method("get_settings"):
+		var settings: Dictionary = _audio_manager.call("get_settings")
+		show_world_time = bool(settings.get("hud_show_world_time", show_world_time))
 
 
 func _text(key: String, args: Array = []) -> String:

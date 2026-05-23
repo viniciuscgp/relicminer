@@ -16,6 +16,7 @@ const DEFAULT_MAX_SFX_PLAYERS := 16
 const DEFAULT_INPUT_MODE := "keyboard"
 const DEFAULT_VIBRATION_ENABLED := false
 const DEFAULT_LANGUAGE := "en"
+const DEFAULT_HUD_SHOW_WORLD_TIME := true
 
 var master_volume := DEFAULT_MASTER_VOLUME
 var music_volume := DEFAULT_MUSIC_VOLUME
@@ -26,6 +27,7 @@ var max_sfx_players := DEFAULT_MAX_SFX_PLAYERS
 var input_mode := DEFAULT_INPUT_MODE
 var vibration_enabled := DEFAULT_VIBRATION_ENABLED
 var language := DEFAULT_LANGUAGE
+var hud_show_world_time := DEFAULT_HUD_SHOW_WORLD_TIME
 
 var _music_player: AudioStreamPlayer
 var _sfx_players: Array[AudioStreamPlayer] = []
@@ -103,6 +105,7 @@ func apply_settings(settings: Dictionary, save := true) -> void:
 	input_mode = str(settings.get("input_mode", input_mode))
 	vibration_enabled = bool(settings.get("vibration_enabled", vibration_enabled))
 	language = str(settings.get("language", language))
+	hud_show_world_time = bool(settings.get("hud_show_world_time", hud_show_world_time))
 	_apply_to_audio_server()
 
 	if save:
@@ -126,6 +129,7 @@ func get_settings() -> Dictionary:
 		"input_mode": input_mode,
 		"vibration_enabled": vibration_enabled,
 		"language": language,
+		"hud_show_world_time": hud_show_world_time,
 	}
 
 
@@ -139,6 +143,7 @@ func restore_defaults(save := true) -> void:
 		"input_mode": DEFAULT_INPUT_MODE,
 		"vibration_enabled": DEFAULT_VIBRATION_ENABLED,
 		"language": DEFAULT_LANGUAGE,
+		"hud_show_world_time": DEFAULT_HUD_SHOW_WORLD_TIME,
 	}, save)
 
 
@@ -152,6 +157,7 @@ func save_settings() -> void:
 	config.set_value("input", "input_mode", input_mode)
 	config.set_value("input", "vibration_enabled", vibration_enabled)
 	config.set_value("game", "language", language)
+	config.set_value("game", "hud_show_world_time", hud_show_world_time)
 	config.save(SETTINGS_PATH)
 
 
@@ -168,6 +174,7 @@ func load_settings() -> void:
 	input_mode = str(config.get_value("input", "input_mode", DEFAULT_INPUT_MODE))
 	vibration_enabled = bool(config.get_value("input", "vibration_enabled", DEFAULT_VIBRATION_ENABLED))
 	language = str(config.get_value("game", "language", DEFAULT_LANGUAGE))
+	hud_show_world_time = bool(config.get_value("game", "hud_show_world_time", DEFAULT_HUD_SHOW_WORLD_TIME))
 
 
 func _ensure_bus(bus_name: String) -> void:

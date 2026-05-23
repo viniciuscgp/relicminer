@@ -4,9 +4,9 @@ class_name StarField
 ## Quantidade de estrelas geradas no ceu. Mais estrelas custam mais instancias no MultiMesh.
 @export_range(32, 2000, 1) var star_count := 450
 ## Distancia das estrelas ao redor da camera. Deve ser grande o bastante para ficar no fundo.
-@export_range(40.0, 2000.0, 1.0) var radius := 360.0
+@export_range(40.0, 8000.0, 1.0) var radius := 3200.0
 ## Tamanho visual de cada estrela.
-@export_range(0.01, 2.0, 0.01) var star_size := 0.18
+@export_range(0.01, 12.0, 0.01) var star_size := 1.6
 ## Cor base das estrelas antes da transparencia calculada por noite/nuvens/chuva.
 @export var star_color := Color(0.88, 0.94, 1.0, 1.0)
 ## Quando ativo, o campo de estrelas segue a camera para parecer distante/infinito.
@@ -54,7 +54,7 @@ func _build_stars() -> void:
 	_material = StandardMaterial3D.new()
 	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_material.no_depth_test = true
+	_material.no_depth_test = false
 	_material.albedo_color = star_color
 	mesh.material = _material
 

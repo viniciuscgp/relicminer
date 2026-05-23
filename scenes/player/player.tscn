@@ -225,7 +225,7 @@ margin = 0.25
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D" unique_id=1977999872]
 current = true
-fov = 70.0
+fov = 81.7
 
 [node name="UnderwaterEnvironment" parent="CameraPivot/SpringArm3D/Camera3D" unique_id=860127035 instance=ExtResource("3_6n8mq")]
 

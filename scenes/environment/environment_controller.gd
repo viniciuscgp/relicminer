@@ -8,7 +8,9 @@ signal weather_changed(weather_id: StringName)
 
 @export_group("Time")
 ## Hora atual do mundo em formato 0-24. Exemplo: 6 amanhecer, 12 meio-dia, 20 noite.
-@export_range(0.0, 24.0, 0.01) var current_hour := 14.0
+@export_range(0.0, 24.0, 0.01) var current_hour := 14.0:
+	set(value):
+		current_hour = fposmod(float(value), 24.0)
 ## Quando ativo, o relogio do mundo avanca automaticamente a cada frame.
 @export var auto_advance_time := true
 ## Quantos segundos de jogo passam por segundo real. 60 significa 1 minuto de jogo por segundo real.
@@ -46,35 +48,69 @@ signal weather_changed(weather_id: StringName)
 
 @export_group("Night Darkness")
 ## Luz ambiente minima durante a noite. Menor deixa tochas mais importantes; maior deixa a noite mais legivel.
-@export_range(0.0, 1.0, 0.001) var night_ambient_energy := 0.095
+@export_range(0.0, 1.0, 0.001) var night_ambient_energy := 0.16
+## Quanto clima/nuvem/chuva reduzem a luz ambiente durante a noite. Menor faz Night Ambient Energy responder mais diretamente.
+@export_range(0.0, 1.0, 0.01) var night_ambient_weather_influence := 0.25
+## Intensidade maxima da lua em noite limpa. Mantem alguma leitura sem competir com tochas.
+@export_range(0.0, 2.0, 0.01) var night_moon_energy := 0.34
+## Cor da luz ambiente noturna. Azul escuro costuma preservar a sensacao de noite.
+@export var night_ambient_color := Color(0.045, 0.055, 0.105, 1.0)
+
+@export_group("Day Lighting")
 ## Luz ambiente base durante o dia antes dos multiplicadores de clima.
 @export_range(0.0, 2.0, 0.01) var day_ambient_energy := 0.72
 ## Intensidade maxima do sol ao meio-dia em clima limpo.
 @export_range(0.0, 8.0, 0.01) var day_sun_energy := 2.15
-## Intensidade maxima da lua em noite limpa. Mantem alguma leitura sem competir com tochas.
-@export_range(0.0, 2.0, 0.01) var night_moon_energy := 0.22
-## Cor da luz ambiente noturna. Azul escuro costuma preservar a sensacao de noite.
-@export var night_ambient_color := Color(0.025, 0.035, 0.075, 1.0)
 ## Cor da luz ambiente diurna.
 @export var day_ambient_color := Color(0.62, 0.68, 0.76, 1.0)
 
-@export_group("Celestial Visuals")
-## Distancia visual do sol e da lua em relacao a camera. Deve ficar alem das montanhas para nao parecer um objeto proximo.
+@export_group("Day Night Timing")
+## Hora em que o ceu comeca a clarear antes do amanhecer.
+@export_range(0.0, 24.0, 0.01) var dawn_start_hour := 5.0
+## Hora em que a luz do dia fica completa.
+@export_range(0.0, 24.0, 0.01) var day_start_hour := 7.0
+## Hora em que o dia comeca a virar entardecer.
+@export_range(0.0, 24.0, 0.01) var sunset_start_hour := 17.4
+## Hora em que a noite comeca a entrar visualmente.
+@export_range(0.0, 24.0, 0.01) var night_start_hour := 21.1
+## Hora em que a noite fica completa.
+@export_range(0.0, 24.0, 0.01) var full_night_hour := 22.5
+## Luz ambiente extra durante amanhecer/entardecer para evitar queda brusca de exposicao.
+@export_range(0.0, 1.0, 0.001) var twilight_ambient_boost := 0.18
+## Energia minima do ceu durante amanhecer/entardecer.
+@export_range(0.0, 2.0, 0.01) var twilight_sky_energy := 0.58
+## Quanto o crepusculo colore o topo do ceu. Menor deixa a faixa quente mais proxima do horizonte.
+@export_range(0.0, 1.0, 0.01) var twilight_top_tint_strength := 0.12
+## Quanto o crepusculo colore a linha do horizonte.
+@export_range(0.0, 1.0, 0.01) var twilight_horizon_tint_strength := 0.62
+## Energia minima do ceu durante a noite completa.
+@export_range(0.0, 1.0, 0.01) var night_sky_energy_floor := 0.24
+## Hora em que as primeiras estrelas comecam a aparecer no entardecer.
+@export_range(0.0, 24.0, 0.01) var stars_start_hour := 18.5
+## Visibilidade inicial das primeiras estrelas ao chegar em Stars Start Hour.
+@export_range(0.0, 1.0, 0.01) var stars_initial_visibility := 0.14
+## Hora em que o campo de estrelas chega na visibilidade maxima.
+@export_range(0.0, 24.0, 0.01) var stars_full_hour := 22.0
+## Hora em que as estrelas comecam a sumir no amanhecer.
+@export_range(0.0, 24.0, 0.01) var stars_fade_out_start_hour := 4.8
+## Hora em que as estrelas somem completamente.
+@export_range(0.0, 24.0, 0.01) var stars_hidden_hour := 6.4
+
+@export_group("Celestial Shared")
+## Distancia visual do sol e da lua em relacao a camera. Deve ficar alem do mundo jogavel para nao parecer um objeto proximo.
 @export_range(50.0, 5000.0, 1.0) var celestial_visual_distance := 3200.0
-## Tamanho visual do disco do sol no ceu.
-@export_range(1.0, 300.0, 0.5) var sun_visual_size := 137.0
-## Tamanho visual do disco da lua no ceu.
-@export_range(1.0, 300.0, 0.5) var moon_visual_size := 99.0
 ## Altura minima acima do horizonte para o sol/lua aparecerem totalmente. Evita o astro atravessar montanhas no nascer/por do sol.
 @export_range(0.0, 0.5, 0.001) var celestial_horizon_fade_height := 0.095
+
+@export_group("Sun Visual")
+## Tamanho visual do disco do sol no ceu.
+@export_range(1.0, 300.0, 0.5) var sun_visual_size := 137.0
 ## Cor emissiva do disco do sol. Use tons amarelados para evitar um sol branco/frio.
 @export var sun_visual_color := Color(1.0, 0.76, 0.32, 1.0)
-## Cor emissiva do disco da lua.
-@export var moon_visual_color := Color(0.45, 0.56, 0.82, 0.82)
 ## Intensidade emissiva do sol visual. Valores maiores alimentam o glow/bloom do Environment.
 @export_range(0.0, 20.0, 0.1) var sun_emission_energy := 7.0
-## Intensidade emissiva da lua visual. Deve ser menor que o sol para nao clarear demais a noite.
-@export_range(0.0, 20.0, 0.1) var moon_emission_energy := 0.75
+
+@export_group("Sun Halo And Flare")
 ## Tamanho do brilho suave ao redor do sol. Maior cria o halo claro visto em ceus HDR.
 @export_range(1.0, 1200.0, 1.0) var sun_halo_size := 520.0
 ## Forca do halo do sol. Afeta o brilho suave mesmo quando a camera nao olha direto para ele.
@@ -85,6 +121,22 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.0, 8.0, 0.01) var sun_flare_intensity := 2.7
 ## Quanto a camera precisa apontar para o sol antes do flare aparecer. Maior deixa o flare mais raro.
 @export_range(0.0, 1.0, 0.01) var sun_flare_alignment_start := 0.58
+
+@export_group("Moon Visual")
+## Tamanho visual do disco da lua no ceu.
+@export_range(1.0, 300.0, 0.5) var moon_visual_size := 99.0
+## Cor emissiva do disco da lua.
+@export var moon_visual_color := Color(0.45, 0.56, 0.82, 0.82)
+## Intensidade emissiva da lua visual.
+@export_range(0.0, 20.0, 0.1) var moon_emission_energy := 0.75
+## Hora em que a lua comeca a ficar visivel ao subir no horizonte.
+@export_range(0.0, 24.0, 0.01) var moon_visible_start_hour := 18.25
+## Hora em que a lua chega na visibilidade maxima.
+@export_range(0.0, 24.0, 0.01) var moon_full_visibility_hour := 21.0
+## Hora em que a lua comeca a sumir no amanhecer.
+@export_range(0.0, 24.0, 0.01) var moon_fade_out_start_hour := 5.0
+## Hora em que a lua some completamente.
+@export_range(0.0, 24.0, 0.01) var moon_hidden_hour := 6.5
 
 @export_group("Glow")
 ## Ativa bloom/glow no WorldEnvironment para o sol e outros materiais emissivos brilharem.
@@ -125,6 +177,20 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.0, 3.0, 0.01) var hdr_post_saturation := 1.14
 ## Gamma final. Acima de 1 clareia medios tons; abaixo de 1 escurece.
 @export_range(0.2, 3.0, 0.01) var hdr_gamma := 1.0
+## Quanto o HDR escurecedor e reduzido durante a noite. 0 mantem o HDR igual; 1 aplica todo o alivio noturno.
+@export_range(0.0, 1.0, 0.01) var hdr_night_relief := 0.75
+## Ponto de preto usado no pico da noite.
+@export_range(0.0, 0.35, 0.001) var hdr_night_black_point := 0.018
+## Potencia de sombras usada no pico da noite. Menor deixa medios tons e sombras mais legiveis.
+@export_range(0.25, 3.0, 0.01) var hdr_night_shadow_power := 0.78
+## Exposicao do pos-processo no pico da noite.
+@export_range(0.25, 3.0, 0.01) var hdr_night_post_exposure := 1.28
+## Contraste do pos-processo no pico da noite.
+@export_range(0.0, 3.0, 0.01) var hdr_night_post_contrast := 0.82
+## Gamma do pos-processo no pico da noite.
+@export_range(0.2, 3.0, 0.01) var hdr_night_gamma := 1.32
+## Vinheta do pos-processo no pico da noite.
+@export_range(0.0, 1.0, 0.01) var hdr_night_vignette_strength := 0.08
 ## Potencia por canal. Valores abaixo de 1 intensificam o canal; acima de 1 seguram o canal.
 @export var hdr_color_power := Color(1.0, 1.0, 1.0, 1.0)
 ## Cor multiplicativa opcional para dar direcao artistica ao mundo.
@@ -326,8 +392,7 @@ func _pick_next_weather() -> void:
 		_schedule_next_weather()
 		return
 
-	var next_index := _random.randi_range(0, options.size() - 1)
-	var next_profile := options[next_index]
+	var next_profile := _pick_weighted_weather(options)
 	change_weather(next_profile.get("id"))
 
 
@@ -335,17 +400,42 @@ func _schedule_next_weather() -> void:
 	_weather_timer_hours = _random.randf_range(min_weather_duration_hours, max_weather_duration_hours)
 
 
+func _pick_weighted_weather(options: Array[Resource]) -> Resource:
+	var total_weight := 0.0
+	for profile in options:
+		total_weight += _get_weather_auto_weight(profile)
+
+	if total_weight <= 0.0:
+		return options[_random.randi_range(0, options.size() - 1)]
+
+	var roll := _random.randf_range(0.0, total_weight)
+	var accumulated := 0.0
+	for profile in options:
+		accumulated += _get_weather_auto_weight(profile)
+		if roll <= accumulated:
+			return profile
+
+	return options[options.size() - 1]
+
+
+func _get_weather_auto_weight(profile: Resource) -> float:
+	if profile == null:
+		return 0.0
+	return maxf(0.0, float(profile.get("auto_weather_weight")))
+
+
 func _apply_environment(delta: float) -> void:
 	_refresh_runtime_environment()
 	if _runtime_environment == null:
 		return
 
-	_configure_glow()
-	_configure_hdr_post_process()
 	var sun_elevation := sin((current_hour / 24.0) * TAU - PI * 0.5)
-	var day_factor := smoothstep(-0.08, 0.24, sun_elevation)
-	var night_factor := 1.0 - smoothstep(-0.18, 0.05, sun_elevation)
-	var twilight_factor := _get_twilight_factor(sun_elevation)
+	var cycle := _get_day_night_cycle()
+	var day_factor := float(cycle.get("day", 1.0))
+	var night_factor := float(cycle.get("night", 0.0))
+	var twilight_factor := float(cycle.get("twilight", 0.0))
+	_configure_glow()
+	_configure_hdr_post_process(night_factor)
 	var cloud_coverage := _weather_float("cloud_coverage", 0.0)
 	var rain_intensity := _weather_float("rain_intensity", 0.0)
 	var fog_density := _weather_float("fog_density", 0.0)
@@ -353,15 +443,16 @@ func _apply_environment(delta: float) -> void:
 	var moon_multiplier := _weather_float("moon_energy_multiplier", 1.0)
 	var ambient_multiplier := _weather_float("ambient_energy_multiplier", 1.0)
 	var star_multiplier := _weather_float("star_visibility_multiplier", 1.0)
+	var lightning_activity := _weather_float("lightning_activity", 0.0)
 	var wind_direction := _weather_vector2("wind_direction", Vector2.RIGHT)
 	var wind_speed := _weather_float("wind_speed", 0.0)
 
 	_apply_sky(day_factor, twilight_factor, night_factor, cloud_coverage, rain_intensity)
 	_apply_lights(day_factor, night_factor, cloud_coverage, rain_intensity, sun_multiplier, moon_multiplier)
-	_apply_ambient(day_factor, night_factor, cloud_coverage, rain_intensity, ambient_multiplier)
+	_apply_ambient(day_factor, twilight_factor, night_factor, cloud_coverage, rain_intensity, ambient_multiplier)
 	_apply_fog(day_factor, fog_density, rain_intensity, cloud_coverage)
 	_apply_water_reflection(night_factor, cloud_coverage, rain_intensity)
-	_apply_visual_systems(day_factor, night_factor, cloud_coverage, rain_intensity, star_multiplier, wind_direction, wind_speed)
+	_apply_visual_systems(day_factor, night_factor, cloud_coverage, rain_intensity, star_multiplier, lightning_activity, wind_direction, wind_speed)
 	_rotate_celestial_lights(delta)
 	_update_celestial_visuals(day_factor, night_factor, cloud_coverage, rain_intensity)
 
@@ -374,16 +465,16 @@ func _apply_sky(day_factor: float, twilight_factor: float, night_factor: float, 
 	var day_horizon := Color(0.62, 0.76, 0.88, 1.0)
 	var night_top := Color(0.012, 0.018, 0.04, 1.0)
 	var night_horizon := Color(0.025, 0.03, 0.065, 1.0)
-	var dusk_top := Color(0.15, 0.08, 0.18, 1.0)
-	var dusk_horizon := Color(0.9, 0.38, 0.16, 1.0)
+	var dusk_top := Color(0.08, 0.08, 0.15, 1.0)
+	var dusk_horizon := Color(0.9, 0.42, 0.18, 1.0)
 	var storm_tint := Color(0.22, 0.24, 0.28, 1.0)
 	var weather_tint: Color = _weather_color("sky_tint", Color.WHITE)
 	var overcast := clampf(cloud_coverage * 0.65 + rain_intensity * 0.55, 0.0, 1.0)
 
 	var top := night_top.lerp(day_top, day_factor)
 	var horizon := night_horizon.lerp(day_horizon, day_factor)
-	top = top.lerp(dusk_top, twilight_factor * 0.7)
-	horizon = horizon.lerp(dusk_horizon, twilight_factor)
+	top = top.lerp(dusk_top, twilight_factor * twilight_top_tint_strength)
+	horizon = horizon.lerp(dusk_horizon, twilight_factor * twilight_horizon_tint_strength)
 	top = top.lerp(storm_tint, overcast)
 	horizon = horizon.lerp(storm_tint.lightened(0.08), overcast)
 	top = _multiply_color(top, weather_tint)
@@ -393,7 +484,9 @@ func _apply_sky(day_factor: float, twilight_factor: float, night_factor: float, 
 	_sky_material.sky_horizon_color = horizon
 	_sky_material.ground_bottom_color = top.darkened(0.35)
 	_sky_material.ground_horizon_color = horizon.darkened(0.18)
-	_sky_material.sky_energy_multiplier = lerpf(0.16, 1.0, day_factor) * lerpf(1.0, 0.42, overcast)
+	var sky_energy := lerpf(night_sky_energy_floor, 1.0, day_factor)
+	sky_energy = maxf(sky_energy, twilight_sky_energy * twilight_factor)
+	_sky_material.sky_energy_multiplier = sky_energy * lerpf(1.0, 0.42, overcast)
 	_sky_material.sun_angle_max = 0.0
 
 
@@ -405,24 +498,26 @@ func _apply_lights(day_factor: float, night_factor: float, cloud_coverage: float
 		_sun_light.shadow_enabled = _sun_light.light_energy > 0.03
 
 	if _moon_light != null:
-		_moon_light.light_energy = night_moon_energy * night_factor * lerpf(1.0, 0.22, cloud_coverage) * lerpf(1.0, 0.05, rain_intensity) * moon_multiplier
+		var moon_light_factor := maxf(night_factor, _get_moon_time_visibility() * 0.65)
+		_moon_light.light_energy = night_moon_energy * moon_light_factor * lerpf(1.0, 0.22, cloud_coverage) * lerpf(1.0, 0.05, rain_intensity) * moon_multiplier
 		_moon_light.light_color = Color(0.42, 0.52, 0.78, 1.0)
 		_moon_light.shadow_enabled = _moon_light.light_energy > 0.02
 
 
-func _apply_ambient(day_factor: float, night_factor: float, cloud_coverage: float, rain_intensity: float, ambient_multiplier: float) -> void:
+func _apply_ambient(day_factor: float, twilight_factor: float, night_factor: float, cloud_coverage: float, rain_intensity: float, ambient_multiplier: float) -> void:
 	var overcast := clampf(cloud_coverage * 0.5 + rain_intensity * 0.4, 0.0, 1.0)
 	var ambient_color := night_ambient_color.lerp(day_ambient_color, day_factor)
 	ambient_color = ambient_color.lerp(Color(0.19, 0.22, 0.27, 1.0), overcast)
 	var ambient_energy := lerpf(night_ambient_energy, day_ambient_energy, day_factor)
-	ambient_energy *= lerpf(1.0, 0.42, overcast) * ambient_multiplier
-	if night_factor > 0.5:
-		ambient_energy = minf(ambient_energy, night_ambient_energy * lerpf(1.0, 2.4, 1.0 - night_factor))
+	var weather_multiplier := lerpf(1.0, 0.42, overcast) * ambient_multiplier
+	var weather_influence := lerpf(night_ambient_weather_influence, 1.0, day_factor)
+	ambient_energy *= lerpf(1.0, weather_multiplier, weather_influence)
+	ambient_energy = maxf(ambient_energy, night_ambient_energy + twilight_ambient_boost * twilight_factor)
 
 	_runtime_environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	_runtime_environment.ambient_light_color = ambient_color
 	_runtime_environment.ambient_light_energy = ambient_energy
-	_runtime_environment.ambient_light_sky_contribution = lerpf(0.02, 0.42, day_factor) * lerpf(1.0, 0.35, overcast)
+	_runtime_environment.ambient_light_sky_contribution = lerpf(0.08, 0.42, day_factor) * lerpf(1.0, 0.35, overcast)
 
 
 func _apply_fog(day_factor: float, fog_density: float, rain_intensity: float, cloud_coverage: float) -> void:
@@ -445,15 +540,19 @@ func _apply_water_reflection(night_factor: float, cloud_coverage: float, rain_in
 		shader_material.set_shader_parameter("moon_reflection_color", Color(0.5, 0.62, 1.0, 1.0))
 
 
-func _apply_visual_systems(day_factor: float, night_factor: float, cloud_coverage: float, rain_intensity: float, star_multiplier: float, wind_direction: Vector2, wind_speed: float) -> void:
+func _apply_visual_systems(day_factor: float, night_factor: float, cloud_coverage: float, rain_intensity: float, star_multiplier: float, lightning_activity: float, wind_direction: Vector2, wind_speed: float) -> void:
 	if _cloud_layer != null and _cloud_layer.has_method("set_weather"):
 		_cloud_layer.call("set_weather", cloud_coverage, wind_direction, wind_speed, day_factor)
 
-	if _rain_controller != null and _rain_controller.has_method("set_intensity"):
-		_rain_controller.call("set_intensity", rain_intensity)
+	if _rain_controller != null:
+		if _rain_controller.has_method("set_weather"):
+			_rain_controller.call("set_weather", rain_intensity, lightning_activity)
+		elif _rain_controller.has_method("set_intensity"):
+			_rain_controller.call("set_intensity", rain_intensity)
 
 	if _star_field != null and _star_field.has_method("set_visibility"):
-		var star_visibility := night_factor * pow(1.0 - cloud_coverage, 1.8) * (1.0 - rain_intensity) * star_multiplier
+		var star_time_visibility := _get_star_time_visibility()
+		var star_visibility := star_time_visibility * pow(1.0 - cloud_coverage, 1.8) * (1.0 - rain_intensity) * star_multiplier
 		_star_field.call("set_visibility", star_visibility)
 
 
@@ -531,7 +630,7 @@ func _create_sun_effect_visual(node_name: String, size: float, color: Color, fal
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
-render_mode unshaded, cull_disabled, depth_draw_never, depth_test_disabled, blend_add;
+render_mode unshaded, cull_disabled, depth_draw_never, blend_add;
 
 uniform vec4 effect_color : source_color = vec4(1.0);
 uniform float intensity = 0.0;
@@ -564,7 +663,7 @@ func _update_celestial_visuals(day_factor: float, night_factor: float, cloud_cov
 
 	var weather_visibility := clampf(1.0 - cloud_coverage * 0.65 - rain_intensity * 0.9, 0.0, 1.0)
 	_update_single_celestial_visual(_sun_visual, _sun_visual_material, _sun_light, day_factor * weather_visibility, sun_visual_color, sun_emission_energy, sun_visual_size)
-	_update_single_celestial_visual(_moon_visual, _moon_visual_material, _moon_light, night_factor * weather_visibility, moon_visual_color, moon_emission_energy, moon_visual_size)
+	_update_single_celestial_visual(_moon_visual, _moon_visual_material, _moon_light, _get_moon_time_visibility() * weather_visibility, moon_visual_color, moon_emission_energy, moon_visual_size)
 	_update_sun_effects(camera, day_factor * weather_visibility)
 
 
@@ -584,7 +683,7 @@ func _update_single_celestial_visual(visual: MeshInstance3D, material: StandardM
 		visible_color.a = alpha
 		material.albedo_color = visible_color
 		material.emission = color
-		material.emission_energy_multiplier = emission_energy * alpha
+		material.emission_energy_multiplier = emission_energy if alpha > 0.01 else 0.0
 	visual.visible = alpha > 0.01
 	visual.global_position = camera.global_position + sky_direction * celestial_visual_distance
 	visual.scale = Vector3.ONE * (visual_size / maxf(visual.get_aabb().size.y, 0.001))
@@ -681,7 +780,7 @@ void fragment() {
 	_configure_hdr_post_process()
 
 
-func _configure_hdr_post_process() -> void:
+func _configure_hdr_post_process(night_factor := 0.0) -> void:
 	if _hdr_post_layer == null or _hdr_post_rect == null:
 		return
 
@@ -691,16 +790,24 @@ func _configure_hdr_post_process() -> void:
 	if _hdr_post_material == null:
 		return
 
-	_hdr_post_material.set_shader_parameter("black_point", hdr_black_point)
-	_hdr_post_material.set_shader_parameter("shadow_power", hdr_shadow_power)
-	_hdr_post_material.set_shader_parameter("post_exposure", hdr_post_exposure)
-	_hdr_post_material.set_shader_parameter("post_contrast", hdr_post_contrast)
+	var night_mix := clampf(night_factor * hdr_night_relief, 0.0, 1.0)
+	var black_point := lerpf(hdr_black_point, hdr_night_black_point, night_mix)
+	var shadow_power := lerpf(hdr_shadow_power, hdr_night_shadow_power, night_mix)
+	var post_exposure := lerpf(hdr_post_exposure, hdr_night_post_exposure, night_mix)
+	var post_contrast := lerpf(hdr_post_contrast, hdr_night_post_contrast, night_mix)
+	var grade_gamma := lerpf(hdr_gamma, hdr_night_gamma, night_mix)
+	var vignette_strength := lerpf(hdr_vignette_strength, hdr_night_vignette_strength, night_mix)
+
+	_hdr_post_material.set_shader_parameter("black_point", black_point)
+	_hdr_post_material.set_shader_parameter("shadow_power", shadow_power)
+	_hdr_post_material.set_shader_parameter("post_exposure", post_exposure)
+	_hdr_post_material.set_shader_parameter("post_contrast", post_contrast)
 	_hdr_post_material.set_shader_parameter("post_saturation", hdr_post_saturation)
-	_hdr_post_material.set_shader_parameter("grade_gamma", hdr_gamma)
+	_hdr_post_material.set_shader_parameter("grade_gamma", grade_gamma)
 	_hdr_post_material.set_shader_parameter("color_power", Vector3(hdr_color_power.r, hdr_color_power.g, hdr_color_power.b))
 	_hdr_post_material.set_shader_parameter("tint_color", hdr_tint_color)
 	_hdr_post_material.set_shader_parameter("tint_strength", hdr_tint_strength)
-	_hdr_post_material.set_shader_parameter("vignette_strength", hdr_vignette_strength)
+	_hdr_post_material.set_shader_parameter("vignette_strength", vignette_strength)
 	_hdr_post_material.set_shader_parameter("vignette_radius", hdr_vignette_radius)
 
 
@@ -748,6 +855,71 @@ func _configure_directional_shadow(light: DirectionalLight3D, distance: float) -
 	light.directional_shadow_max_distance = distance
 
 
+func _get_day_night_cycle() -> Dictionary:
+	var hour := current_hour
+	var day_rise := smoothstep(dawn_start_hour, day_start_hour, hour)
+	var day_set := 1.0 - smoothstep(sunset_start_hour, night_start_hour, hour)
+	var day_factor := clampf(minf(day_rise, day_set), 0.0, 1.0)
+	var night_factor := _get_night_factor(hour)
+	var twilight_factor := maxf(
+		_get_interval_peak_factor(hour, dawn_start_hour, day_start_hour),
+		_get_interval_peak_factor(hour, sunset_start_hour, full_night_hour)
+	)
+
+	return {
+		"day": day_factor,
+		"night": night_factor,
+		"twilight": twilight_factor,
+	}
+
+
+func _get_night_factor(hour: float) -> float:
+	if hour >= full_night_hour or hour < dawn_start_hour:
+		return 1.0
+	if hour < day_start_hour:
+		return 1.0 - smoothstep(dawn_start_hour, day_start_hour, hour)
+	if hour >= night_start_hour:
+		return smoothstep(night_start_hour, full_night_hour, hour)
+	return 0.0
+
+
+func _get_star_time_visibility() -> float:
+	var hour := current_hour
+	if hour >= stars_start_hour:
+		var appear := smoothstep(stars_start_hour, stars_full_hour, hour)
+		return lerpf(stars_initial_visibility, 1.0, appear)
+
+	if hour < stars_fade_out_start_hour:
+		return 1.0
+
+	if hour < stars_hidden_hour:
+		return 1.0 - smoothstep(stars_fade_out_start_hour, stars_hidden_hour, hour)
+
+	return 0.0
+
+
+func _get_moon_time_visibility() -> float:
+	var hour := current_hour
+	if hour >= moon_visible_start_hour:
+		return smoothstep(moon_visible_start_hour, moon_full_visibility_hour, hour)
+
+	if hour < moon_fade_out_start_hour:
+		return 1.0
+
+	if hour < moon_hidden_hour:
+		return 1.0 - smoothstep(moon_fade_out_start_hour, moon_hidden_hour, hour)
+
+	return 0.0
+
+
+func _get_interval_peak_factor(hour: float, start_hour: float, end_hour: float) -> float:
+	if hour < start_hour or hour > end_hour or is_equal_approx(start_hour, end_hour):
+		return 0.0
+
+	var t := clampf(inverse_lerp(start_hour, end_hour, hour), 0.0, 1.0)
+	return sin(t * PI)
+
+
 func _get_twilight_factor(sun_elevation: float) -> float:
 	var below := 1.0 - smoothstep(-0.24, -0.02, sun_elevation)
 	var above := 1.0 - smoothstep(0.16, 0.32, sun_elevation)
@@ -782,6 +954,7 @@ func _get_active_weather_snapshot() -> Resource:
 	profile.moon_energy_multiplier = _weather_float("moon_energy_multiplier", 1.0)
 	profile.ambient_energy_multiplier = _weather_float("ambient_energy_multiplier", 1.0)
 	profile.star_visibility_multiplier = _weather_float("star_visibility_multiplier", 1.0)
+	profile.lightning_activity = _weather_float("lightning_activity", 0.0)
 	profile.wind_direction = _weather_vector2("wind_direction", Vector2.RIGHT)
 	profile.wind_speed = _weather_float("wind_speed", 0.0)
 	return profile
