@@ -2,6 +2,17 @@ extends Node3D
 class_name EnvironmentController
 
 const WeatherProfileScript := preload("res://scenes/environment/weather_profile.gd")
+const RANDOMIZED_WEATHER_FLOAT_PROPERTIES := [
+	&"cloud_coverage",
+	&"rain_intensity",
+	&"fog_density",
+	&"sun_energy_multiplier",
+	&"moon_energy_multiplier",
+	&"ambient_energy_multiplier",
+	&"star_visibility_multiplier",
+	&"lightning_activity",
+	&"wind_speed",
+]
 
 signal hour_changed(hour: float)
 signal weather_changed(weather_id: StringName)
@@ -21,8 +32,16 @@ signal weather_changed(weather_id: StringName)
 @export var weather_profiles: Array[Resource] = []
 ## ID do clima inicial. Deve bater com o campo id de um WeatherProfile.
 @export var initial_weather_id: StringName = &"clear"
+## ID do clima limpo. Depois de qualquer clima diferente deste, o proximo sorteio automatico força este clima.
+@export var clear_weather_id: StringName = &"clear"
 ## Quando ativo, o sistema troca o clima sozinho depois de algumas horas de jogo.
 @export var auto_weather := true
+## Cobertura minima de nuvem gerada por chuva. Exemplo: chuva 0.5 e multiplicador 1.4 força pelo menos 0.7 de nuvens.
+@export_range(0.0, 3.0, 0.01) var rain_cloud_coverage_multiplier := 1.4
+## Cobertura minima sempre que existir chuva. Garante nuvens mesmo em chuva fraca sorteada.
+@export_range(0.0, 1.0, 0.01) var rain_min_cloud_coverage := 0.36
+## Cobertura minima no clima limpo. Evita ceu vazio quando o Clear sorteia cloud_coverage muito baixo.
+@export_range(0.0, 1.0, 0.01) var clear_min_cloud_coverage := 0.28
 ## Duracao, em horas de jogo, da mistura visual entre um clima e outro.
 @export_range(0.05, 24.0, 0.05) var weather_transition_hours := 0.35
 ## Tempo minimo, em horas de jogo, que um clima fica ativo antes de poder trocar.
@@ -45,6 +64,26 @@ signal weather_changed(weather_id: StringName)
 @export var star_field_path: NodePath = NodePath("StarField")
 ## Caminho para o controlador de chuva/particulas.
 @export var rain_controller_path: NodePath = NodePath("RainController")
+
+@export_group("Cloud Layer")
+## Raio da cupula de nuvens ao redor da camera.
+@export_range(100.0, 4000.0, 10.0) var cloud_layer_size := 2600.0
+## Quanto o centro da cupula de nuvens fica abaixo da camera para preencher o ceu.
+@export_range(0.0, 600.0, 1.0) var cloud_layer_height := 180.0
+## Velocidade geral do movimento das nuvens.
+@export_range(0.0, 1.0, 0.001) var cloud_drift_speed_multiplier := 0.089
+## Variacao lenta do vento das nuvens.
+@export_range(0.0, 1.0, 0.001) var cloud_slow_drift_variation := 0.473
+## Velocidade da variacao lenta do vento.
+@export_range(0.0, 0.2, 0.001) var cloud_slow_drift_variation_speed := 0.054
+## Opacidade maxima das nuvens no pico de cobertura.
+@export_range(0.0, 1.0, 0.01) var cloud_max_opacity := 0.98
+## Opacidade minima quando existe alguma cobertura.
+@export_range(0.0, 1.0, 0.01) var cloud_min_visible_opacity := 0.22
+## Suavidade das bordas da nuvem procedural. Menor deixa as massas mais recortadas.
+@export_range(0.05, 1.0, 0.01) var cloud_visibility_threshold_max := 0.45
+## Quanto as nuvens ficam mais cinzas durante noite/clima escuro.
+@export_range(0.0, 1.0, 0.01) var cloud_night_shadow_strength := 0.78
 
 @export_group("Night Darkness")
 ## Luz ambiente minima durante a noite. Menor deixa tochas mais importantes; maior deixa a noite mais legivel.
@@ -251,6 +290,7 @@ func _ready() -> void:
 	_target_weather = _find_weather(initial_weather_id)
 	if _target_weather == null:
 		_target_weather = _get_fallback_weather()
+	_target_weather = _create_weather_event(_target_weather)
 	_source_weather = _target_weather
 	_weather_blend = 1.0
 	_schedule_next_weather()
@@ -282,7 +322,7 @@ func change_weather(weather_id: StringName, immediate := false) -> bool:
 		return false
 
 	_source_weather = _get_active_weather_snapshot()
-	_target_weather = profile
+	_target_weather = _create_weather_event(profile)
 	_weather_blend = 1.0 if immediate else 0.0
 	_schedule_next_weather()
 	weather_changed.emit(weather_id)
@@ -301,6 +341,8 @@ func get_environment_save_data() -> Dictionary:
 		"current_hour": current_hour,
 		"source_weather_id": str(_source_weather.get("id")) if _source_weather != null else "",
 		"target_weather_id": str(_target_weather.get("id")) if _target_weather != null else "",
+		"source_weather_values": _get_weather_event_values(_source_weather),
+		"target_weather_values": _get_weather_event_values(_target_weather),
 		"weather_blend": _weather_blend,
 		"weather_timer_hours": _weather_timer_hours,
 	}
@@ -315,10 +357,16 @@ func apply_environment_save_data(data: Dictionary) -> void:
 	_target_weather = _find_weather(target_weather_id)
 	if _target_weather == null:
 		_target_weather = _get_fallback_weather()
+	_target_weather = _create_weather_event(_target_weather)
 
 	_source_weather = _find_weather(source_weather_id)
 	if _source_weather == null:
 		_source_weather = _target_weather
+	else:
+		_source_weather = _create_weather_event(_source_weather)
+
+	_apply_weather_event_values(_target_weather, data.get("target_weather_values", {}))
+	_apply_weather_event_values(_source_weather, data.get("source_weather_values", {}))
 
 	_weather_blend = clampf(float(data.get("weather_blend", 1.0)), 0.0, 1.0)
 	if is_equal_approx(_weather_blend, 1.0):
@@ -339,6 +387,7 @@ func _resolve_nodes() -> void:
 	_cloud_layer = get_node_or_null(cloud_layer_path)
 	_star_field = get_node_or_null(star_field_path)
 	_rain_controller = get_node_or_null(rain_controller_path)
+	_apply_cloud_layer_settings()
 
 
 func _refresh_runtime_environment() -> void:
@@ -380,6 +429,10 @@ func _update_weather(delta_hours: float) -> void:
 
 
 func _pick_next_weather() -> void:
+	if _target_weather != null and not _is_clear_weather(_target_weather):
+		if change_weather(clear_weather_id):
+			return
+
 	var options: Array[Resource] = []
 	for profile in weather_profiles:
 		if profile == null:
@@ -424,6 +477,28 @@ func _get_weather_auto_weight(profile: Resource) -> float:
 	return maxf(0.0, float(profile.get("auto_weather_weight")))
 
 
+func _is_clear_weather(profile: Resource) -> bool:
+	return profile != null and profile.get("id") == clear_weather_id
+
+
+func _apply_cloud_layer_settings() -> void:
+	if _cloud_layer == null or not _cloud_layer.has_method("apply_runtime_settings"):
+		return
+
+	var settings := {
+		"size": cloud_layer_size,
+		"height": cloud_layer_height,
+		"drift_speed_multiplier": cloud_drift_speed_multiplier,
+		"slow_drift_variation": cloud_slow_drift_variation,
+		"slow_drift_variation_speed": cloud_slow_drift_variation_speed,
+		"max_opacity": cloud_max_opacity,
+		"min_visible_opacity": cloud_min_visible_opacity,
+		"visibility_threshold_max": cloud_visibility_threshold_max,
+		"night_shadow_strength": cloud_night_shadow_strength,
+	}
+	_cloud_layer.call("apply_runtime_settings", settings)
+
+
 func _apply_environment(delta: float) -> void:
 	_refresh_runtime_environment()
 	if _runtime_environment == null:
@@ -447,6 +522,7 @@ func _apply_environment(delta: float) -> void:
 	var wind_direction := _weather_vector2("wind_direction", Vector2.RIGHT)
 	var wind_speed := _weather_float("wind_speed", 0.0)
 
+	_apply_cloud_layer_settings()
 	_apply_sky(day_factor, twilight_factor, night_factor, cloud_coverage, rain_intensity)
 	_apply_lights(day_factor, night_factor, cloud_coverage, rain_intensity, sun_multiplier, moon_multiplier)
 	_apply_ambient(day_factor, twilight_factor, night_factor, cloud_coverage, rain_intensity, ambient_multiplier)
@@ -941,6 +1017,48 @@ func _get_fallback_weather() -> Resource:
 	profile.id = &"clear"
 	profile.display_name = "Clear"
 	return profile
+
+
+func _create_weather_event(profile: Resource) -> Resource:
+	if profile == null:
+		return null
+
+	var event := profile.duplicate(true)
+	for property in RANDOMIZED_WEATHER_FLOAT_PROPERTIES:
+		var max_value := maxf(0.0, float(event.get(property)))
+		event.set(property, _random.randf_range(0.0, max_value) if max_value > 0.0 else 0.0)
+
+	if _is_clear_weather(event):
+		var clear_cloud_coverage := clampf(float(event.get("cloud_coverage")), 0.0, 1.0)
+		event.set("cloud_coverage", maxf(clear_cloud_coverage, clear_min_cloud_coverage))
+
+	var rain_intensity := clampf(float(event.get("rain_intensity")), 0.0, 1.0)
+	if rain_intensity > 0.0:
+		var cloud_coverage := clampf(float(event.get("cloud_coverage")), 0.0, 1.0)
+		var rain_cloud_coverage := clampf(maxf(rain_min_cloud_coverage, rain_intensity * rain_cloud_coverage_multiplier), 0.0, 1.0)
+		event.set("cloud_coverage", maxf(cloud_coverage, rain_cloud_coverage))
+	return event
+
+
+func _get_weather_event_values(profile: Resource) -> Dictionary:
+	var values := {}
+	if profile == null:
+		return values
+
+	for property in RANDOMIZED_WEATHER_FLOAT_PROPERTIES:
+		values[str(property)] = maxf(0.0, float(profile.get(property)))
+	return values
+
+
+func _apply_weather_event_values(profile: Resource, values_variant: Variant) -> void:
+	if profile == null or not values_variant is Dictionary:
+		return
+
+	var values: Dictionary = values_variant
+	for property in RANDOMIZED_WEATHER_FLOAT_PROPERTIES:
+		var key := str(property)
+		if values.has(key):
+			profile.set(property, maxf(0.0, float(values.get(key))))
 
 
 func _get_active_weather_snapshot() -> Resource:

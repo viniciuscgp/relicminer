@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d285wpv4amw2j"
-path="res://.godot/imported/background_6.jpg-48cef7b36d57b61a8a70774c529da19a.ctex"
+uid="uid://d2q6u63cbtf51"
+path="res://.godot/imported/clock_handler_small.png-4814ab370105d9bd714e694333ebb975.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/background_6.jpg"
-dest_files=["res://.godot/imported/background_6.jpg-48cef7b36d57b61a8a70774c529da19a.ctex"]
+source_file="res://assets/clocks/clock_handler_small.png"
+dest_files=["res://.godot/imported/clock_handler_small.png-4814ab370105d9bd714e694333ebb975.ctex"]
 
 [params]
 

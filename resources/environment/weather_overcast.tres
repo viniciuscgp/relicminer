@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"overcast"
 display_name = "Overcast"
-auto_weather_weight = 1.5
+auto_weather_weight = 0.0
 cloud_coverage = 0.92
 fog_density = 0.008
 sky_tint = Color(0.72, 0.76, 0.8, 1)

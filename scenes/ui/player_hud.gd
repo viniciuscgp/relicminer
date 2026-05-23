@@ -2,21 +2,23 @@ extends CanvasLayer
 
 @export var player_path: NodePath = NodePath("..")
 @export var update_interval := 0.15
+@export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 @export_group("World Time")
 @export var show_world_time := true
 @export var environment_path: NodePath
-@export var show_weather_id := true
+@export var clock_margin := Vector2(56.0, 56.0)
 
 var _stats: Node
 var _inventory: Node
 var _environment: Node
+var _underwater_environment: Node
 var _localization_manager: Node
 var _audio_manager: Node
 var _elapsed := 0.0
 
-var _time_panel: PanelContainer
-var _time_label: Label
-var _weather_label: Label
+var _clock: Node2D
+var _stats_panel: PanelContainer
+var _oxygen_row: Control
 var _level_label: Label
 var _hp_label: Label
 var _energy_label: Label
@@ -37,6 +39,7 @@ func _ready() -> void:
 	if _localization_manager != null and _localization_manager.has_signal("language_changed"):
 		_localization_manager.connect("language_changed", _on_language_changed)
 	_apply_saved_settings()
+	_resolve_clock()
 	_build_ui()
 	_resolve_player_links()
 	_resolve_environment()
@@ -44,6 +47,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_position_clock()
 	_elapsed += delta
 	if _elapsed < update_interval:
 		return
@@ -62,6 +66,9 @@ func _resolve_player_links() -> void:
 
 	_stats = player.get_node_or_null("PlayerStats")
 	_inventory = player.get_node_or_null("Inventory")
+	_underwater_environment = get_node_or_null(underwater_environment_path)
+	if _underwater_environment == null:
+		_underwater_environment = player.get_node_or_null("CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 
 	if _stats != null and _stats.has_signal("changed"):
 		_stats.connect("changed", _refresh)
@@ -92,6 +99,10 @@ func _find_environment(node: Node) -> Node:
 	return null
 
 
+func _resolve_clock() -> void:
+	_clock = get_node_or_null("Clock") as Node2D
+
+
 func _build_ui() -> void:
 	var root := Control.new()
 	root.name = "Root"
@@ -99,67 +110,35 @@ func _build_ui() -> void:
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(root)
 
-	_time_panel = PanelContainer.new()
-	_time_panel.name = "WorldTimePanel"
-	_time_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_time_panel.custom_minimum_size = Vector2(164.0, 48.0)
-	_time_panel.offset_left = 16.0
-	_time_panel.offset_top = 184.0
-	_time_panel.offset_right = 180.0
-	_time_panel.offset_bottom = 232.0
-	_time_panel.add_theme_stylebox_override("panel", _make_panel_style())
-	root.add_child(_time_panel)
-
-	var time_margin := MarginContainer.new()
-	time_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	time_margin.add_theme_constant_override("margin_left", 10)
-	time_margin.add_theme_constant_override("margin_top", 8)
-	time_margin.add_theme_constant_override("margin_right", 10)
-	time_margin.add_theme_constant_override("margin_bottom", 8)
-	_time_panel.add_child(time_margin)
-
-	var time_rows := VBoxContainer.new()
-	time_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	time_rows.add_theme_constant_override("separation", 2)
-	time_margin.add_child(time_rows)
-
-	_time_label = Label.new()
-	_time_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_time_label.add_theme_font_size_override("font_size", 14)
-	time_rows.add_child(_time_label)
-
-	_weather_label = Label.new()
-	_weather_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_weather_label.add_theme_font_size_override("font_size", 11)
-	time_rows.add_child(_weather_label)
-
-	var panel := PanelContainer.new()
-	panel.name = "Panel"
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.custom_minimum_size = Vector2(315.0, 154.0)
-	panel.offset_left = 16.0
-	panel.offset_top = 16.0
-	panel.offset_right = 331.0
-	panel.offset_bottom = 170.0
-	panel.add_theme_stylebox_override("panel", _make_panel_style())
-	root.add_child(panel)
+	_stats_panel = PanelContainer.new()
+	_stats_panel.name = "StatsPanel"
+	_stats_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stats_panel.custom_minimum_size = Vector2(190.0, 102.0)
+	_stats_panel.anchor_top = 1.0
+	_stats_panel.anchor_bottom = 1.0
+	_stats_panel.offset_left = 30.0
+	_stats_panel.offset_top = -150.0
+	_stats_panel.offset_right = 220.0
+	_stats_panel.offset_bottom = -48.0
+	_stats_panel.add_theme_stylebox_override("panel", _make_panel_style())
+	root.add_child(_stats_panel)
 
 	var margin := MarginContainer.new()
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_top", 10)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_bottom", 10)
-	panel.add_child(margin)
+	margin.add_theme_constant_override("margin_left", 9)
+	margin.add_theme_constant_override("margin_top", 7)
+	margin.add_theme_constant_override("margin_right", 9)
+	margin.add_theme_constant_override("margin_bottom", 7)
+	_stats_panel.add_child(margin)
 
 	var rows := VBoxContainer.new()
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rows.add_theme_constant_override("separation", 6)
+	rows.add_theme_constant_override("separation", 4)
 	margin.add_child(rows)
 
 	_level_label = Label.new()
 	_level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_level_label.add_theme_font_size_override("font_size", 15)
+	_level_label.add_theme_font_size_override("font_size", 12)
 	rows.add_child(_level_label)
 
 	_hp_bar = _add_meter(rows, "HP", Color(0.78, 0.16, 0.14))
@@ -170,10 +149,11 @@ func _build_ui() -> void:
 	_hunger_label = _hunger_bar.get_meta("label") as Label
 	_oxygen_bar = _add_meter(rows, "ui.hud.breath", Color(0.23, 0.57, 0.86))
 	_oxygen_label = _oxygen_bar.get_meta("label") as Label
+	_oxygen_row = _oxygen_bar.get_parent() as Control
 
 	_weight_label = Label.new()
 	_weight_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_weight_label.add_theme_font_size_override("font_size", 12)
+	_weight_label.add_theme_font_size_override("font_size", 10)
 	rows.add_child(_weight_label)
 
 
@@ -187,12 +167,12 @@ func _add_meter(parent: Control, title: String, color: Color) -> ProgressBar:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.text = _meter_title(title)
 	label.set_meta("title_key", title)
-	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_font_size_override("font_size", 10)
 	row.add_child(label)
 
 	var bar := ProgressBar.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar.custom_minimum_size = Vector2(0.0, 9.0)
+	bar.custom_minimum_size = Vector2(0.0, 6.0)
 	bar.show_percentage = false
 	bar.add_theme_stylebox_override("background", _make_bar_style(Color(0.02, 0.025, 0.03, 0.9)))
 	bar.add_theme_stylebox_override("fill", _make_bar_style(color))
@@ -236,36 +216,51 @@ func _refresh() -> void:
 	_set_meter(_hp_bar, _hp_label, "HP", _stats.current_hp, float(_stats.call("get_max_hp")))
 	_set_meter(_energy_bar, _energy_label, "ui.hud.energy", _stats.current_energy, float(_stats.call("get_max_energy")))
 	_set_meter(_hunger_bar, _hunger_label, "ui.hud.hunger", _stats.current_hunger, _stats.max_hunger)
-	_set_meter(_oxygen_bar, _oxygen_label, "ui.hud.breath", _stats.current_oxygen, float(_stats.call("get_max_oxygen")))
+	var underwater := _is_underwater()
+	if _oxygen_row != null:
+		_oxygen_row.visible = underwater
+	_update_stats_panel_height(underwater)
+	if underwater:
+		_set_meter(_oxygen_bar, _oxygen_label, "ui.hud.breath", _stats.current_oxygen, float(_stats.call("get_max_oxygen")))
 
 	var carried: float = float(_stats.call("get_carried_weight_kg"))
 	_weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.hud.weight"), carried, float(_stats.call("get_absolute_weight_kg"))]
 
 
 func _update_world_time() -> void:
-	if _time_panel == null:
+	if _clock == null:
 		return
 
-	_time_panel.visible = show_world_time and _environment != null
-	if not _time_panel.visible:
+	_clock.visible = show_world_time and _environment != null
+	if not _clock.visible:
 		return
 
 	var hour := float(_environment.get("current_hour"))
-	_time_label.text = "%s %s" % [_text("ui.hud.time"), _format_world_time(hour)]
-	_weather_label.visible = show_weather_id
-	if show_weather_id:
-		var weather_id := ""
-		if _environment.has_method("get_current_weather_id"):
-			weather_id = str(_environment.call("get_current_weather_id"))
-		_weather_label.text = "%s %s" % [_text("ui.hud.weather"), weather_id.capitalize()]
+	if _clock.has_method("set_current_hour"):
+		_clock.call("set_current_hour", hour)
+	_position_clock()
 
 
-func _format_world_time(hour: float) -> String:
-	var wrapped := fposmod(hour, 24.0)
-	var total_minutes := int(round(wrapped * 60.0)) % (24 * 60)
-	var hours := int(total_minutes / 60)
-	var minutes := total_minutes % 60
-	return "%02d:%02d" % [hours, minutes]
+func _is_underwater() -> bool:
+	return _underwater_environment != null and _underwater_environment.has_method("is_underwater") and bool(_underwater_environment.call("is_underwater"))
+
+
+func _update_stats_panel_height(show_oxygen: bool) -> void:
+	if _stats_panel == null:
+		return
+
+	var height := 102.0 if show_oxygen else 82.0
+	_stats_panel.custom_minimum_size.y = height
+	_stats_panel.offset_top = -height - 48.0
+	_stats_panel.offset_bottom = -48.0
+
+
+func _position_clock() -> void:
+	if _clock == null:
+		return
+
+	var viewport_size := get_viewport().get_visible_rect().size
+	_clock.position = Vector2(viewport_size.x - clock_margin.x, viewport_size.y - clock_margin.y)
 
 
 func _set_meter(bar: ProgressBar, label: Label, title: String, value: float, maximum: float) -> void:

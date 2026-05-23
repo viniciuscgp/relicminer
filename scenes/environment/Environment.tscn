@@ -112,15 +112,11 @@ directional_shadow_max_distance = 48.0
 [node name="CloudLayer" type="MeshInstance3D" parent="." unique_id=2074919743]
 script = ExtResource("2_clouds")
 size = 2600.0
-height = 255.0
-cloud_cluster_count = 35
-puffs_per_cluster = 13
-min_puff_size = 46.0
-max_puff_size = 99.0
-cluster_spread = 103.0
+height = 180.0
 drift_speed_multiplier = 0.089
 slow_drift_variation = 0.473
 slow_drift_variation_speed = 0.054
+max_opacity = 0.98
 
 [node name="StarField" type="Node3D" parent="." unique_id=1289911612]
 script = ExtResource("3_stars")

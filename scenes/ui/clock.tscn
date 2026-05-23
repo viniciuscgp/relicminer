@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bpxhvgetbao5g"]
+
+[ext_resource type="Script" uid="uid://s4ge4a05n1em" path="res://scenes/ui/clock.gd" id="1_p8qao"]
+[ext_resource type="Texture2D" uid="uid://d2q6u63cbtf51" path="res://assets/clocks/clock_handler_small.png" id="2_cn410"]
+[ext_resource type="Texture2D" uid="uid://2bft67w7ekeh" path="res://assets/clocks/clock_8.png" id="2_whj6s"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_cn410"]
+blend_mode = 4
+
+[node name="Clock" type="Node2D" unique_id=1303657953]
+script = ExtResource("1_p8qao")
+
+[node name="clock" type="Sprite2D" parent="." unique_id=1325293539]
+texture = ExtResource("2_whj6s")
+
+[node name="handle" type="Sprite2D" parent="." unique_id=701821115]
+material = SubResource("CanvasItemMaterial_cn410")
+position = Vector2(3.801518e-07, 4.6968594)
+rotation = -1.5707964
+scale = Vector2(0.84875035, 1)
+texture = ExtResource("2_cn410")
+offset = Vector2(150, 0)

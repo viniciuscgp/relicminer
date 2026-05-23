@@ -1,7 +1,13 @@
 [gd_scene format=3 uid="uid://bpu4v5el4ayp7"]
 
 [ext_resource type="Script" uid="uid://dpfqk4og5kbjl" path="res://scenes/ui/player_hud.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bpxhvgetbao5g" path="res://scenes/ui/clock.tscn" id="2_31ty4"]
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=2024289196]
 layer = 10
 script = ExtResource("1")
+clock_margin = Vector2(100, 100)
+
+[node name="Clock" parent="." unique_id=1303657953 instance=ExtResource("2_31ty4")]
+position = Vector2(1170, 609)
+scale = Vector2(0.18, 0.18)
