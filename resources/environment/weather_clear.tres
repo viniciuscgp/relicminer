@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1")
 auto_weather_weight = 50.0
-cloud_coverage = 0.28
+cloud_coverage = 0.41
 wind_direction = Vector2(1, 0.18)
 wind_speed = 0.55

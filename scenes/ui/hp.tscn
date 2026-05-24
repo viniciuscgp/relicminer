@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cc3fqloinn3dm"]
+
+[ext_resource type="Texture2D" uid="uid://dbtkhkpgj1kbk" path="res://assets/stats/hp.png" id="1_0s0cs"]
+
+[node name="HP" type="Sprite2D" unique_id=1308961528]
+texture = ExtResource("1_0s0cs")

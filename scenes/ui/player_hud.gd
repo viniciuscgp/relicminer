@@ -17,18 +17,12 @@ var _audio_manager: Node
 var _elapsed := 0.0
 
 var _clock: Node2D
-var _stats_panel: PanelContainer
-var _oxygen_row: Control
-var _level_label: Label
 var _hp_label: Label
 var _energy_label: Label
 var _hunger_label: Label
-var _oxygen_label: Label
-var _weight_label: Label
-var _hp_bar: ProgressBar
-var _energy_bar: ProgressBar
-var _hunger_bar: ProgressBar
-var _oxygen_bar: ProgressBar
+var _hp_bar: Range
+var _energy_bar: Range
+var _hunger_bar: Range
 
 
 func _ready() -> void:
@@ -40,7 +34,7 @@ func _ready() -> void:
 		_localization_manager.connect("language_changed", _on_language_changed)
 	_apply_saved_settings()
 	_resolve_clock()
-	_build_ui()
+	_resolve_status_ui()
 	_resolve_player_links()
 	_resolve_environment()
 	_refresh()
@@ -103,128 +97,81 @@ func _resolve_clock() -> void:
 	_clock = get_node_or_null("Clock") as Node2D
 
 
-func _build_ui() -> void:
-	var root := Control.new()
-	root.name = "Root"
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(root)
-
-	_stats_panel = PanelContainer.new()
-	_stats_panel.name = "StatsPanel"
-	_stats_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_stats_panel.custom_minimum_size = Vector2(190.0, 102.0)
-	_stats_panel.anchor_top = 1.0
-	_stats_panel.anchor_bottom = 1.0
-	_stats_panel.offset_left = 30.0
-	_stats_panel.offset_top = -150.0
-	_stats_panel.offset_right = 220.0
-	_stats_panel.offset_bottom = -48.0
-	_stats_panel.add_theme_stylebox_override("panel", _make_panel_style())
-	root.add_child(_stats_panel)
-
-	var margin := MarginContainer.new()
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_theme_constant_override("margin_left", 9)
-	margin.add_theme_constant_override("margin_top", 7)
-	margin.add_theme_constant_override("margin_right", 9)
-	margin.add_theme_constant_override("margin_bottom", 7)
-	_stats_panel.add_child(margin)
-
-	var rows := VBoxContainer.new()
-	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rows.add_theme_constant_override("separation", 4)
-	margin.add_child(rows)
-
-	_level_label = Label.new()
-	_level_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_level_label.add_theme_font_size_override("font_size", 12)
-	rows.add_child(_level_label)
-
-	_hp_bar = _add_meter(rows, "HP", Color(0.78, 0.16, 0.14))
-	_hp_label = _hp_bar.get_meta("label") as Label
-	_energy_bar = _add_meter(rows, "ui.hud.energy", Color(0.9, 0.68, 0.18))
-	_energy_label = _energy_bar.get_meta("label") as Label
-	_hunger_bar = _add_meter(rows, "ui.hud.hunger", Color(0.33, 0.72, 0.33))
-	_hunger_label = _hunger_bar.get_meta("label") as Label
-	_oxygen_bar = _add_meter(rows, "ui.hud.breath", Color(0.23, 0.57, 0.86))
-	_oxygen_label = _oxygen_bar.get_meta("label") as Label
-	_oxygen_row = _oxygen_bar.get_parent() as Control
-
-	_weight_label = Label.new()
-	_weight_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_weight_label.add_theme_font_size_override("font_size", 10)
-	rows.add_child(_weight_label)
+func _resolve_status_ui() -> void:
+	_hp_label = _get_status_caption("HP")
+	_hp_bar = _get_status_value("HP")
+	_hunger_label = _get_status_caption("Hunger")
+	_hunger_bar = _get_status_value("Hunger")
+	_energy_label = _get_status_caption("Energy")
+	_energy_bar = _get_status_value("Energy")
+	_configure_status_bar(_hp_bar, Color(0.78, 0.12, 0.1, 0.82))
+	_configure_status_bar(_hunger_bar, Color(0.24, 0.68, 0.24, 0.82))
+	_configure_status_bar(_energy_bar, Color(0.95, 0.68, 0.16, 0.82))
 
 
-func _add_meter(parent: Control, title: String, color: Color) -> ProgressBar:
-	var row := VBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override("separation", 2)
-	parent.add_child(row)
-
-	var label := Label.new()
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.text = _meter_title(title)
-	label.set_meta("title_key", title)
-	label.add_theme_font_size_override("font_size", 10)
-	row.add_child(label)
-
-	var bar := ProgressBar.new()
-	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar.custom_minimum_size = Vector2(0.0, 6.0)
-	bar.show_percentage = false
-	bar.add_theme_stylebox_override("background", _make_bar_style(Color(0.02, 0.025, 0.03, 0.9)))
-	bar.add_theme_stylebox_override("fill", _make_bar_style(color))
-	bar.set_meta("label", label)
-	row.add_child(bar)
-	return bar
+func _get_status_caption(status_name: String) -> Label:
+	return get_node_or_null("%s/Caption" % status_name) as Label
 
 
-func _make_panel_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035, 0.04, 0.045, 0.84)
-	style.border_color = Color(0.62, 0.5, 0.34, 0.65)
-	style.border_width_left = 1
-	style.border_width_top = 1
-	style.border_width_right = 1
-	style.border_width_bottom = 1
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	return style
+func _get_status_value(status_name: String) -> Range:
+	var value := get_node_or_null("%s/Value" % status_name) as Range
+	if value == null:
+		value = get_node_or_null("%s/value" % status_name) as Range
+	return value
 
 
-func _make_bar_style(color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.corner_radius_top_left = 3
-	style.corner_radius_top_right = 3
-	style.corner_radius_bottom_left = 3
-	style.corner_radius_bottom_right = 3
-	return style
+func _configure_status_bar(bar: Range, color: Color) -> void:
+	if bar == null:
+		return
+
+	bar.min_value = 0.0
+	bar.max_value = 100.0
+	bar.value = 100.0
+	bar.set_meta("fill_color", color)
+
+	var texture_bar := bar as TextureProgressBar
+	if texture_bar != null:
+		texture_bar.texture_progress = _make_status_fill_texture()
+		texture_bar.tint_progress = color
+
+	var control := bar as Control
+	if control == null:
+		return
+
+	var fill_parent := control.get_parent()
+	if fill_parent == null:
+		return
+
+	var fill := fill_parent.get_node_or_null("%sRuntimeFill" % control.name) as ColorRect
+	if fill == null:
+		fill = ColorRect.new()
+		fill.name = "%sRuntimeFill" % control.name
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fill.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		fill_parent.add_child(fill)
+	fill.color = color
+	fill.z_index = control.z_index + 1
+	fill.position = control.position
+	fill.size = control.size
+
+
+func _make_status_fill_texture() -> Texture2D:
+	var image := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	image.fill(Color.WHITE)
+	return ImageTexture.create_from_image(image)
 
 
 func _refresh() -> void:
 	_update_world_time()
 	if _stats == null:
-		_level_label.text = "%s --" % _text("ui.hud.level")
+		_set_meter(_hp_bar, _hp_label, "HP", 0.0, 1.0)
+		_set_meter(_energy_bar, _energy_label, "ui.hud.energy", 0.0, 1.0)
+		_set_meter(_hunger_bar, _hunger_label, "ui.hud.hunger", 0.0, 1.0)
 		return
 
-	_level_label.text = "%s %d  XP %d/%d" % [_text("ui.hud.level"), _stats.level, _stats.xp, int(_stats.call("get_xp_required_for_next_level"))]
 	_set_meter(_hp_bar, _hp_label, "HP", _stats.current_hp, float(_stats.call("get_max_hp")))
 	_set_meter(_energy_bar, _energy_label, "ui.hud.energy", _stats.current_energy, float(_stats.call("get_max_energy")))
 	_set_meter(_hunger_bar, _hunger_label, "ui.hud.hunger", _stats.current_hunger, _stats.max_hunger)
-	var underwater := _is_underwater()
-	if _oxygen_row != null:
-		_oxygen_row.visible = underwater
-	_update_stats_panel_height(underwater)
-	if underwater:
-		_set_meter(_oxygen_bar, _oxygen_label, "ui.hud.breath", _stats.current_oxygen, float(_stats.call("get_max_oxygen")))
-
-	var carried: float = float(_stats.call("get_carried_weight_kg"))
-	_weight_label.text = "%s %.1f/%.1f kg" % [_text("ui.hud.weight"), carried, float(_stats.call("get_absolute_weight_kg"))]
 
 
 func _update_world_time() -> void:
@@ -241,20 +188,6 @@ func _update_world_time() -> void:
 	_position_clock()
 
 
-func _is_underwater() -> bool:
-	return _underwater_environment != null and _underwater_environment.has_method("is_underwater") and bool(_underwater_environment.call("is_underwater"))
-
-
-func _update_stats_panel_height(show_oxygen: bool) -> void:
-	if _stats_panel == null:
-		return
-
-	var height := 102.0 if show_oxygen else 82.0
-	_stats_panel.custom_minimum_size.y = height
-	_stats_panel.offset_top = -height - 48.0
-	_stats_panel.offset_bottom = -48.0
-
-
 func _position_clock() -> void:
 	if _clock == null:
 		return
@@ -263,10 +196,34 @@ func _position_clock() -> void:
 	_clock.position = Vector2(viewport_size.x - clock_margin.x, viewport_size.y - clock_margin.y)
 
 
-func _set_meter(bar: ProgressBar, label: Label, title: String, value: float, maximum: float) -> void:
-	bar.max_value = maxf(1.0, maximum)
-	bar.value = clampf(value, 0.0, bar.max_value)
-	label.text = "%s %.0f/%.0f" % [_meter_title(title), value, maximum]
+func _set_meter(bar: Range, label: Label, title: String, value: float, maximum: float) -> void:
+	if bar != null:
+		bar.max_value = maxf(1.0, maximum)
+		bar.value = clampf(value, 0.0, bar.max_value)
+		_update_status_fill(bar)
+	if label == null:
+		return
+	label.text = _meter_title(title)
+
+
+func _update_status_fill(bar: Range) -> void:
+	var control := bar as Control
+	if control == null:
+		return
+
+	var fill_parent := control.get_parent()
+	if fill_parent == null:
+		return
+
+	var fill := fill_parent.get_node_or_null("%sRuntimeFill" % control.name) as ColorRect
+	if fill == null:
+		return
+
+	var ratio := 0.0
+	if bar.max_value > bar.min_value:
+		ratio = clampf((bar.value - bar.min_value) / (bar.max_value - bar.min_value), 0.0, 1.0)
+	fill.position = control.position
+	fill.size = Vector2(control.size.x * ratio, control.size.y)
 
 
 func _meter_title(title: String) -> String:

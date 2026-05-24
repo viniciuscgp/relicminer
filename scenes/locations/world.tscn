@@ -11381,8 +11381,6 @@ clear_min_cloud_coverage = 0.12
 weather_transition_hours = 0.9
 min_weather_duration_hours = 2.0
 max_weather_duration_hours = 4.0
-clear_weather_min_duration_hours = 10.0
-clear_weather_max_duration_hours = 22.0
 bad_weather_min_duration_hours = 1.25
 bad_weather_max_duration_hours = 3.25
 night_ambient_energy = 0.34
@@ -11438,7 +11436,7 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 341.46274, 0.7765527, -532.23987)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 341.46274, 0.7765527, 2099.9636)
 
 [node name="Markers" type="Node3D" parent="." unique_id=980118374]
 visible = false
