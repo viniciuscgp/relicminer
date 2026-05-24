@@ -100,11 +100,11 @@ cast_shadow = 0
 [node name="OmniLight3D" type="OmniLight3D" parent="Visual"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49, 0)
 light_color = Color(1, 0.55, 0.25, 1)
-light_energy = 2.45
+light_energy = 3.05
 shadow_enabled = false
 shadow_bias = 0.03
 shadow_normal_bias = 1.0
-omni_range = 6.5
+omni_range = 8.2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_simple_torch")

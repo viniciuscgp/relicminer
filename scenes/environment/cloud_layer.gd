@@ -147,7 +147,7 @@ func _build_cloud_material() -> ShaderMaterial:
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
-render_mode unshaded, cull_disabled, depth_draw_never, blend_mix;
+render_mode unshaded, cull_back, depth_draw_never, blend_mix;
 
 uniform sampler2D cloud_noise : repeat_enable, filter_linear_mipmap;
 uniform vec4 cloud_color : source_color = vec4(1.0);
@@ -199,10 +199,22 @@ func _build_noise_texture() -> Texture2D:
 	var image := Image.create(NOISE_TEXTURE_SIZE.x, NOISE_TEXTURE_SIZE.y, false, Image.FORMAT_L8)
 	for y in range(NOISE_TEXTURE_SIZE.y):
 		for x in range(NOISE_TEXTURE_SIZE.x):
-			var value := noise.get_noise_2d(float(x) / float(NOISE_TEXTURE_SIZE.x), float(y) / float(NOISE_TEXTURE_SIZE.y))
+			var u := float(x) / float(NOISE_TEXTURE_SIZE.x - 1)
+			var v := float(y) / float(NOISE_TEXTURE_SIZE.y - 1)
+			var value := _get_tileable_noise(noise, u, v)
 			value = clampf(value * 0.5 + 0.5, 0.0, 1.0)
 			image.set_pixel(x, y, Color(value, value, value, 1.0))
 	return ImageTexture.create_from_image(image)
+
+
+func _get_tileable_noise(noise: FastNoiseLite, u: float, v: float) -> float:
+	var n00 := noise.get_noise_2d(u, v)
+	var n10 := noise.get_noise_2d(u - 1.0, v)
+	var n01 := noise.get_noise_2d(u, v - 1.0)
+	var n11 := noise.get_noise_2d(u - 1.0, v - 1.0)
+	var nx0 := lerpf(n00, n10, u)
+	var nx1 := lerpf(n01, n11, u)
+	return lerpf(nx0, nx1, v)
 
 
 func _update_shader_parameters() -> void:

@@ -2,9 +2,9 @@ extends "res://scenes/items/item_world_base.gd"
 class_name SimpleTorchWorld
 
 @export_group("Torch Light")
-@export_range(0.0, 10.0, 0.01) var base_light_energy := 2.45
-@export_range(0.0, 5.0, 0.01) var flicker_energy := 0.55
-@export_range(0.0, 20.0, 0.01) var light_range := 6.5
+@export_range(0.0, 10.0, 0.01) var base_light_energy := 3.05
+@export_range(0.0, 5.0, 0.01) var flicker_energy := 0.65
+@export_range(0.0, 20.0, 0.01) var light_range := 8.2
 @export_range(0.1, 30.0, 0.1) var flicker_speed := 11.0
 @export var cast_torch_shadows := false
 @export var lit := true

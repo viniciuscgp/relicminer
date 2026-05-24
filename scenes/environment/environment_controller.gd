@@ -9,7 +9,6 @@ const RANDOMIZED_WEATHER_FLOAT_PROPERTIES := [
 	&"sun_energy_multiplier",
 	&"moon_energy_multiplier",
 	&"ambient_energy_multiplier",
-	&"star_visibility_multiplier",
 	&"lightning_activity",
 	&"wind_speed",
 ]
@@ -48,6 +47,14 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.25, 72.0, 0.25) var min_weather_duration_hours := 5.0
 ## Tempo maximo, em horas de jogo, que um clima fica ativo antes de poder trocar.
 @export_range(0.25, 72.0, 0.25) var max_weather_duration_hours := 14.0
+## Tempo minimo, em horas de jogo, que o clima limpo fica ativo depois de chuva/nublado.
+@export_range(0.25, 120.0, 0.25) var clear_weather_min_duration_hours := 10.0
+## Tempo maximo, em horas de jogo, que o clima limpo fica ativo depois de chuva/nublado.
+@export_range(0.25, 120.0, 0.25) var clear_weather_max_duration_hours := 22.0
+## Tempo minimo, em horas de jogo, que um clima ruim fica ativo antes de voltar para o limpo.
+@export_range(0.25, 72.0, 0.25) var bad_weather_min_duration_hours := 1.5
+## Tempo maximo, em horas de jogo, que um clima ruim fica ativo antes de voltar para o limpo.
+@export_range(0.25, 72.0, 0.25) var bad_weather_max_duration_hours := 3.5
 
 @export_group("Scene")
 ## Caminho para o WorldEnvironment que recebe ceu, luz ambiente e neblina dinamicos.
@@ -95,6 +102,16 @@ signal weather_changed(weather_id: StringName)
 ## Cor da luz ambiente noturna. Azul escuro costuma preservar a sensacao de noite.
 @export var night_ambient_color := Color(0.045, 0.055, 0.105, 1.0)
 
+@export_group("Fog Lighting")
+## Cor da neblina no pico da noite. Se ficar preta demais, a chuva apaga a cena inteira.
+@export var night_fog_light_color := Color(0.075, 0.085, 0.13, 1.0)
+## Energia da neblina no pico da noite. Mantem leitura de silhueta sem substituir a tocha.
+@export_range(0.0, 1.0, 0.001) var night_fog_light_energy := 0.055
+## Cor da neblina durante o dia.
+@export var day_fog_light_color := Color(0.62, 0.68, 0.72, 1.0)
+## Energia da neblina durante o dia.
+@export_range(0.0, 1.0, 0.001) var day_fog_light_energy := 0.22
+
 @export_group("Day Lighting")
 ## Luz ambiente base durante o dia antes dos multiplicadores de clima.
 @export_range(0.0, 2.0, 0.01) var day_ambient_energy := 0.72
@@ -130,6 +147,8 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.0, 1.0, 0.01) var stars_initial_visibility := 0.14
 ## Hora em que o campo de estrelas chega na visibilidade maxima.
 @export_range(0.0, 24.0, 0.01) var stars_full_hour := 22.0
+## Visibilidade minima das estrelas em noite de clima limpo, mesmo com alguma nuvem procedural.
+@export_range(0.0, 1.0, 0.01) var clear_night_star_visibility_floor := 0.36
 ## Hora em que as estrelas comecam a sumir no amanhecer.
 @export_range(0.0, 24.0, 0.01) var stars_fade_out_start_hour := 4.8
 ## Hora em que as estrelas somem completamente.
@@ -433,11 +452,12 @@ func _pick_next_weather() -> void:
 		if change_weather(clear_weather_id):
 			return
 
+	var current_is_clear := _is_clear_weather(_target_weather)
 	var options: Array[Resource] = []
 	for profile in weather_profiles:
 		if profile == null:
 			continue
-		if _target_weather != null and profile.get("id") == _target_weather.get("id"):
+		if not current_is_clear and _target_weather != null and profile.get("id") == _target_weather.get("id"):
 			continue
 		options.append(profile)
 
@@ -446,11 +466,26 @@ func _pick_next_weather() -> void:
 		return
 
 	var next_profile := _pick_weighted_weather(options)
+	if next_profile == null:
+		_schedule_next_weather()
+		return
 	change_weather(next_profile.get("id"))
 
 
-func _schedule_next_weather() -> void:
-	_weather_timer_hours = _random.randf_range(min_weather_duration_hours, max_weather_duration_hours)
+func _schedule_next_weather(profile: Resource = null) -> void:
+	var scheduled_weather := profile if profile != null else _target_weather
+	var min_duration := min_weather_duration_hours
+	var max_duration := max_weather_duration_hours
+	if scheduled_weather != null:
+		if _is_clear_weather(scheduled_weather):
+			min_duration = clear_weather_min_duration_hours
+			max_duration = clear_weather_max_duration_hours
+		else:
+			min_duration = bad_weather_min_duration_hours
+			max_duration = bad_weather_max_duration_hours
+
+	max_duration = maxf(min_duration, max_duration)
+	_weather_timer_hours = _random.randf_range(min_duration, max_duration)
 
 
 func _pick_weighted_weather(options: Array[Resource]) -> Resource:
@@ -459,7 +494,7 @@ func _pick_weighted_weather(options: Array[Resource]) -> Resource:
 		total_weight += _get_weather_auto_weight(profile)
 
 	if total_weight <= 0.0:
-		return options[_random.randi_range(0, options.size() - 1)]
+		return null
 
 	var roll := _random.randf_range(0.0, total_weight)
 	var accumulated := 0.0
@@ -599,8 +634,8 @@ func _apply_ambient(day_factor: float, twilight_factor: float, night_factor: flo
 func _apply_fog(day_factor: float, fog_density: float, rain_intensity: float, cloud_coverage: float) -> void:
 	var density := fog_density + rain_intensity * 0.018 + cloud_coverage * 0.004
 	_runtime_environment.fog_enabled = density > 0.001
-	_runtime_environment.fog_light_color = Color(0.03, 0.04, 0.07, 1.0).lerp(Color(0.62, 0.68, 0.72, 1.0), day_factor)
-	_runtime_environment.fog_light_energy = lerpf(0.02, 0.22, day_factor)
+	_runtime_environment.fog_light_color = night_fog_light_color.lerp(day_fog_light_color, day_factor)
+	_runtime_environment.fog_light_energy = lerpf(night_fog_light_energy, day_fog_light_energy, day_factor)
 	_runtime_environment.fog_density = density
 	_runtime_environment.fog_sky_affect = clampf(0.2 + cloud_coverage * 0.45 + rain_intensity * 0.35, 0.0, 1.0)
 
@@ -629,6 +664,8 @@ func _apply_visual_systems(day_factor: float, night_factor: float, cloud_coverag
 	if _star_field != null and _star_field.has_method("set_visibility"):
 		var star_time_visibility := _get_star_time_visibility()
 		var star_visibility := star_time_visibility * pow(1.0 - cloud_coverage, 1.8) * (1.0 - rain_intensity) * star_multiplier
+		if _is_clear_weather(_target_weather) and rain_intensity <= 0.01:
+			star_visibility = maxf(star_visibility, star_time_visibility * clear_night_star_visibility_floor)
 		_star_field.call("set_visibility", star_visibility)
 
 
