@@ -11,9 +11,9 @@ class_name PlayerController
 ## Ambiente subaquatico ligado/desligado quando a camera entra na agua.
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 ## Caminho fallback do esqueleto do personagem. Quando ha Male/Female, o esqueleto ativo e resolvido via PlayerAnimation.
-@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
-## Probe usado como fallback para detectar se a cabeca esta submersa.
-@export var breath_probe_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D/BreathProbeAttachment/BreathProbe")
+@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Male/Armature/Skeleton3D")
+## Probe opcional usado para detectar se a cabeca esta submersa.
+@export var breath_probe_path: NodePath
 
 @export_group("Ground Movement")
 ## Velocidade base do personagem em metros por segundo antes de multiplicadores.
@@ -81,8 +81,8 @@ class_name PlayerController
 @onready var camera_pivot: Node3D = get_node_or_null(camera_pivot_path) as Node3D
 @onready var camera: Node3D = get_node_or_null(camera_path) as Node3D
 @onready var underwater_environment: Node = get_node_or_null(underwater_environment_path)
-@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D
-@onready var breath_probe: Node3D = get_node_or_null(breath_probe_path) as Node3D
+@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D if not skeleton_path.is_empty() else null
+@onready var breath_probe: Node3D = get_node_or_null(breath_probe_path) as Node3D if not breath_probe_path.is_empty() else null
 
 var _camera_pitch := 0.0
 var _target_camera_pitch := 0.0
@@ -116,9 +116,9 @@ func refresh_character_nodes() -> void:
 			skeleton = player_animation.call("get_active_skeleton") as Skeleton3D
 
 	if skeleton == null:
-		skeleton = get_node_or_null(skeleton_path) as Skeleton3D
+		skeleton = get_node_or_null(skeleton_path) as Skeleton3D if not skeleton_path.is_empty() else null
 	if breath_probe == null:
-		breath_probe = get_node_or_null(breath_probe_path) as Node3D
+		breath_probe = get_node_or_null(breath_probe_path) as Node3D if not breath_probe_path.is_empty() else null
 	if breath_probe == null and skeleton != null:
 		breath_probe = skeleton.get_node_or_null("BreathProbeAttachment/BreathProbe") as Node3D
 

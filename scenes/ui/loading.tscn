@@ -2,7 +2,11 @@
 
 [ext_resource type="Texture2D" uid="uid://nviwbejocevb" path="res://assets/stats/title.png" id="1_35gka"]
 [ext_resource type="FontFile" uid="uid://betapt22xusc7" path="res://assets/fonts/Cinzel-Bold.ttf" id="2_0ih7j"]
-[ext_resource type="Script" path="res://scenes/ui/loading.gd" id="3_loading"]
+[ext_resource type="Texture2D" uid="uid://cg43nn5gpk55b" path="res://assets/background_5.jpg" id="2_sjr32"]
+[ext_resource type="Script" uid="uid://co87ggvrs48j3" path="res://scenes/ui/loading.gd" id="3_loading"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_gbjog"]
+blend_mode = 1
 
 [node name="Loading" type="Control" unique_id=1121056042]
 layout_mode = 3
@@ -12,6 +16,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_loading")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1947913713]
+z_index = -1
+layout_mode = 0
+offset_right = 1279.8195
+offset_bottom = 719.55
+texture = ExtResource("2_sjr32")
+expand_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1880499673]
 layout_mode = 0
@@ -33,6 +45,7 @@ theme_override_fonts/font = ExtResource("2_0ih7j")
 rounded = true
 
 [node name="Label" type="Label" parent="TextureRect" unique_id=985182330]
+material = SubResource("CanvasItemMaterial_gbjog")
 layout_mode = 0
 offset_left = 373.63837
 offset_top = -42.166107

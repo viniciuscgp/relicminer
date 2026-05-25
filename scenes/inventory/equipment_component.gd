@@ -36,8 +36,8 @@ var _live_preview_poll_time := 0.0
 @export var right_hand_socket_path: NodePath = NodePath("../EquipmentSockets/RightHandSocket")
 ## NodePath used to locate the left hand socket node in the Socket Paths settings.
 @export var left_hand_socket_path: NodePath = NodePath("../EquipmentSockets/LeftHandSocket")
-## NodePath used to locate the skeleton node in the Socket Paths settings.
-@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+## Fallback NodePath used to locate the skeleton node in the Socket Paths settings.
+@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Male/Armature/Skeleton3D")
 
 @export_group("Bone Sockets")
 ## Name used for right hand bone in the Bone Sockets settings.
@@ -71,7 +71,7 @@ var _live_preview_poll_time := 0.0
 @onready var inventory_dropper: Node = get_node_or_null(inventory_dropper_path)
 @onready var right_hand_socket: Node3D = get_node_or_null(right_hand_socket_path) as Node3D
 @onready var left_hand_socket: Node3D = get_node_or_null(left_hand_socket_path) as Node3D
-@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D
+@onready var skeleton: Skeleton3D = get_node_or_null(skeleton_path) as Skeleton3D if not skeleton_path.is_empty() else null
 @onready var aim_source: Node3D = get_node_or_null(aim_source_path) as Node3D
 
 var _equipped_stacks := {
@@ -102,7 +102,7 @@ func refresh_skeleton() -> void:
 		if player_animation != null and player_animation.has_method("get_active_skeleton"):
 			skeleton = player_animation.call("get_active_skeleton") as Skeleton3D
 	if skeleton == null:
-		skeleton = get_node_or_null(skeleton_path) as Skeleton3D
+		skeleton = get_node_or_null(skeleton_path) as Skeleton3D if not skeleton_path.is_empty() else null
 	if skeleton == null and actor != null:
 		skeleton = _find_skeleton(actor)
 	right_hand_socket = _get_or_create_bone_socket(right_hand_socket, right_hand_bone_name, right_hand_bone_socket_name)

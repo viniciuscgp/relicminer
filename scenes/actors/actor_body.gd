@@ -5,8 +5,8 @@ class_name ActorBody
 @export var inventory_path: NodePath = NodePath("Inventory")
 ## NodePath used to locate the stats node.
 @export var stats_path: NodePath = NodePath("PlayerStats")
-## NodePath used to locate the combat stats node.
-@export var combat_stats_path: NodePath = NodePath("CombatStats")
+## Optional NodePath used to locate a separate combat stats node.
+@export var combat_stats_path: NodePath
 ## NodePath used to locate the inventory dropper node.
 @export var inventory_dropper_path: NodePath = NodePath("InventoryDropper")
 ## NodePath used to locate the interactor node.
@@ -20,7 +20,7 @@ class_name ActorBody
 
 @onready var inventory: Node = get_node_or_null(inventory_path)
 @onready var stats: Node = get_node_or_null(stats_path)
-@onready var combat_stats: Node = get_node_or_null(combat_stats_path)
+@onready var combat_stats: Node = get_node_or_null(combat_stats_path) if not combat_stats_path.is_empty() else null
 @onready var inventory_dropper: Node = get_node_or_null(inventory_dropper_path)
 @onready var interactor: Node = get_node_or_null(interactor_path)
 @onready var rigid_body_pusher: Node = get_node_or_null(rigid_body_pusher_path)

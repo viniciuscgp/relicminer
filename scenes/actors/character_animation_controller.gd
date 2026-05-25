@@ -143,8 +143,8 @@ const LEFT_HAND_SLOT := &"left_hand"
 @export_group("Held Pose Override")
 ## NodePath used to locate the equipment node in the Held Pose Override settings.
 @export var equipment_path: NodePath = NodePath("../Equipment")
-## NodePath used to locate the skeleton node in the Held Pose Override settings.
-@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
+## Fallback NodePath used to locate the skeleton node in the Held Pose Override settings.
+@export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Male/Armature/Skeleton3D")
 
 var animation_map: Dictionary = {
 	WALKING: WALKING,
@@ -375,7 +375,7 @@ func _refresh_held_pose_links() -> void:
 	if not Engine.is_editor_hint() and model_root != null and model_root.has_method("get_active_skeleton"):
 		_skeleton = model_root.call("get_active_skeleton") as Skeleton3D
 	if _skeleton == null:
-		_skeleton = get_node_or_null(skeleton_path) as Skeleton3D
+		_skeleton = get_node_or_null(skeleton_path) as Skeleton3D if not skeleton_path.is_empty() else null
 	if _skeleton == null and model_root != null:
 		_skeleton = _find_skeleton(model_root)
 
