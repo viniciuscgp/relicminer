@@ -1,5 +1,7 @@
 extends Node
 
+const LoadingScreen := preload("res://scenes/ui/loading.gd")
+
 const SAVE_PATH := "user://savegame.json"
 const SAVE_DIRECTORY := "user://saves"
 const SAVE_SNAPSHOT_EXTENSION := "png"
@@ -126,6 +128,22 @@ func get_save_entries() -> Array[Dictionary]:
 	return entries
 
 
+func delete_save_from_path(save_path: String) -> bool:
+	var resolved_path := str(save_path)
+	if not _is_named_save_path(resolved_path) or not FileAccess.file_exists(resolved_path):
+		return false
+
+	var payload := _load_payload_from_path(resolved_path)
+	var snapshot_path := str(payload.get("snapshot_path", ""))
+	if not _remove_file(resolved_path):
+		return false
+	if _is_named_save_snapshot_path(snapshot_path):
+		_remove_file(snapshot_path)
+
+	_refresh_latest_save_file()
+	return true
+
+
 func load_game_scene_from_path(save_path: String, fallback_scene_path := "") -> bool:
 	var payload := load_payload(save_path)
 	if payload.is_empty():
@@ -155,6 +173,13 @@ func load_game_scene(fallback_scene_path := "") -> bool:
 	return _load_payload_scene(payload, fallback_scene_path)
 
 
+func apply_loaded_scene_payload(payload: Dictionary, scene: Node) -> void:
+	if payload.is_empty() or scene == null:
+		return
+	_apply_payload_to_scene(payload, scene)
+	_notify_scene_loaded(scene)
+
+
 func _load_payload_scene(payload: Dictionary, fallback_scene_path := "") -> bool:
 	var scene_path := str(payload.get("scene_path", ""))
 	if scene_path.is_empty():
@@ -163,27 +188,11 @@ func _load_payload_scene(payload: Dictionary, fallback_scene_path := "") -> bool
 		return false
 
 	_apply_global_save_metadata(payload)
-	var packed_scene := load(scene_path) as PackedScene
-	if packed_scene == null:
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
 		push_error("SaveManager: failed to load scene '%s'." % scene_path)
 		return false
 
-	var scene := packed_scene.instantiate()
-	if scene == null:
-		push_error("SaveManager: failed to instantiate scene '%s'." % scene_path)
-		return false
-
-	var tree := get_tree()
-	var old_scene := tree.current_scene
-	if old_scene != null:
-		tree.root.remove_child(old_scene)
-		old_scene.queue_free()
-
-	tree.root.add_child(scene)
-	tree.current_scene = scene
-	_apply_payload_to_scene(payload, scene)
-	_notify_scene_loaded(scene)
-	return true
+	return LoadingScreen.load_scene(get_tree(), scene_path, payload) == OK
 
 
 func load_payload(save_path := "") -> Dictionary:
@@ -386,12 +395,41 @@ func _get_latest_save_path() -> String:
 	return str(entries[0].get("path", ""))
 
 
+func _refresh_latest_save_file() -> void:
+	var entries := get_save_entries()
+	if entries.is_empty():
+		_remove_file(SAVE_PATH)
+		return
+
+	var latest_payload := _load_payload_from_path(str(entries[0].get("path", "")))
+	if not latest_payload.is_empty():
+		_write_payload_to_path(latest_payload, SAVE_PATH)
+
+
 func _get_save_path_for_name(save_name: String) -> String:
 	return "%s/%s.json" % [SAVE_DIRECTORY, _sanitize_save_file_name(save_name)]
 
 
 func _get_snapshot_path_for_name(save_name: String) -> String:
 	return "%s/%s.%s" % [SAVE_DIRECTORY, _sanitize_save_file_name(save_name), SAVE_SNAPSHOT_EXTENSION]
+
+
+func _is_named_save_path(path: String) -> bool:
+	return path.begins_with("%s/" % SAVE_DIRECTORY) and path.get_extension().to_lower() == "json"
+
+
+func _is_named_save_snapshot_path(path: String) -> bool:
+	return path.begins_with("%s/" % SAVE_DIRECTORY) and path.get_extension().to_lower() == SAVE_SNAPSHOT_EXTENSION
+
+
+func _remove_file(path: String) -> bool:
+	if path.is_empty() or not FileAccess.file_exists(path):
+		return true
+	var error := DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	if error != OK:
+		push_error("SaveManager: failed to remove file '%s'. Error: %s" % [path, error])
+		return false
+	return true
 
 
 func _build_save_entry(path: String, payload: Dictionary) -> Dictionary:

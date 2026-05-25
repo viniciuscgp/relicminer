@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://ba88imyj5tg5q"]
+
+[ext_resource type="Texture2D" uid="uid://nviwbejocevb" path="res://assets/stats/title.png" id="1_35gka"]
+[ext_resource type="FontFile" uid="uid://betapt22xusc7" path="res://assets/fonts/Cinzel-Bold.ttf" id="2_0ih7j"]
+[ext_resource type="Script" path="res://scenes/ui/loading.gd" id="3_loading"]
+
+[node name="Loading" type="Control" unique_id=1121056042]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_loading")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1880499673]
+layout_mode = 0
+offset_left = -2.1573486
+offset_top = 299.08902
+offset_right = 1270.1498
+offset_bottom = 433.58188
+texture = ExtResource("1_35gka")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="ProgressBar" type="ProgressBar" parent="TextureRect" unique_id=1473620677]
+layout_mode = 0
+offset_left = 369.89716
+offset_top = 36.40335
+offset_right = 892.0326
+offset_bottom = 96.13666
+theme_override_fonts/font = ExtResource("2_0ih7j")
+rounded = true
+
+[node name="Label" type="Label" parent="TextureRect" unique_id=985182330]
+layout_mode = 0
+offset_left = 373.63837
+offset_top = -42.166107
+offset_right = 894.6469
+offset_bottom = -0.16610718
+theme_override_fonts/font = ExtResource("2_0ih7j")
+theme_override_font_sizes/font_size = 30
+text = "Loading"
+horizontal_alignment = 1
+vertical_alignment = 1

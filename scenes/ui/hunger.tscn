@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://df6bga75joh7q"]
-
-[ext_resource type="Texture2D" uid="uid://dyhchti0ysojl" path="res://assets/stats/hunger.png" id="1_4prft"]
-
-[node name="Hunger" type="Sprite2D" unique_id=1599198450]
-texture = ExtResource("1_4prft")

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cuirhw6v7d40d" path="res://assets/background_5.jpg" id="2"]
 [ext_resource type="Texture2D" uid="uid://cd7nyws528uag" path="res://assets/logo.png" id="3"]
 [ext_resource type="PackedScene" uid="uid://bkgrgihwnmvl8" path="res://scenes/ui/settings_menu.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/save_load_dialog.tscn" id="5"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1kxf"]
 
@@ -166,5 +167,9 @@ theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
 text = "Relic Miner  Version 1.0.0"
 
 [node name="SettingsMenu" parent="." unique_id=968535290 instance=ExtResource("4")]
+unique_name_in_owner = true
+visible = false
+
+[node name="SaveLoadDialog" parent="." instance=ExtResource("5")]
 unique_name_in_owner = true
 visible = false

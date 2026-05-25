@@ -1,6 +1,7 @@
 extends Control
 
 const CHARACTER_MODEL_META := &"selected_player_character_model"
+const LoadingScreen := preload("res://scenes/ui/loading.gd")
 
 ## Scene file path used for game scene.
 @export_file("*.tscn") var game_scene_path := "res://scenes/locations/world.tscn"
@@ -45,11 +46,11 @@ func _start_game(character_model: StringName) -> void:
 		_save_manager.call("set_player_character_model", character_model)
 	else:
 		get_tree().set_meta(CHARACTER_MODEL_META, character_model)
-	get_tree().change_scene_to_file(game_scene_path)
+	LoadingScreen.load_scene(get_tree(), game_scene_path)
 
 
 func _back_to_menu() -> void:
-	get_tree().change_scene_to_file(main_menu_scene_path)
+	LoadingScreen.load_scene(get_tree(), main_menu_scene_path)
 
 
 func _configure_focus() -> void:

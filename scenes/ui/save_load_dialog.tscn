@@ -1,0 +1,431 @@
+[gd_scene format=3 uid="uid://dvr8nbmlk6xpm"]
+
+[ext_resource type="Script" path="res://scenes/ui/save_load_dialog.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://betapt22xusc7" path="res://assets/fonts/Cinzel-Bold.ttf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.025, 0.023, 0.018, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.63, 0.42, 0.16, 0.92)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner"]
+bg_color = Color(0.055, 0.047, 0.034, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.29, 0.12, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.08, 0.065, 0.045, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.45, 0.17, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.13, 0.095, 0.055, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.86, 0.58, 0.22, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.34, 0.21, 0.06, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.66, 0.22, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_danger"]
+bg_color = Color(0.18, 0.045, 0.035, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.22, 0.16, 0.95)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_line"]
+bg_color = Color(0.025, 0.02, 0.014, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.34, 0.14, 0.86)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="SaveLoadDialog" type="CanvasLayer"]
+process_mode = 3
+layer = 35
+script = ExtResource("1")
+
+[node name="Root" type="Control" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.58)
+
+[node name="OuterMargin" type="MarginContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 42.0
+offset_top = 34.0
+offset_right = -42.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Root/OuterMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Root/OuterMargin/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="Root/OuterMargin/Panel/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Root/OuterMargin/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 30
+text = "Save Game"
+horizontal_alignment = 1
+
+[node name="Body" type="HBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="ListPanel" type="PanelContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body"]
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner")
+
+[node name="ListMargin" type="MarginContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ListContent" type="VBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ListTitle" type="Label" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin/ListContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
+text = "Saved games"
+
+[node name="SaveListScroll" type="ScrollContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin/ListContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SaveList" type="VBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin/ListContent/SaveListScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SlotButtonTemplate" type="Button" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin/ListContent/SaveListScroll/SaveList"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
+theme_override_colors/font_hover_color = Color(1, 0.86, 0.52, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.89, 0.6, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_line")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_pressed")
+toggle_mode = true
+text = "Save slot"
+text_overrun_behavior = 3
+autowrap_mode = 2
+alignment = 0
+
+[node name="EmptyLabel" type="Label" parent="Root/OuterMargin/Panel/Margin/Content/Body/ListPanel/ListMargin/ListContent/SaveListScroll/SaveList"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.73, 0.65, 0.52, 1)
+theme_override_font_sizes/font_size = 14
+text = "No saved games found."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DetailsPanel" type="PanelContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner")
+
+[node name="DetailsMargin" type="MarginContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="DetailsContent" type="VBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PreviewTitle" type="Label" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin/DetailsContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.62, 0.28, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 18
+text = "Preview"
+
+[node name="PreviewFrame" type="PanelContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin/DetailsContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_line")
+
+[node name="PreviewMargin" type="MarginContainer" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin/DetailsContent/PreviewFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="PreviewRect" type="TextureRect" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin/DetailsContent/PreviewFrame/PreviewMargin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 236)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DetailsLabel" type="Label" parent="Root/OuterMargin/Panel/Margin/Content/Body/DetailsPanel/DetailsMargin/DetailsContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "Screenshot that will be saved with this slot."
+autowrap_mode = 2
+
+[node name="NameRow" type="HBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="Root/OuterMargin/Panel/Margin/Content/NameRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
+theme_override_font_sizes/font_size = 15
+text = "Save name"
+vertical_alignment = 1
+
+[node name="NameEdit" type="LineEdit" parent="Root/OuterMargin/Panel/Margin/Content/NameRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter a save name"
+select_all_on_focus = true
+
+[node name="Actions" type="HBoxContainer" parent="Root/OuterMargin/Panel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="DeleteButton" type="Button" parent="Root/OuterMargin/Panel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.68, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_danger")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Delete"
+
+[node name="PrimaryButton" type="Button" parent="Root/OuterMargin/Panel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Save"
+
+[node name="CancelButton" type="Button" parent="Root/OuterMargin/Panel/Margin/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Cancel"
+
+[node name="MessageRoot" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MessageDim" type="ColorRect" parent="MessageRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.68)
+
+[node name="MessageCenter" type="CenterContainer" parent="MessageRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MessagePanel" type="PanelContainer" parent="MessageRoot/MessageCenter"]
+custom_minimum_size = Vector2(460, 220)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MessageMargin" type="MarginContainer" parent="MessageRoot/MessageCenter/MessagePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="MessageContent" type="VBoxContainer" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="MessageTitle" type="Label" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin/MessageContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.74, 0.42, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 22
+text = "Message"
+horizontal_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin/MessageContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.78, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "Message"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="MessageActions" type="HBoxContainer" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin/MessageContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="MessageOkButton" type="Button" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin/MessageContent/MessageActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 38)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "OK"
+
+[node name="MessageCancelButton" type="Button" parent="MessageRoot/MessageCenter/MessagePanel/MessageMargin/MessageContent/MessageActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 38)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+text = "Cancel"
