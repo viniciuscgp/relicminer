@@ -1,22 +1,39 @@
 extends Node3D
 
 
+## Directory used for output directory.
 @export_dir var output_directory := "res://surveys/rivers"
+## Name used for survey base.
 @export var survey_base_name := "blue_river"
+## Name used for survey.
 @export var survey_name := "blue_river_01"
+## Name used for auto increment.
 @export var auto_increment_name := true
+## NodePath used to locate the output node.
 @export var output_path := ""
+## Distance used for sample.
 @export var sample_distance := 4.0
+## Distance used for max bank.
 @export var max_bank_distance := 80.0
+## Radius used for bank probe.
 @export var bank_probe_radius := 1.0
+## Radius used for bank probe vertical.
 @export var bank_probe_vertical_radius := 0.5
+## Offset applied to surface height.
 @export var surface_height_offset := 1.0
+## Enables automatic detect surface height.
 @export var auto_detect_surface_height := true
+## Height used for max surface scan.
 @export var max_surface_scan_height := 8.0
+## Configures surface scan step.
 @export var surface_scan_step := 0.25
+## Configures minimum depth.
 @export var minimum_depth := 0.5
+## Height used for down ray.
 @export var down_ray_height := 20.0
+## Configures down ray depth.
 @export var down_ray_depth := 120.0
+## Physics layers used by collision mask.
 @export_flags_3d_physics var collision_mask := 1
 
 

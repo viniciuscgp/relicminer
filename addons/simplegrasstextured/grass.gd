@@ -45,18 +45,28 @@ extends MultiMeshInstance3D
 ## the grass, recommended for very simple meshes[br][br]
 ## [b]Unshaded[/b][br]No lighting will affect the grass
 @export_enum("Lambert", "Normal grass", "Unshaded") var light_mode := 1 : set = _on_set_light_mode
+## Texture filtering mode used by the grass material.
 @export_enum("Nearest", "Linear", "Nearest mipmap", "Linear mipmap") var texture_filter := 3 : set = _on_set_texture_filter
 @export_subgroup("Normal")
+## Normal map texture applied to the grass material.
 @export var texture_normal : Texture = null : set = _on_set_texture_normal
+## Strength of the normal map effect.
 @export_range(-16.0, 16.0) var normal_scale := 1.0 : set = _on_set_normal_scale
 @export_subgroup("Metallic")
+## Metallic map texture applied to the grass material.
 @export var texture_metallic : Texture = null : set = _on_set_texture_metallic
+## Channel sampled from the metallic texture.
 @export_enum("Red","Green","Blue","Alpha","Gray") var metallic_texture_channel : int = 0 : set = _on_set_metallic_texture_channel
+## Metallic amount applied to the grass material.
 @export_range(0.0, 1.0) var metallic := 0.0 : set = _on_set_metallic
+## Specular amount applied to the grass material.
 @export_range(0.0, 1.0) var specular := 0.5 : set = _on_set_specular
 @export_subgroup("Roughness")
+## Roughness map texture applied to the grass material.
 @export var texture_roughness : Texture = null : set = _on_set_texture_roughness
+## Channel sampled from the roughness texture.
 @export_enum("Red","Green","Blue","Alpha","Gray") var roughness_texture_channel : int = 0 : set = _on_set_roughness_texture_channel
+## Roughness amount applied to the grass material.
 @export_range(0.0, 1.0) var roughness := 1.0 : set = _on_set_roughness
 @export_group("")
 @export_category("Grass settings")
@@ -94,9 +104,13 @@ extends MultiMeshInstance3D
 ## Disable the ability to rotate the SimpleGrassTextured node
 @export var disable_node_rotation := true : set = _on_set_disable_node_rotation
 @export_group("Optimization")
+## Enables distance-based grass optimization.
 @export var optimization_by_distance := false : set = _on_set_optimization_by_distance
+## Strength of the distance optimization effect.
 @export var optimization_level := 7.0 : set = _on_set_optimization_level
+## Minimum distance where optimization starts.
 @export var optimization_dist_min := 10.0 : set = _on_set_optimization_dist_min
+## Maximum distance where optimization reaches full effect.
 @export var optimization_dist_max := 50.0 : set = _on_set_optimization_dist_max
 @export_group("Height Map Data")
 ## This is the baked height map of this grass, this will speed up the load of 

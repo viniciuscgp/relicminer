@@ -1,11 +1,17 @@
 extends Node
 class_name ActorInteractor
 
+## NodePath used to locate the actor node.
 @export var actor_path: NodePath = NodePath("..")
+## NodePath used to locate the aim source node.
 @export var aim_source_path: NodePath
+## Distance used for interaction.
 @export var interaction_distance := 3.0
+## Radius used for interaction.
 @export var interaction_radius := 1.45
+## Radius used for ground pickup.
 @export var ground_pickup_radius := 2.0
+## Height used for ground pickup.
 @export var ground_pickup_height := 0.45
 
 @onready var actor: Node = get_node_or_null(actor_path)

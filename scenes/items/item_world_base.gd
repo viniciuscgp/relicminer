@@ -17,23 +17,37 @@ signal pickup_failed(reason: String)
 signal opened(actor_inventory: Node, container_inventory: Node)
 signal open_failed(reason: String)
 
+## Item resource represented by this stack or world object.
 @export var item: Resource
+## Number of item units represented by this stack or world object.
 @export_range(1, 999, 1, "or_greater") var amount := 1
+## Current durability value; negative values use the item default.
 @export var durability := -1.0
+## Controls whether remove when empty is enabled.
 @export var remove_when_empty := true
 
 @export_group("Physics")
+## Configures default mass kg in the Physics settings.
 @export_range(0.1, 500.0, 0.1, "or_greater") var default_mass_kg := 1.0
+## Controls whether contents affect mass is enabled in the Physics settings.
 @export var contents_affect_mass := true
 
 @export_group("Inventory")
+## Controls whether this object has inventory in the Inventory settings.
 @export var has_inventory := false
+## NodePath used to locate the inventory node in the Inventory settings.
 @export var inventory_path: NodePath = NodePath("InventoryComponent")
+## Name used for inventory display in the Inventory settings.
 @export var inventory_display_name := ""
+## Configures capacity slots in the Inventory settings.
 @export_range(1, 200, 1, "or_greater") var capacity_slots := 8
+## Weight value used for max weight kg in the Inventory settings.
 @export_range(0.0, 1000.0, 0.01, "or_greater") var max_weight_kg := 0.0
+## Controls whether locked is enabled in the Inventory settings.
 @export var locked := false
+## ID used to match or reference required key in the Inventory settings.
 @export var required_key_id: StringName
+## Configures starting items in the Inventory settings.
 @export var starting_items: Array[Resource] = []
 
 @onready var inventory: Node = get_node_or_null(inventory_path)

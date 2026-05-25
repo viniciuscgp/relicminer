@@ -1,6 +1,8 @@
 extends Control
 
+## Scene file path used for game scene.
 @export_file("*.tscn") var game_scene_path := "res://scenes/locations/world.tscn"
+## Scene file path used for character select scene.
 @export_file("*.tscn") var character_select_scene_path := "res://scenes/ui/character_select.tscn"
 
 @onready var continue_button: Button = %ContinueButton

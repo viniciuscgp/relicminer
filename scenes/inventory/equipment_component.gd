@@ -22,28 +22,43 @@ var _live_preview_payload_text := ""
 var _live_preview_poll_time := 0.0
 
 @export_group("Node References")
+## NodePath used to locate the actor node in the Node References settings.
 @export var actor_path: NodePath = NodePath("..")
+## NodePath used to locate the inventory node in the Node References settings.
 @export var inventory_path: NodePath = NodePath("../Inventory")
+## NodePath used to locate the inventory dropper node in the Node References settings.
 @export var inventory_dropper_path: NodePath = NodePath("../InventoryDropper")
+## NodePath used to locate the aim source node in the Node References settings.
 @export var aim_source_path: NodePath
 
 @export_group("Socket Paths")
+## NodePath used to locate the right hand socket node in the Socket Paths settings.
 @export var right_hand_socket_path: NodePath = NodePath("../EquipmentSockets/RightHandSocket")
+## NodePath used to locate the left hand socket node in the Socket Paths settings.
 @export var left_hand_socket_path: NodePath = NodePath("../EquipmentSockets/LeftHandSocket")
+## NodePath used to locate the skeleton node in the Socket Paths settings.
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
 
 @export_group("Bone Sockets")
+## Name used for right hand bone in the Bone Sockets settings.
 @export var right_hand_bone_name: StringName = &"R_Hand"
+## Name used for right hand bone socket in the Bone Sockets settings.
 @export var right_hand_bone_socket_name := "RightHandBoneSocket"
+## Name used for left hand bone in the Bone Sockets settings.
 @export var left_hand_bone_name: StringName = &"L_Hand"
+## Name used for left hand bone socket in the Bone Sockets settings.
 @export var left_hand_bone_socket_name := "LeftHandBoneSocket"
 
 @export_group("Runtime Behavior")
+## Controls whether compensate socket scale is enabled in the Runtime Behavior settings.
 @export var compensate_socket_scale := true
+## Controls whether refresh held transforms in game is enabled in the Runtime Behavior settings.
 @export var refresh_held_transforms_in_game := true
+## Controls whether editor live preview overrides is used in the Runtime Behavior settings.
 @export var use_editor_live_preview_overrides := true
 
 @export_group("Held Transform Overrides")
+## Configures held transform overrides in the Held Transform Overrides settings.
 @export var held_transform_overrides: Array[HeldItemTransformOverride] = []:
 	set(value):
 		held_transform_overrides = _make_unique_held_transform_overrides(value, held_transform_overrides.size())

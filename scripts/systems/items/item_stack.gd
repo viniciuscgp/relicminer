@@ -1,8 +1,11 @@
 extends Resource
 class_name ItemStack
 
+## Item resource represented by this stack or world object.
 @export var item: Resource
+## Number of item units represented by this stack or world object.
 @export_range(1, 999, 1, "or_greater") var amount := 1
+## Current durability value; negative values use the item default.
 @export var durability := -1.0
 
 

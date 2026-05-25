@@ -2,16 +2,25 @@ extends "res://scenes/items/item_world_base.gd"
 class_name SimpleTorchWorld
 
 @export_group("Torch Light")
+## Energy or light intensity used for base light in the Torch Light settings.
 @export_range(0.0, 10.0, 0.01) var base_light_energy := 3.05
+## Energy or light intensity used for flicker in the Torch Light settings.
 @export_range(0.0, 5.0, 0.01) var flicker_energy := 0.65
+## Configures light range in the Torch Light settings.
 @export_range(0.0, 20.0, 0.01) var light_range := 8.2
+## Speed value used for flicker in the Torch Light settings.
 @export_range(0.1, 30.0, 0.1) var flicker_speed := 11.0
+## Controls whether cast torch shadows is enabled in the Torch Light settings.
 @export var cast_torch_shadows := false
+## Controls whether lit is enabled in the Torch Light settings.
 @export var lit := true
 
 @export_group("Flame")
+## Energy or light intensity used for flame emission in the Flame settings.
 @export_range(0.0, 5.0, 0.01) var flame_emission_energy := 3.5
+## Configures flame scale flicker in the Flame settings.
 @export_range(0.0, 1.0, 0.01) var flame_scale_flicker := 0.18
+## Configures ember particles in the Flame settings.
 @export_range(0, 256, 1) var ember_particles := 42
 
 @onready var light: OmniLight3D = get_node_or_null("Visual/OmniLight3D") as OmniLight3D

@@ -26,10 +26,15 @@ extends Control
 
 signal value_changed(value_min: float, value_max: float)
 
+## Minimum value allowed by the range control.
 @export var range_min: float = 0.0
+## Maximum value allowed by the range control.
 @export var range_max: float = 180.0
+## Step size used when changing range values.
 @export var step: float = 1.0
+## Current minimum selected value.
 @export var value_min: float = 0.0 : set = set_value_min
+## Current maximum selected value.
 @export var value_max: float = 45.0 : set = set_value_max
 
 var _ed_scale: float = 1.0

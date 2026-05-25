@@ -1,9 +1,13 @@
 extends "res://scripts/systems/items/actions/item_action.gd"
 class_name MeleeItemAction
 
+## Name used for animation.
 @export var animation_name: StringName = &""
+## Multiplier applied to damage.
 @export var damage_multiplier := 1.0
+## Configures range.
 @export var range := 1.7
+## Configures impact impulse.
 @export var impact_impulse := 3.0
 
 

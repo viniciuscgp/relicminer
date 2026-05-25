@@ -5,7 +5,9 @@ signal died(enemy: Node)
 signal loot_opened(actor_inventory: Node, enemy_inventory: Node)
 signal loot_open_failed(reason: String)
 
+## Controls whether loot after death is enabled.
 @export var loot_after_death := true
+## Controls whether disable collision on death is enabled.
 @export var disable_collision_on_death := true
 
 

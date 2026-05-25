@@ -1,18 +1,31 @@
 extends Node3D
 
 
+## NodePath used to locate the world environment node.
 @export var world_environment_path: NodePath
+## NodePath used to locate the target node.
 @export var target_path: NodePath
+## Physics layers used by water collision mask.
 @export_flags_3d_physics var water_collision_mask := 1
+## Configures water area group.
 @export var water_area_group := "water_volume"
+## Name used for water area.
 @export var water_area_name := "WaterArea"
+## Configures check interval.
 @export var check_interval := 0.1
+## Speed value used for transition.
 @export var transition_speed := 4.0
+## Configures max water results.
 @export var max_water_results := 16
+## Radius used for probe.
 @export var probe_radius := 0.6
+## Radius used for vertical probe.
 @export var vertical_probe_radius := 0.35
+## Color used for underwater fog.
 @export var underwater_fog_color := Color(0.03, 0.22, 0.28, 1.0)
+## Density used for underwater fog.
 @export_range(0.0, 1.0, 0.01) var underwater_fog_density := 0.12
+## Configures underwater fog sky affect.
 @export_range(0.0, 1.0, 0.01) var underwater_fog_sky_affect := 0.65
 
 

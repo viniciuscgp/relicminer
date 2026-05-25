@@ -1,13 +1,21 @@
 extends CharacterBody3D
 class_name ActorBody
 
+## NodePath used to locate the inventory node.
 @export var inventory_path: NodePath = NodePath("Inventory")
+## NodePath used to locate the stats node.
 @export var stats_path: NodePath = NodePath("PlayerStats")
+## NodePath used to locate the combat stats node.
 @export var combat_stats_path: NodePath = NodePath("CombatStats")
+## NodePath used to locate the inventory dropper node.
 @export var inventory_dropper_path: NodePath = NodePath("InventoryDropper")
+## NodePath used to locate the interactor node.
 @export var interactor_path: NodePath = NodePath("Interactor")
+## NodePath used to locate the rigid body pusher node.
 @export var rigid_body_pusher_path: NodePath = NodePath("RigidBodyPusher")
+## NodePath used to locate the equipment node.
 @export var equipment_path: NodePath = NodePath("Equipment")
+## NodePath used to locate the animation controller node.
 @export var animation_controller_path: NodePath = NodePath("AnimationController")
 
 @onready var inventory: Node = get_node_or_null(inventory_path)

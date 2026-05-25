@@ -5,54 +5,66 @@ class_name HeldItemTransformOverride
 const LIVE_PREVIEW_PATH := "user://held_transform_override_preview.json"
 
 @export_group("Item Matching")
+## ID used to match or reference item in the Item Matching settings.
 @export var item_id: StringName:
 	set(value):
 		item_id = value
 		_notify_override_changed()
+## Additional IDs accepted for additional item matching in the Item Matching settings.
 @export var additional_item_ids: Array[StringName] = []:
 	set(value):
 		additional_item_ids = value
 		_notify_override_changed()
 
 @export_group("Held Transform")
+## Configures position in the Held Transform settings.
 @export var position := Vector3.ZERO:
 	set(value):
 		position = value
 		_notify_override_changed()
+## Configures rotation degrees in the Held Transform settings.
 @export var rotation_degrees := Vector3.ZERO:
 	set(value):
 		rotation_degrees = value
 		_notify_override_changed()
+## Configures scale in the Held Transform settings.
 @export var scale := Vector3.ONE:
 	set(value):
 		scale = value
 		_notify_override_changed()
 
 @export_group("Bone Pose Override")
+## Enables pose in the Bone Pose Override settings.
 @export var pose_enabled := false:
 	set(value):
 		pose_enabled = value
 		_notify_override_changed()
+## Name used for upperarm bone in the Bone Pose Override settings.
 @export var upperarm_bone_name: StringName:
 	set(value):
 		upperarm_bone_name = value
 		_notify_override_changed()
+## Configures upperarm rotation degrees in the Bone Pose Override settings.
 @export var upperarm_rotation_degrees := Vector3.ZERO:
 	set(value):
 		upperarm_rotation_degrees = value
 		_notify_override_changed()
+## Name used for forearm bone in the Bone Pose Override settings.
 @export var forearm_bone_name: StringName:
 	set(value):
 		forearm_bone_name = value
 		_notify_override_changed()
+## Configures forearm rotation degrees in the Bone Pose Override settings.
 @export var forearm_rotation_degrees := Vector3.ZERO:
 	set(value):
 		forearm_rotation_degrees = value
 		_notify_override_changed()
+## Name used for hand bone in the Bone Pose Override settings.
 @export var hand_bone_name: StringName:
 	set(value):
 		hand_bone_name = value
 		_notify_override_changed()
+## Configures hand rotation degrees in the Bone Pose Override settings.
 @export var hand_rotation_degrees := Vector3.ZERO:
 	set(value):
 		hand_rotation_degrees = value

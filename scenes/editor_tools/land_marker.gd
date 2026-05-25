@@ -1,6 +1,7 @@
 @tool
 extends Node3D
 
+## Configures label.
 @export var label: String = "Label":
 	set(value):
 		label = value

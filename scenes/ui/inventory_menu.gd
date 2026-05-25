@@ -19,9 +19,13 @@ const KIND_KEYS := {
 const KIND_FOOD := 5
 const KIND_POTION := 6
 
+## NodePath used to locate the actor node.
 @export var actor_path: NodePath = NodePath("../..")
+## Count used for visible slot.
 @export var visible_slot_count := 30
+## Configures slot columns.
 @export var slot_columns := 5
+## Size used for slot.
 @export var slot_size := Vector2(72, 64)
 
 @onready var title_label: Label = %TitleLabel

@@ -22,9 +22,13 @@
 @tool
 extends Terrain3D
 
+## Source SimpleGrassTextured node whose transforms will be imported.
 @export var simple_grass_textured: MultiMeshInstance3D
+## Terrain3D mesh ID assigned to imported grass instances.
 @export var assign_mesh_id: int
+## Runs the SimpleGrassTextured import when enabled in the inspector.
 @export var import: bool = false : set = import_sgt
+## Clears existing imported instances for the assigned mesh ID.
 @export var clear_instances: bool = false : set = clear_multimeshes
 
 

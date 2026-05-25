@@ -7,11 +7,16 @@ enum BlockKind {
 	WALL
 }
 
+## Configures block kind.
 @export var block_kind: BlockKind = BlockKind.GROUND
+## Name used for block.
 @export var block_name: String = "VillageBlock"
 
+## Configures max health.
 @export var max_health: int = 1
+## Controls whether this object can drop item.
 @export var can_drop_item: bool = false
+## ID used to match or reference drop item.
 @export var drop_item_id: String = ""
 
 var health: int

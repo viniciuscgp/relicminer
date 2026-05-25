@@ -2,7 +2,9 @@ extends Control
 
 const CHARACTER_MODEL_META := &"selected_player_character_model"
 
+## Scene file path used for game scene.
 @export_file("*.tscn") var game_scene_path := "res://scenes/locations/world.tscn"
+## Scene file path used for main menu scene.
 @export_file("*.tscn") var main_menu_scene_path := "res://scenes/ui/main_menu.tscn"
 
 @onready var title_label: Label = %TitleLabel

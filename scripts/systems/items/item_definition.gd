@@ -19,44 +19,73 @@ enum Kind {
 	ARMOR
 }
 
+## Stable ID used to reference this resource from code and saved data.
 @export var id: StringName
+## Name shown to players and editor tools.
 @export var display_name := ""
+## Long text shown when describing this resource to players.
 @export_multiline var description := ""
+## Configures kind.
 @export var kind: Kind = Kind.MISC
 
 @export_group("Presentation")
+## Configures icon in the Presentation settings.
 @export var icon: Texture2D
+## Configures world scene in the Presentation settings.
 @export var world_scene: PackedScene
+## Configures held scene in the Presentation settings.
 @export var held_scene: PackedScene
+## Controls whether generate icon from world scene is enabled in the Presentation settings.
 @export var generate_icon_from_world_scene := true
 
 @export_group("Inventory")
+## Configures weight kg in the Inventory settings.
 @export_range(0.0, 1000.0, 0.01, "or_greater") var weight_kg := 0.0
+## Configures stack limit in the Inventory settings.
 @export_range(1, 999, 1, "or_greater") var stack_limit := 1
+## Configures buy price in the Inventory settings.
 @export var buy_price := 0
+## Configures sell price in the Inventory settings.
 @export var sell_price := 0
 
 @export_group("Equipment")
+## Configures default equipment slot in the Equipment settings.
 @export var default_equipment_slot: StringName
+## Marks whether this object is mining tool in the Equipment settings.
 @export var is_mining_tool := false
+## Damage value used for weapon in the Equipment settings.
 @export var weapon_damage := 0
+## Configures defense bonus in the Equipment settings.
 @export var defense_bonus := 0
+## Configures durability max in the Equipment settings.
 @export var durability_max := 0.0
+## ID used to match or reference key in the Equipment settings.
 @export var key_id: StringName
 
 @export_group("Held Transform")
+## Configures held position in the Held Transform settings.
 @export var held_position := Vector3.ZERO
+## Configures held rotation degrees in the Held Transform settings.
 @export var held_rotation_degrees := Vector3.ZERO
+## Scale applied to held in the Held Transform settings.
 @export var held_scale := Vector3.ONE
+## Configures actions in the Held Transform settings.
 @export var actions: Array[Resource] = []
 
 @export_group("Use")
+## Configures HP restore in the Use settings.
 @export var hp_restore := 0.0
+## Configures hunger restore in the Use settings.
 @export var hunger_restore := 0.0
+## Configures energy restore in the Use settings.
 @export var energy_restore := 0.0
+## Duration in seconds for oxygen bonus in the Use settings.
 @export var oxygen_bonus_seconds := 0.0
+## Configures attack bonus in the Use settings.
 @export var attack_bonus := 0
+## Configures defense buff in the Use settings.
 @export var defense_buff := 0
+## Duration in seconds for effect duration in the Use settings.
 @export var effect_duration_seconds := 0.0
 
 

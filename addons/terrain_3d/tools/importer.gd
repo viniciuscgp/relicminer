@@ -4,8 +4,11 @@
 extends Terrain3D
 
 
+## Clears all importer settings and terrain data.
 @export var clear_all: bool = false : set = reset_settings
+## Clears only the current Terrain3D terrain data.
 @export var clear_terrain: bool = false : set = reset_terrain
+## Recalculates min and max height data for all active regions.
 @export var update_height_range: bool = false : set = update_heights
 
 
@@ -39,17 +42,28 @@ func update_heights(p_value) -> void:
 
 
 @export_group("Import File")
+## Height map file used by the importer.
 @export_global_file var height_file_name: String = ""
+## Control map file used by the importer.
 @export_global_file var control_file_name: String = ""
+## Color map file used by the importer.
 @export_global_file var color_file_name: String = ""
+## Terrain region position where imported maps are placed.
 @export var import_position: Vector2i = Vector2i(0, 0) : set = set_import_position
+## Scale applied to imported height data.
 @export var import_scale: float = 1.0
+## Height offset applied while importing.
 @export var height_offset: float = 0.0
+## Source value range used when reading R16 height maps.
 @export var r16_range: Vector2 = Vector2(0, 1)
+## Resolution of the R16 height map being imported.
 @export var r16_size: Vector2i = Vector2i(1024, 1024) : set = set_r16_size
+## Starts the import operation when enabled in the inspector.
 @export var run_import: bool = false : set = start_import
 
+## Directory where imported terrain data will be saved.
 @export_dir var destination_directory: String = ""
+## Saves current terrain data to disk when enabled in the inspector.
 @export var save_to_disk: bool = false : set = save_data
 
 
@@ -98,8 +112,11 @@ func save_data(p_value: bool) -> void:
 
 @export_group("Export File")
 enum { TYPE_HEIGHT, TYPE_CONTROL, TYPE_COLOR }
+## Terrain map type exported by the export operation.
 @export_enum("Height:0", "Control:1", "Color:2") var map_type: int = TYPE_HEIGHT
+## Output file name used by the export operation.
 @export var file_name_out: String = ""
+## Starts the export operation when enabled in the inspector.
 @export var run_export: bool = false : set = start_export
 
 func start_export(p_value: bool) -> void:

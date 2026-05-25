@@ -47,19 +47,25 @@ const FEMALE_CHARACTER_MODEL := &"Female"
 const CHARACTER_MODELS: Array[StringName] = [MALE_CHARACTER_MODEL, FEMALE_CHARACTER_MODEL]
 const LEFT_HAND_SLOT := &"left_hand"
 
+## NodePath used to locate the model root node.
 @export var model_root_path: NodePath = NodePath("../visual/PlayerAnimation"):
 	set(value):
 		model_root_path = value
 		_refresh_animation_player()
 		_notify_animation_map_changed()
+## NodePath used to locate the animation player node.
 @export var animation_player_path: NodePath:
 	set(value):
 		animation_player_path = value
 		_refresh_animation_player()
 		_notify_animation_map_changed()
+## Configures default blend time.
 @export var default_blend_time := 0.12
+## Duration in seconds for action lock.
 @export var action_lock_seconds := 0.45
+## Controls whether warn missing mapped animations is enabled.
 @export var warn_missing_mapped_animations := true
+## Speed value used for underwater drift animation.
 @export_range(0.05, 1.0, 0.05) var underwater_drift_animation_speed := 0.25
 @export_group("Locomotion Speed Matching")
 ## When enabled, walk/run animation speed is scaled from the character's real horizontal movement speed.
@@ -84,36 +90,60 @@ const LEFT_HAND_SLOT := &"left_hand"
 @export var procedural_jump_base_animation: StringName = IDLE
 ## Spine bone used to lean the body during the procedural jump fallback.
 @export var jump_fallback_spine_bone_name: StringName = &"Spine02"
+## Configures jump fallback spine rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_spine_rotation_degrees := Vector3(-4.0, 0.0, 0.0)
 ## Shoulder bones used to open the arms during the procedural jump fallback.
 @export var jump_fallback_left_clavicle_bone_name: StringName = &"L_Clavicle"
+## Configures jump fallback left clavicle rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_clavicle_rotation_degrees := Vector3(0.0, 0.0, 2.0)
+## Name used for jump fallback right clavicle bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_clavicle_bone_name: StringName = &"R_Clavicle"
+## Configures jump fallback right clavicle rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_clavicle_rotation_degrees := Vector3(0.0, 0.0, -2.0)
 ## Arm bones used to create the simple airborne pose.
 @export var jump_fallback_left_upperarm_bone_name: StringName = &"L_Upperarm"
+## Configures jump fallback left upperarm rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_upperarm_rotation_degrees := Vector3(0.0, 0.0, 8.0)
+## Name used for jump fallback right upperarm bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_upperarm_bone_name: StringName = &"R_Upperarm"
+## Configures jump fallback right upperarm rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_upperarm_rotation_degrees := Vector3(0.0, 0.0, -8.0)
+## Name used for jump fallback left forearm bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_forearm_bone_name: StringName = &"L_Forearm"
+## Configures jump fallback left forearm rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_forearm_rotation_degrees := Vector3(0.0, 0.0, 18.0)
+## Name used for jump fallback right forearm bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_forearm_bone_name: StringName = &"R_Forearm"
+## Configures jump fallback right forearm rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_forearm_rotation_degrees := Vector3(0.0, 0.0, -18.0)
 ## Leg bones used to bend the legs during the procedural jump fallback.
 @export var jump_fallback_left_thigh_bone_name: StringName = &"L_Thigh"
+## Configures jump fallback left thigh rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_thigh_rotation_degrees := Vector3(7.0, 0.0, 2.0)
+## Name used for jump fallback right thigh bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_thigh_bone_name: StringName = &"R_Thigh"
+## Configures jump fallback right thigh rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_thigh_rotation_degrees := Vector3(-7.0, 0.0, -2.0)
+## Name used for jump fallback left calf bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_calf_bone_name: StringName = &"L_Calf"
+## Configures jump fallback left calf rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_calf_rotation_degrees := Vector3(-28.0, 0.0, 0.0)
+## Name used for jump fallback right calf bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_calf_bone_name: StringName = &"R_Calf"
+## Configures jump fallback right calf rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_calf_rotation_degrees := Vector3(-28.0, 0.0, 0.0)
+## Name used for jump fallback left foot bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_foot_bone_name: StringName = &"L_Foot"
+## Configures jump fallback left foot rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_left_foot_rotation_degrees := Vector3(8.0, 0.0, 0.0)
+## Name used for jump fallback right foot bone in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_foot_bone_name: StringName = &"R_Foot"
+## Configures jump fallback right foot rotation degrees in the Procedural Jump Fallback settings.
 @export var jump_fallback_right_foot_rotation_degrees := Vector3(8.0, 0.0, 0.0)
 @export_group("Held Pose Override")
+## NodePath used to locate the equipment node in the Held Pose Override settings.
 @export var equipment_path: NodePath = NodePath("../Equipment")
+## NodePath used to locate the skeleton node in the Held Pose Override settings.
 @export var skeleton_path: NodePath = NodePath("../visual/PlayerAnimation/Armature/Skeleton3D")
 
 var animation_map: Dictionary = {

@@ -1,6 +1,7 @@
 extends Node
 class_name RigidBodyPusher
 
+## Speed value used for push.
 @export var push_speed := 1.25
 
 

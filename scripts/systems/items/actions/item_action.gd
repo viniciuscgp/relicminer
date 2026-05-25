@@ -5,7 +5,9 @@ const TRIGGER_PRIMARY := &"primary"
 const TRIGGER_SECONDARY := &"secondary"
 const TRIGGER_THROW := &"throw"
 
+## Configures trigger.
 @export var trigger: StringName = TRIGGER_PRIMARY
+## Name shown to players and editor tools.
 @export var display_name := ""
 
 

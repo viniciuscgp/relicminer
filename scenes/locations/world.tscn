@@ -11375,7 +11375,7 @@ points = PackedVector3Array(-21.300873, -3.1057606, 1758.4055, 548.3058, -3, 113
 
 [node name="Environment" parent="." unique_id=1202088949 instance=ExtResource("6_d6lop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1241.7966, 265.15833, 802.27075)
-current_hour = 8.0
+current_hour = 6.0
 time_scale = 120.0
 clear_min_cloud_coverage = 0.12
 weather_transition_hours = 0.9

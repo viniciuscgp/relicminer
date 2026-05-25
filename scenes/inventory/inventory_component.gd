@@ -7,11 +7,17 @@ signal locked_changed(locked: bool)
 signal item_added(item: Resource, amount: int)
 signal item_removed(item_id: StringName, amount: int)
 
+## Name shown to players and editor tools.
 @export var display_name := "Inventory"
+## Configures capacity slots.
 @export_range(1, 200, 1, "or_greater") var capacity_slots := 16
+## Weight value used for max weight kg.
 @export_range(0.0, 1000.0, 0.01, "or_greater") var max_weight_kg := 0.0
+## Controls whether locked is enabled.
 @export var locked := false
+## ID used to match or reference required key.
 @export var required_key_id: StringName
+## Configures starting items.
 @export var starting_items: Array[Resource] = []
 
 var slots: Array[Resource] = []

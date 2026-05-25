@@ -1,7 +1,9 @@
 extends "res://scripts/systems/items/actions/item_action.gd"
 class_name ThrowItemAction
 
+## Speed value used for throw.
 @export var throw_speed := 9.0
+## Speed value used for upward.
 @export var upward_speed := 1.5
 
 

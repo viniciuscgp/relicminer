@@ -2,16 +2,19 @@
 extends Node3D
 
 
+## Configures marker label.
 @export var marker_label: String = "":
 	set(value):
 		marker_label = value
 		_update_label()
 
+## Configures depth.
 @export_range(0.1, 100.0, 0.1, "or_greater") var depth: float = 3.0:
 	set(value):
 		depth = value
 		_update_label()
 
+## Offset applied to surface.
 @export var surface_offset: float = 0.0:
 	set(value):
 		surface_offset = value

@@ -5,6 +5,7 @@ const CHARACTER_MODEL_META := &"selected_player_character_model"
 const DEFAULT_CHARACTER_MODEL := &"Male"
 const AVAILABLE_CHARACTER_MODELS: Array[StringName] = [&"Male", &"Female"]
 
+## Configures character model.
 @export var character_model: StringName = DEFAULT_CHARACTER_MODEL:
 	set(value):
 		character_model = _normalize_character_model(value)

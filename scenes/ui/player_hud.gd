@@ -1,12 +1,16 @@
 extends CanvasLayer
 
+## NodePath used to locate the player node.
 @export var player_path: NodePath = NodePath("..")
+## Configures update interval.
 @export var update_interval := 0.15
+## NodePath used to locate the underwater environment node.
 @export var underwater_environment_path: NodePath = NodePath("../CameraPivot/SpringArm3D/Camera3D/UnderwaterEnvironment")
 @export_group("World Time")
+## Controls whether world time is shown in the World Time settings.
 @export var show_world_time := true
+## NodePath used to locate the environment node in the World Time settings.
 @export var environment_path: NodePath
-@export var clock_margin := Vector2(56.0, 56.0)
 
 var _stats: Node
 var _inventory: Node
@@ -16,7 +20,7 @@ var _localization_manager: Node
 var _audio_manager: Node
 var _elapsed := 0.0
 
-var _clock: Node2D
+var _clock: CanvasItem
 var _hp_label: Label
 var _energy_label: Label
 var _hunger_label: Label
@@ -41,7 +45,6 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	_position_clock()
 	_elapsed += delta
 	if _elapsed < update_interval:
 		return
@@ -70,15 +73,38 @@ func _resolve_player_links() -> void:
 		_inventory.connect("changed", _refresh)
 
 
-func _resolve_environment() -> void:
+func refresh_after_load() -> void:
+	_resolve_environment(true)
+	_refresh()
+
+
+func _resolve_environment(force_refresh := false) -> void:
+	if force_refresh:
+		_disconnect_environment()
+		_environment = null
 	if not environment_path.is_empty():
 		_environment = get_node_or_null(environment_path)
 	if _environment == null:
 		_environment = _find_environment(get_tree().current_scene)
 	if _environment != null and _environment.has_signal("hour_changed"):
-		_environment.connect("hour_changed", _on_environment_hour_changed)
+		_connect_environment_signal(&"hour_changed", _on_environment_hour_changed)
 	if _environment != null and _environment.has_signal("weather_changed"):
-		_environment.connect("weather_changed", _on_environment_weather_changed)
+		_connect_environment_signal(&"weather_changed", _on_environment_weather_changed)
+
+
+func _connect_environment_signal(signal_name: StringName, callback: Callable) -> void:
+	if _environment == null or _environment.is_connected(signal_name, callback):
+		return
+	_environment.connect(signal_name, callback)
+
+
+func _disconnect_environment() -> void:
+	if _environment == null:
+		return
+	if _environment.has_signal("hour_changed") and _environment.is_connected(&"hour_changed", _on_environment_hour_changed):
+		_environment.disconnect(&"hour_changed", _on_environment_hour_changed)
+	if _environment.has_signal("weather_changed") and _environment.is_connected(&"weather_changed", _on_environment_weather_changed):
+		_environment.disconnect(&"weather_changed", _on_environment_weather_changed)
 
 
 func _find_environment(node: Node) -> Node:
@@ -94,16 +120,16 @@ func _find_environment(node: Node) -> Node:
 
 
 func _resolve_clock() -> void:
-	_clock = get_node_or_null("Clock") as Node2D
+	_clock = get_node_or_null("Clock") as CanvasItem
 
 
 func _resolve_status_ui() -> void:
-	_hp_label = _get_status_caption("HP")
-	_hp_bar = _get_status_value("HP")
-	_hunger_label = _get_status_caption("Hunger")
-	_hunger_bar = _get_status_value("Hunger")
-	_energy_label = _get_status_caption("Energy")
-	_energy_bar = _get_status_value("Energy")
+	_hp_label = _get_status_caption("Stats/HP")
+	_hp_bar = _get_status_value("Stats/HP")
+	_hunger_label = _get_status_caption("Stats/Hunger")
+	_hunger_bar = _get_status_value("Stats/Hunger")
+	_energy_label = _get_status_caption("Stats/Energy")
+	_energy_bar = _get_status_value("Stats/Energy")
 	_configure_status_bar(_hp_bar, Color(0.78, 0.12, 0.1, 0.82))
 	_configure_status_bar(_hunger_bar, Color(0.24, 0.68, 0.24, 0.82))
 	_configure_status_bar(_energy_bar, Color(0.95, 0.68, 0.16, 0.82))
@@ -185,15 +211,6 @@ func _update_world_time() -> void:
 	var hour := float(_environment.get("current_hour"))
 	if _clock.has_method("set_current_hour"):
 		_clock.call("set_current_hour", hour)
-	_position_clock()
-
-
-func _position_clock() -> void:
-	if _clock == null:
-		return
-
-	var viewport_size := get_viewport().get_visible_rect().size
-	_clock.position = Vector2(viewport_size.x - clock_margin.x, viewport_size.y - clock_margin.y)
 
 
 func _set_meter(bar: Range, label: Label, title: String, value: float, maximum: float) -> void:

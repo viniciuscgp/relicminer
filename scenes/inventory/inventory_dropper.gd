@@ -1,12 +1,19 @@
 extends Node
 class_name InventoryDropper
 
+## NodePath used to locate the inventory node.
 @export var inventory_path: NodePath = NodePath("../Inventory")
+## Distance used for drop.
 @export var drop_distance := 1.25
+## Height used for drop.
 @export var drop_height := 0.75
+## Speed value used for drop up.
 @export var drop_up_speed := 0.12
+## Speed value used for drop light forward.
 @export var drop_light_forward_speed := 0.25
+## Speed value used for drop forward.
 @export var drop_forward_speed := 0.75
+## Configures light mass threshold.
 @export var light_mass_threshold := 0.12
 
 @onready var inventory: Node = get_node_or_null(inventory_path)

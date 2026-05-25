@@ -1,78 +1,176 @@
 [gd_scene format=3 uid="uid://bpu4v5el4ayp7"]
 
 [ext_resource type="Script" uid="uid://dpfqk4og5kbjl" path="res://scenes/ui/player_hud.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://bpxhvgetbao5g" path="res://scenes/ui/clock.tscn" id="2_31ty4"]
-[ext_resource type="PackedScene" uid="uid://cc3fqloinn3dm" path="res://scenes/ui/hp.tscn" id="3_hbwp2"]
 [ext_resource type="FontFile" uid="uid://betapt22xusc7" path="res://assets/fonts/Cinzel-Bold.ttf" id="4_nh6vl"]
-[ext_resource type="PackedScene" uid="uid://df6bga75joh7q" path="res://scenes/ui/hunger.tscn" id="4_tfw32"]
-[ext_resource type="PackedScene" uid="uid://c44tp1v315vyy" path="res://scenes/ui/energy.tscn" id="5_nh6vl"]
+[ext_resource type="Texture2D" uid="uid://blwi3hlelcpft" path="res://assets/stats/energy.png" id="5_tfw32"]
+[ext_resource type="Texture2D" uid="uid://dyhchti0ysojl" path="res://assets/stats/hunger.png" id="6_nh6vl"]
+[ext_resource type="Texture2D" uid="uid://dbtkhkpgj1kbk" path="res://assets/stats/hp.png" id="6_tfw32"]
+[ext_resource type="Script" uid="uid://s4ge4a05n1em" path="res://scenes/ui/clock.gd" id="7_3cn05"]
+[ext_resource type="Texture2D" uid="uid://d2q6u63cbtf51" path="res://assets/clocks/clock_handler_small.png" id="8_3cn05"]
+[ext_resource type="Texture2D" uid="uid://2bft67w7ekeh" path="res://assets/clocks/clock_8.png" id="8_bhaj2"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bhaj2"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_3cn05"]
+blend_mode = 1
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=2024289196]
 layer = 10
 script = ExtResource("1")
-clock_margin = Vector2(100, 100)
-metadata/_edit_vertical_guides_ = [317.0, 18.0]
+metadata/_edit_vertical_guides_ = [317.0, 18.0, 143.0, 297.0]
 
-[node name="Clock" parent="." unique_id=1303657953 instance=ExtResource("2_31ty4")]
-position = Vector2(1170, 609)
-scale = Vector2(0.18, 0.18)
+[node name="Stats" type="CanvasLayer" parent="." unique_id=1211599538]
 
-[node name="HP" parent="." unique_id=1308961528 instance=ExtResource("3_hbwp2")]
-position = Vector2(167.10002, 579.00006)
-scale = Vector2(0.14322768, 0.1471573)
+[node name="Hunger" type="TextureRect" parent="Stats" unique_id=804241178]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -50.0
+offset_right = 318.0
+offset_bottom = -5.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+texture = ExtResource("6_nh6vl")
+expand_mode = 2
+stretch_mode = 4
 
-[node name="Caption" type="Label" parent="HP" unique_id=1901913132]
-offset_left = -712.8512
-offset_top = -67.954865
-offset_right = -300.91965
-offset_bottom = 56.045135
+[node name="Caption" type="Label" parent="Stats/Hunger" unique_id=683819786]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 9.0
+offset_right = 115.0
+offset_bottom = 34.0
 theme_override_fonts/font = ExtResource("4_nh6vl")
-theme_override_font_sizes/font_size = 90
-text = "HP"
-
-[node name="Value" type="TextureProgressBar" parent="HP" unique_id=505515288]
-offset_left = -147.31804
-offset_top = -67.954956
-offset_right = 879.01984
-offset_bottom = 54.36316
-value = 100.0
-
-[node name="Hunger" parent="." unique_id=1599198450 instance=ExtResource("4_tfw32")]
-position = Vector2(167.74089, 664.70746)
-scale = Vector2(0.14340772, 0.15291165)
-
-[node name="Caption" type="Label" parent="Hunger" unique_id=683819786]
-offset_left = -712.8512
-offset_top = -67.954865
-offset_right = -300.91965
-offset_bottom = 56.045135
-theme_override_fonts/font = ExtResource("4_nh6vl")
-theme_override_font_sizes/font_size = 90
+theme_override_font_sizes/font_size = 16
 text = "Hungry"
+vertical_alignment = 1
+metadata/_edit_lock_ = true
 
-[node name="Value" type="TextureProgressBar" parent="Hunger" unique_id=111121971]
-offset_left = -147.31804
-offset_top = -67.954956
-offset_right = 879.01984
-offset_bottom = 54.36316
+[node name="Value" type="TextureProgressBar" parent="Stats/Hunger" unique_id=111121971]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 12.0
+offset_right = 277.0
+offset_bottom = 29.0
 value = 100.0
+rounded = true
+metadata/_edit_lock_ = true
 
-[node name="Energy" parent="." unique_id=1240466784 instance=ExtResource("5_nh6vl")]
-position = Vector2(167.10005, 622)
-scale = Vector2(0.143, 0.145)
+[node name="Energy" type="TextureRect" parent="Stats" unique_id=16804960]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -91.0
+offset_right = 337.0
+offset_bottom = -48.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+texture = ExtResource("5_tfw32")
+expand_mode = 2
+stretch_mode = 4
 
-[node name="Caption" type="Label" parent="Energy" unique_id=1451715569]
-offset_left = -712.8512
-offset_top = -67.954865
-offset_right = -300.91965
-offset_bottom = 56.045135
+[node name="Caption" type="Label" parent="Stats/Energy" unique_id=1451715569]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 9.0
+offset_right = 117.0
+offset_bottom = 34.0
 theme_override_fonts/font = ExtResource("4_nh6vl")
-theme_override_font_sizes/font_size = 90
+theme_override_font_sizes/font_size = 16
 text = "Energy"
+vertical_alignment = 1
+metadata/_edit_lock_ = true
 
-[node name="Value" type="TextureProgressBar" parent="Energy" unique_id=2891036]
-offset_left = -147.31804
-offset_top = -67.954956
-offset_right = 879.01984
-offset_bottom = 54.36316
+[node name="Value" type="TextureProgressBar" parent="Stats/Energy" unique_id=2891036]
+layout_mode = 0
+offset_left = 126.0
+offset_top = 13.0
+offset_right = 279.0
+offset_bottom = 29.318115
 value = 100.0
+rounded = true
+metadata/_edit_lock_ = true
+
+[node name="HP" type="TextureRect" parent="Stats" unique_id=1235626157]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -134.0
+offset_right = 318.0
+offset_bottom = -90.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+texture = ExtResource("6_tfw32")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="Caption" type="Label" parent="Stats/HP" unique_id=1901913132]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 10.0
+offset_right = 102.0
+offset_bottom = 35.0
+theme_override_fonts/font = ExtResource("4_nh6vl")
+theme_override_font_sizes/font_size = 16
+text = "HP"
+vertical_alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="Value" type="TextureProgressBar" parent="Stats/HP" unique_id=505515288]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 12.0
+offset_right = 280.0
+offset_bottom = 30.0
+value = 100.0
+rounded = true
+metadata/_edit_lock_ = true
+
+[node name="Clock" type="Control" parent="." unique_id=234539439]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -48.821167
+offset_top = -51.196167
+offset_right = -8.821167
+offset_bottom = -11.196167
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.5, 0.5)
+script = ExtResource("7_3cn05")
+
+[node name="clock" type="TextureRect" parent="Clock" unique_id=36899424]
+modulate = Color(1.2378781, 1.2502502, 1.2446828, 0.6784314)
+self_modulate = Color(1, 0.99334645, 0.6494981, 1)
+material = SubResource("CanvasItemMaterial_bhaj2")
+layout_mode = 0
+offset_left = -185.094
+offset_top = -177.42615
+offset_right = 151.8982
+offset_bottom = 77.82312
+texture = ExtResource("8_bhaj2")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="handle" type="TextureRect" parent="Clock/clock" unique_id=783063350]
+modulate = Color(1, 0.4299941, 0.19353199, 1)
+self_modulate = Color(3.0964003, 2.9769158, 0.7067128, 1)
+material = SubResource("CanvasItemMaterial_3cn05")
+layout_mode = 0
+offset_left = 114.16528
+offset_top = 109.41321
+offset_right = 224.27979
+offset_bottom = 145.87622
+pivot_offset = Vector2(14.770264, 16.34314)
+texture = ExtResource("8_3cn05")
+expand_mode = 2
+stretch_mode = 4

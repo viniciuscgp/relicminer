@@ -55,8 +55,10 @@ extends Node3D
 		_create_grid()
 
 
+## Number of particle grid rows calculated for the current settings.
 @export_storage var rows: int = 1
 
+## Total particle amount distributed across generated particle nodes.
 @export_storage var amount: int = 1:
 	set(value):
 		amount = value
@@ -66,6 +68,7 @@ extends Node3D
 			p.amount = amount
 
 
+## Fixed FPS used by generated particle processors.
 @export_range(1, 256, 1) var process_fixed_fps: int = 30:
 	set(value):
 		process_fixed_fps = maxi(value, 1)
@@ -80,6 +83,7 @@ extends Node3D
 ## The mesh that each particle will render
 @export var mesh: Mesh
 
+## Shadow casting mode assigned to each generated particle node.
 @export var shadow_mode: GeometryInstance3D.ShadowCastingSetting = (
 		GeometryInstance3D.ShadowCastingSetting.SHADOW_CASTING_SETTING_ON):
 	set(value):

@@ -9,32 +9,53 @@ signal level_changed(level: int)
 signal died
 signal message_requested(text: String)
 
+## NodePath used to locate the inventory node.
 @export var inventory_path: NodePath
 
 @export_group("Level")
+## Configures level in the Level settings.
 @export_range(1, 100, 1, "or_greater") var level := 1
+## Configures XP in the Level settings.
 @export var xp := 0
 
 @export_group("Base Stats")
+## Configures base max HP in the Base Stats settings.
 @export var base_max_hp     := 100.0
+## Configures base attack in the Base Stats settings.
 @export var base_attack     := 5
+## Configures base defense in the Base Stats settings.
 @export var base_defense    := 1
+## Energy or light intensity used for base max in the Base Stats settings.
 @export var base_max_energy := 100.0
+## Configures max hunger in the Base Stats settings.
 @export var max_hunger      := 100.0
+## Duration in seconds for base oxygen in the Base Stats settings.
 @export var base_oxygen_seconds     := 10.0
+## Weight value used for base comfort weight kg in the Base Stats settings.
 @export var base_comfort_weight_kg  := 22.0
+## Weight value used for base absolute weight kg in the Base Stats settings.
 @export var base_absolute_weight_kg := 32.0
 
 @export_group("Survival Rates")
+## Configures hunger drain per second in the Survival Rates settings.
 @export var hunger_drain_per_second         := 0.015
+## Multiplier applied to moving hunger in the Survival Rates settings.
 @export var moving_hunger_multiplier        := 3.0
+## Multiplier applied to swimming hunger in the Survival Rates settings.
 @export var swimming_hunger_multiplier      := 4.0
+## Configures hunger damage per second in the Survival Rates settings.
 @export var hunger_damage_per_second        := 1.0
+## Configures energy recovery per second in the Survival Rates settings.
 @export var energy_recovery_per_second      := 18.0
+## Configures moving energy cost per second in the Survival Rates settings.
 @export var moving_energy_cost_per_second   := 0.0
+## Configures running energy cost per second in the Survival Rates settings.
 @export var running_energy_cost_per_second  := 14.0
+## Configures swimming energy cost per second in the Survival Rates settings.
 @export var swimming_energy_cost_per_second := 8.0
+## Duration in seconds for drowning damage first in the Survival Rates settings.
 @export var drowning_damage_first_seconds   := 5.0
+## Duration in seconds for drowning damage late in the Survival Rates settings.
 @export var drowning_damage_late_seconds    := 10.0
 
 var current_hp     := 0.0

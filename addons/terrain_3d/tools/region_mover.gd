@@ -14,7 +14,9 @@
 extends Terrain3D
 
 
+## Region offset applied when moving Terrain3D regions.
 @export var offset: Vector2i
+## Runs the region move/rename operation when enabled in the inspector.
 @export var run: bool = false : set = start_rename
 
 
