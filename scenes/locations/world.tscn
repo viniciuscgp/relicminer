@@ -18,6 +18,8 @@
 [ext_resource type="Material" uid="uid://dkxtwx1c8r7nh" path="res://addons/relic_road_tools/water_surface.tres" id="16_vdlkt"]
 [ext_resource type="Resource" path="res://resources/items/weak_healing_potion.tres" id="17_dwhbb"]
 [ext_resource type="PackedScene" uid="uid://b1b141erxdkyq" path="res://scenes/buildings/bridge.tscn" id="18_y6k2x"]
+[ext_resource type="PackedScene" uid="uid://yt0pc4n682y6" path="res://scenes/buildings/bridge_simple.tscn" id="19_8wbvp"]
+[ext_resource type="PackedScene" uid="uid://cev7haxedgsl6" path="res://scenes/buildings/bridge_broken.tscn" id="20_wdctj"]
 
 [sub_resource type="Gradient" id="Gradient_cqucs"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -11436,10 +11438,9 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." unique_id=817496980 instance=ExtResource("5_1llb7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 341.46274, 0.7765527, 2099.9636)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 459.58148, 10.755857, 1838.2351)
 
 [node name="Markers" type="Node3D" parent="." unique_id=980118374]
-visible = false
 
 [node name="LandMakers" type="Node3D" parent="Markers" unique_id=209163618]
 
@@ -22671,5 +22672,11 @@ starting_items = Array[Resource]([ExtResource("17_dwhbb")])
 
 [node name="Buildings" type="Node3D" parent="." unique_id=1950341038]
 
-[node name="Bridge" parent="." unique_id=376669443 instance=ExtResource("18_y6k2x")]
+[node name="Bridge" parent="Buildings" unique_id=376669443 instance=ExtResource("18_y6k2x")]
 transform = Transform3D(0.77176887, 0, -0.6359031, 0, 1, 0, 0.6359031, 0, 0.77176887, 212.4429, -3.6916027, 2067.7139)
+
+[node name="BridgeSimple" parent="Buildings" unique_id=455067314 instance=ExtResource("19_8wbvp")]
+transform = Transform3D(0.6920802, 0, -0.7218206, 0, 1, 0, 0.7218206, 0, 0.6920802, 1566.6843, -2.3661776, -58.59645)
+
+[node name="BridgeSimple2" parent="Buildings" unique_id=2017652181 instance=ExtResource("20_wdctj")]
+transform = Transform3D(-0.508544, 0.0027134106, 0.8610318, 0.012251956, 0.9999165, 0.004085186, -0.8609489, 0.01262682, -0.50853485, 454.38162, 4.813238, 1821.5272)
