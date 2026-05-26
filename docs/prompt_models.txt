@@ -1,0 +1,12 @@
+Madeira:
+
+1) Create a stylized low-poly medieval wooden [OBJECT NAME] for a fantasy village game, 
+clean 3D asset render, chunky wooden construction, simple angular shapes, carved wood details, 
+warm brown material, slightly worn edges, game-ready prop, isolated on a light neutral background, 
+soft studio lighting, no text, no characters.
+Não crie ranhuras na madeira pois ficam parecendo gravetos
+
+2) Crie as imagens para usar como textura para este modelo.
+
+3) Crie o script em pyton para o blender criar o modelo aplicando essa imagem
+

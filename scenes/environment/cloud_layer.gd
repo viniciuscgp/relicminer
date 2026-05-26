@@ -13,6 +13,10 @@ class_name CloudLayer
 @export_range(0.0, 1.0, 0.001) var slow_drift_variation := 0.45
 ## Velocidade da variacao lenta do vento. Menor significa ciclos mais longos.
 @export_range(0.0, 0.2, 0.001) var slow_drift_variation_speed := 0.018
+## Velocidade minima de vento visual quando existe nuvem. Evita nuvens paradas quando o clima sorteia vento muito baixo.
+@export_range(0.0, 2.0, 0.01) var minimum_drift_wind_speed := 0.35
+## Escala aplicada ao deslocamento da textura procedural. Aumente se a nuvem parecer parada mesmo com vento.
+@export_range(0.0, 2.0, 0.01) var texture_drift_scale := 0.55
 ## Opacidade maxima das nuvens no pico de cobertura.
 @export_range(0.0, 1.0, 0.01) var max_opacity := 0.92
 ## Opacidade minima quando existe alguma cobertura. Evita que nuvens sorteadas baixas fiquem invisiveis.
@@ -21,6 +25,12 @@ class_name CloudLayer
 @export_range(0.05, 1.0, 0.01) var visibility_threshold_max := 0.45
 ## Quanto as nuvens ficam mais cinzas durante noite/clima escuro.
 @export_range(0.0, 1.0, 0.01) var night_shadow_strength := 0.78
+## Ponto vertical da cupula onde a nuvem comeca a aparecer perto do horizonte.
+@export_range(0.0, 0.2, 0.001) var horizon_fade_start := 0.0
+## Ponto vertical da cupula onde a nuvem chega na opacidade normal perto do horizonte.
+@export_range(0.001, 0.3, 0.001) var horizon_fade_end := 0.045
+## Reforco de massa das nuvens na parte baixa do ceu para nao ficarem concentradas so no topo.
+@export_range(0.0, 0.25, 0.001) var lower_sky_density_boost := 0.08
 
 const DOME_RINGS := 28
 const DOME_SEGMENTS := 112
@@ -50,6 +60,10 @@ func apply_runtime_settings(settings: Dictionary) -> void:
 		slow_drift_variation = float(settings.get("slow_drift_variation"))
 	if settings.has("slow_drift_variation_speed"):
 		slow_drift_variation_speed = float(settings.get("slow_drift_variation_speed"))
+	if settings.has("minimum_drift_wind_speed"):
+		minimum_drift_wind_speed = float(settings.get("minimum_drift_wind_speed"))
+	if settings.has("texture_drift_scale"):
+		texture_drift_scale = float(settings.get("texture_drift_scale"))
 	if settings.has("max_opacity"):
 		max_opacity = float(settings.get("max_opacity"))
 	if settings.has("min_visible_opacity"):
@@ -58,6 +72,12 @@ func apply_runtime_settings(settings: Dictionary) -> void:
 		visibility_threshold_max = float(settings.get("visibility_threshold_max"))
 	if settings.has("night_shadow_strength"):
 		night_shadow_strength = float(settings.get("night_shadow_strength"))
+	if settings.has("horizon_fade_start"):
+		horizon_fade_start = float(settings.get("horizon_fade_start"))
+	if settings.has("horizon_fade_end"):
+		horizon_fade_end = float(settings.get("horizon_fade_end"))
+	if settings.has("lower_sky_density_boost"):
+		lower_sky_density_boost = float(settings.get("lower_sky_density_boost"))
 
 	if should_rebuild and is_node_ready():
 		_build_layer()
@@ -72,8 +92,12 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_drift_time += delta
 	var drift_variation := lerpf(1.0 - slow_drift_variation, 1.0, (sin(_drift_time * TAU * slow_drift_variation_speed) + 1.0) * 0.5)
-	var drift_speed := _wind_speed * drift_speed_multiplier * drift_variation
+	var effective_wind_speed := _wind_speed
+	if _coverage > 0.015:
+		effective_wind_speed = maxf(effective_wind_speed, minimum_drift_wind_speed)
+	var drift_speed := effective_wind_speed * drift_speed_multiplier * drift_variation * texture_drift_scale
 	_wind_offset += _wind_direction.normalized() * drift_speed * delta
+	_wind_offset = Vector2(wrapf(_wind_offset.x, -1000.0, 1000.0), wrapf(_wind_offset.y, -1000.0, 1000.0))
 
 	if follow_camera:
 		var camera := get_viewport().get_camera_3d()
@@ -147,7 +171,7 @@ func _build_cloud_material() -> ShaderMaterial:
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
-render_mode unshaded, cull_back, depth_draw_never, blend_mix;
+render_mode unshaded, cull_disabled, depth_draw_never, blend_mix;
 
 uniform sampler2D cloud_noise : repeat_enable, filter_linear_mipmap;
 uniform vec4 cloud_color : source_color = vec4(1.0);
@@ -156,6 +180,9 @@ uniform float coverage = 0.0;
 uniform float opacity = 0.0;
 uniform float softness = 0.18;
 uniform float contrast = 1.18;
+uniform float horizon_fade_start = 0.0;
+uniform float horizon_fade_end = 0.045;
+uniform float lower_sky_density_boost = 0.08;
 
 void fragment() {
 	vec2 uv = UV;
@@ -170,9 +197,12 @@ void fragment() {
 	cloud = pow(cloud, contrast);
 
 	float clamped_coverage = clamp(coverage, 0.0, 1.0);
-	float threshold = mix(0.68, 0.22, clamped_coverage);
-	float mask = smoothstep(threshold, threshold + softness, cloud);
-	float horizon_fade = smoothstep(0.015, 0.13, uv.y);
+	float threshold = mix(0.63, 0.20, clamped_coverage);
+	float low_sky_factor = 1.0 - smoothstep(0.05, 0.36, uv.y);
+	float local_threshold = threshold - lower_sky_density_boost * low_sky_factor;
+	float mask = smoothstep(local_threshold, local_threshold + softness, cloud);
+	float fade_end = max(horizon_fade_start + 0.001, horizon_fade_end);
+	float horizon_fade = smoothstep(horizon_fade_start, fade_end, uv.y);
 	float zenith_fade = 1.0 - smoothstep(0.96, 1.0, uv.y) * 0.12;
 	float alpha = mask * horizon_fade * zenith_fade * opacity;
 
@@ -221,9 +251,11 @@ func _update_shader_parameters() -> void:
 	if _material == null:
 		return
 
-	var wind_uv := _wind_offset / maxf(size, 1.0)
-	_material.set_shader_parameter("wind_offset", wind_uv)
+	_material.set_shader_parameter("wind_offset", _wind_offset)
 	_material.set_shader_parameter("coverage", _coverage)
 	_material.set_shader_parameter("opacity", _opacity)
 	_material.set_shader_parameter("cloud_color", _cloud_color)
 	_material.set_shader_parameter("softness", lerpf(0.24, 0.10, clampf(_coverage, 0.0, 1.0)))
+	_material.set_shader_parameter("horizon_fade_start", horizon_fade_start)
+	_material.set_shader_parameter("horizon_fade_end", horizon_fade_end)
+	_material.set_shader_parameter("lower_sky_density_boost", lower_sky_density_boost)

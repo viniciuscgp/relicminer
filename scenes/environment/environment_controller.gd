@@ -83,6 +83,10 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.0, 1.0, 0.001) var cloud_slow_drift_variation := 0.473
 ## Velocidade da variacao lenta do vento.
 @export_range(0.0, 0.2, 0.001) var cloud_slow_drift_variation_speed := 0.054
+## Velocidade minima de vento visual usada pelas nuvens quando o clima sorteia vento muito baixo.
+@export_range(0.0, 2.0, 0.01) var cloud_minimum_drift_wind_speed := 0.35
+## Escala aplicada ao movimento da textura procedural das nuvens.
+@export_range(0.0, 2.0, 0.01) var cloud_texture_drift_scale := 0.55
 ## Opacidade maxima das nuvens no pico de cobertura.
 @export_range(0.0, 1.0, 0.01) var cloud_max_opacity := 0.98
 ## Opacidade minima quando existe alguma cobertura.
@@ -91,6 +95,12 @@ signal weather_changed(weather_id: StringName)
 @export_range(0.05, 1.0, 0.01) var cloud_visibility_threshold_max := 0.45
 ## Quanto as nuvens ficam mais cinzas durante noite/clima escuro.
 @export_range(0.0, 1.0, 0.01) var cloud_night_shadow_strength := 0.78
+## Ponto vertical onde a nuvem comeca a aparecer perto do horizonte.
+@export_range(0.0, 0.2, 0.001) var cloud_horizon_fade_start := 0.0
+## Ponto vertical onde a nuvem chega na opacidade normal perto do horizonte.
+@export_range(0.001, 0.3, 0.001) var cloud_horizon_fade_end := 0.045
+## Reforco de massa das nuvens na parte baixa do ceu.
+@export_range(0.0, 0.25, 0.001) var cloud_lower_sky_density_boost := 0.08
 
 @export_group("Night Darkness")
 ## Luz ambiente minima durante a noite. Menor deixa tochas mais importantes; maior deixa a noite mais legivel.
@@ -526,10 +536,15 @@ func _apply_cloud_layer_settings() -> void:
 		"drift_speed_multiplier": cloud_drift_speed_multiplier,
 		"slow_drift_variation": cloud_slow_drift_variation,
 		"slow_drift_variation_speed": cloud_slow_drift_variation_speed,
+		"minimum_drift_wind_speed": cloud_minimum_drift_wind_speed,
+		"texture_drift_scale": cloud_texture_drift_scale,
 		"max_opacity": cloud_max_opacity,
 		"min_visible_opacity": cloud_min_visible_opacity,
 		"visibility_threshold_max": cloud_visibility_threshold_max,
 		"night_shadow_strength": cloud_night_shadow_strength,
+		"horizon_fade_start": cloud_horizon_fade_start,
+		"horizon_fade_end": cloud_horizon_fade_end,
+		"lower_sky_density_boost": cloud_lower_sky_density_boost,
 	}
 	_cloud_layer.call("apply_runtime_settings", settings)
 
